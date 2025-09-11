@@ -1,7 +1,7 @@
 import { useHeader } from "@/contexts";
 import { useViewportWidth } from "@/hooks/useViewport";
 import { getLabelFromPath } from "@/utils/aria";
-import { Home, LucideOctagonX, Settings } from "lucide-react";
+import { LayoutDashboard, LucideOctagonX, Settings } from "lucide-react";
 import { motion } from "motion/react";
 import { Link, useLocation } from "react-router";
 import { useClickOutside } from "@/hooks/useEventListener";
@@ -22,7 +22,7 @@ export const Sidebar = () => {
   useClickOutside(headerRef, () => !isDesktop && setSidebar(false));
 
   const pages: Pages = [
-    { path: "/", label: "Dashboard", icon: <Home size={19} /> },
+    { path: "/", label: "Dashboard", icon: <LayoutDashboard size={19} /> },
     { path: "/settings", label: "Settings", icon: <Settings size={19} /> },
   ];
 
@@ -33,7 +33,7 @@ export const Sidebar = () => {
       <motion.div
         id="sidebar"
         ref={sidebarRef}
-        className="fixed h-dvh bg-sidebar-accent overflow-hidden"
+        className="fixed h-dvh bg-sidebar overflow-hidden"
         style={{ top: isDesktop ? 0 : headerHeight }}
         initial={{ left: "-50%" }}
         animate={{
@@ -93,31 +93,44 @@ export const Sidebar = () => {
             animate={{
               x: logoOnly ? -300 : 0,
               opacity: logoOnly ? 0 : 1,
+              visibility: logoOnly ? "hidden" : "visible",
             }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
           >
-            {pages.map(({ icon, label, path }) => (
-              <Link
-                key={path}
-                to={path}
-                className={clsx(
-                  "relative h-15 flex items-center focus:outline-0 focus:bg-sidebar-accent-foreground/10 hover:bg-sidebar-accent-foreground/10 transition-all duration-200"
-                )}
-                onClick={() => setSidebar((prev) => isDesktop && prev)}
-                aria-label={getLabelFromPath(path)}
-              >
-                {location.pathname === path && (
-                  <motion.div
-                    layoutId="page-nav-highlight"
-                    transition={{ duration: 0.2 }}
-                    className="absolute bg-sidebar-accent-foreground w-1 h-full rounded-r-md"
-                  ></motion.div>
-                )}
-                <div className="px-5 flex gap-2 items-center">
-                  {icon}
-                  <span className="font-bold text-[14px]">{label}</span>
-                </div>
-              </Link>
+            {pages.map(({ icon, label, path }, idx) => (
+              <div key={path}>
+                <Link
+                  to={path}
+                  className={clsx(
+                    "relative h-15 flex items-center focus:outline-0 focus:bg-sidebar-accent-foreground/10 hover:bg-sidebar-accent-foreground/10 transition-all duration-200",
+                    location.pathname === path && "bg-sidebar-accent-foreground/15"
+                  )}
+                  onClick={(e) => {
+                    if (location.pathname === path) {
+                      window.scrollTo({
+                        top: 0,
+                        behavior: "smooth",
+                      });
+                    }
+                    setSidebar((prev) => isDesktop && prev);
+                    e.currentTarget.blur();
+                  }}
+                  aria-label={location.pathname === path ? `Back to top page of ${getLabelFromPath(path).toLowerCase()}` : getLabelFromPath(path)}
+                >
+                  {location.pathname === path && (
+                    <motion.div
+                      layoutId="page-nav-highlight"
+                      transition={{ duration: 0.2 }}
+                      className="absolute bg-sidebar-accent-foreground w-1 h-full rounded-r-md"
+                    />
+                  )}
+                  <div className="px-5 flex gap-2 items-center">
+                    {icon}
+                    <span className="font-bold text-[14px]">{label}</span>
+                  </div>
+                </Link>
+                {idx !== pages.length - 1 && <div role="separator" className="w-full h-[1px] bg-sidebar-accent-foreground/30" />}
+              </div>
             ))}
           </motion.div>
 
@@ -126,6 +139,7 @@ export const Sidebar = () => {
             animate={{
               opacity: logoOnly ? 1 : 0,
               x: logoOnly ? 0 : 300,
+              visibility: logoOnly ? "visible" : "hidden",
             }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
           >
@@ -147,7 +161,7 @@ export const Sidebar = () => {
                     layoutId="page-nav-highlight-logo"
                     transition={{ duration: 0.2 }}
                     className="absolute -left-4 bg-sidebar-accent-foreground w-1 h-8 rounded-r-md"
-                  ></motion.div>
+                  />
                 )}
               </Link>
             ))}

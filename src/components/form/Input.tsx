@@ -109,7 +109,8 @@ export const Input = ({
           onFocus={() => {
             setIsFocus(true);
           }}
-          onBlur={() => {
+          onBlur={(e) => {
+            if (e.relatedTarget?.closest(`.${label}-suggestions`)) return;
             if (internalValue !== "") return;
             setIsFocus(false);
           }}
@@ -154,7 +155,6 @@ export const Input = ({
           <div
             className={endClass}
             onClick={() => {
-              console.debug("masuk");
               handleChange("");
               ref.current?.focus();
               setIsFocus(true);
@@ -167,7 +167,16 @@ export const Input = ({
         <StartEnd {...{ start, end, setPadding }} />
         {error && <p className="absolute text-red-500 text-[12px] text-start">{error}</p>}
         <AnimatePresence>
-          {isSuggestOpen && type !== "password" && <Suggestion max={5} inputRef={ref} source={suggestion} setValue={(val) => onValueChange?.(val)} />}
+          {isSuggestOpen && type !== "password" && (
+            <Suggestion
+              className={`${label}-suggestions`}
+              max={5}
+              inputRef={ref}
+              source={suggestion}
+              setValue={(val) => onValueChange?.(val)}
+              setIsFocus={setIsFocus}
+            />
+          )}
         </AnimatePresence>
       </div>
     </>

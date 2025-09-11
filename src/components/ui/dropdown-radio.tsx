@@ -56,7 +56,12 @@ export const DropdownRadio = ({
         <DropdownMenuSeparator {...separatorProps} />
         <DropdownMenuRadioGroup onValueChange={onValueChange} {...radioGroupProps}>
           {items.map(({ label, ...rest }, idx) => (
-            <DropdownMenuRadioItem key={typeof label === "string" ? label : `idx-${idx}`} className="cursor-pointer" {...radioItemProps} {...rest}>
+            <DropdownMenuRadioItem
+              key={typeof label === "string" ? label : `idx-${idx}`}
+              className="cursor-pointer hover:bg-popover-foreground/10 focus:bg-popover-foreground/10 focus:text-foreground"
+              {...radioItemProps}
+              {...rest}
+            >
               {label}
             </DropdownMenuRadioItem>
           ))}

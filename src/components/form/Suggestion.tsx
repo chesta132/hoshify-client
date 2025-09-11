@@ -17,9 +17,10 @@ export type SuggestionProps = {
   source: SuggestionSource;
   setValue: (suggestion: string) => void;
   max?: number;
+  setIsFocus: React.Dispatch<React.SetStateAction<boolean>>;
 } & HTMLMotionProps<"ul">;
 
-export const Suggestion = ({ inputRef, source, setValue, className, style, max, ...wrapperProps }: SuggestionProps) => {
+export const Suggestion = ({ inputRef, source, setValue, className, style, max, setIsFocus, ...wrapperProps }: SuggestionProps) => {
   const [position, setPosition] = useState({ left: 0, top: 0, width: 0, height: 0 });
   const [highlight, setHighlight] = useState<null | number>(null);
 
@@ -46,7 +47,9 @@ export const Suggestion = ({ inputRef, source, setValue, className, style, max, 
     };
   }, [inputRef]);
 
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement | HTMLLIElement, MouseEvent>) => {
+  const handleClick = (
+    e: React.MouseEvent<HTMLButtonElement | HTMLLIElement, MouseEvent> | React.KeyboardEvent<HTMLButtonElement | HTMLLIElement>
+  ) => {
     e.stopPropagation();
     e.preventDefault();
     inputRef.current?.focus();
@@ -77,6 +80,7 @@ export const Suggestion = ({ inputRef, source, setValue, className, style, max, 
           });
           return;
         case "Enter":
+        case " ":
           setHighlight((highlight) => {
             if (highlight !== null) {
               e.preventDefault();
@@ -84,6 +88,7 @@ export const Suggestion = ({ inputRef, source, setValue, className, style, max, 
                 const { action, suggestion } = source[highlight];
                 action(suggestion);
                 inputRef.current?.blur();
+                setIsFocus(false);
               });
             }
             return highlight;
@@ -98,7 +103,7 @@ export const Suggestion = ({ inputRef, source, setValue, className, style, max, 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [inputRef, setValue, source]);
+  }, [inputRef, setIsFocus, setValue, source]);
 
   return (
     <>
@@ -120,70 +125,84 @@ export const Suggestion = ({ inputRef, source, setValue, className, style, max, 
       >
         {source
           .filter((_, idx) => max == null || idx < max)
-          .map(({ action, suggestion, deletes, icon }, idx) => (
-            <motion.li
-              key={suggestion}
-              onMouseDown={(e) => {
-                handleClick(e);
-                queueMicrotask(() => action(suggestion));
-                inputRef.current?.blur();
-              }}
-              className="flex justify-between p-2 items-center cursor-pointer hover:bg-popover-foreground/10 transition-all relative overflow-hidden border-b border-b-popover-foreground/10"
-              role="option"
-            >
-              <AnimatePresence>
-                {highlight === idx && (
-                  <>
-                    <motion.div
-                      transition={{ type: "keyframes", ease: "easeInOut", duration: 0.2 }}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 100 }}
-                      exit={{ opacity: 0 }}
-                      layoutId="suggestion-left-highlight"
-                      className="bg-popover-foreground/50 absolute left-0 h-1/2 w-0.5"
-                    />
-                    <motion.div
-                      layoutId={"suggestion-highlight"}
-                      transition={{ type: "keyframes", ease: "easeInOut", duration: 0.2 }}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 100 }}
-                      exit={{ opacity: 0 }}
-                      className="bg-popover-foreground/10 absolute h-full w-full left-0"
-                    />
-                  </>
-                )}
-              </AnimatePresence>
-              <div className="flex gap-2 items-center">
-                {icon}
-                <span className="text-[13.5px]">{ellipsis(suggestion, { width: { px: position.width - 100, fontSize: 13.5 } })}</span>
-              </div>
-              <div className="flex gap-1">
-                <Button
-                  aria-label="Delete suggestion"
-                  type="button"
-                  variant={"ghost"}
-                  size={"icon"}
-                  onMouseDown={(e) => {
-                    handleClick(e);
-                    deletes(suggestion);
-                  }}
-                >
-                  <Trash2 />
-                </Button>
-                <Button
-                  type="button"
-                  variant={"ghost"}
-                  size={"icon"}
-                  onMouseDown={(e) => {
-                    handleClick(e);
-                    setValue(suggestion);
-                  }}
-                >
-                  <ArrowUpLeft />
-                </Button>
-              </div>
-            </motion.li>
-          ))}
+          .map(({ action, suggestion, deletes, icon }, idx) => {
+            type ButtonEvent = React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLButtonElement>;
+            const acceptableKey = ["Enter", " "];
+
+            const act = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
+              handleClick(e);
+              queueMicrotask(() => action(suggestion));
+              inputRef.current?.blur();
+              setIsFocus(false);
+            };
+
+            const del = (e: ButtonEvent) => {
+              if ((e as React.KeyboardEvent<HTMLButtonElement>)?.key) {
+                if (!acceptableKey.includes((e as any).key)) {
+                  return;
+                }
+              }
+              handleClick(e);
+              deletes(suggestion);
+            };
+
+            const insert = (e: ButtonEvent) => {
+              if ((e as React.KeyboardEvent<HTMLButtonElement>)?.key) {
+                if (!acceptableKey.includes((e as any).key)) {
+                  return;
+                }
+              }
+              handleClick(e);
+              setValue(suggestion);
+            };
+
+            return (
+              <motion.li
+                key={suggestion}
+                onMouseDown={act}
+                className="flex justify-between p-2 items-center cursor-pointer hover:bg-popover-foreground/10 focus:outline-0 transition-all relative overflow-hidden border-b border-b-popover-foreground/10"
+                role="option"
+                tabIndex={0}
+                onFocus={() => setHighlight(idx)}
+                onBlur={() => setHighlight(null)}
+              >
+                <AnimatePresence>
+                  {highlight === idx && (
+                    <>
+                      <motion.div
+                        transition={{ type: "keyframes", ease: "easeInOut", duration: 0.2 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 100 }}
+                        exit={{ opacity: 0 }}
+                        layoutId="suggestion-left-highlight"
+                        className="bg-popover-foreground/50 absolute left-0 h-1/2 w-0.5"
+                      />
+                      <motion.div
+                        layoutId={"suggestion-highlight"}
+                        transition={{ type: "keyframes", ease: "easeInOut", duration: 0.2 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 100 }}
+                        exit={{ opacity: 0 }}
+                        className="bg-popover-foreground/10 absolute h-full w-full left-0"
+                      />
+                    </>
+                  )}
+                </AnimatePresence>
+                <div className="flex gap-2 items-center">
+                  {icon}
+                  <span className="text-[13.5px]">{ellipsis(suggestion, { width: { px: position.width - 100, fontSize: 13.5 } })}</span>
+                </div>
+                <div className="flex gap-1">
+                  <Button aria-label="Delete suggestion" type="button" variant={"ghost"} size={"icon"} onMouseDown={del} onKeyDown={del}>
+                    <Trash2 />
+                  </Button>
+                  <Button type="button" variant={"ghost"} size={"icon"} onMouseDown={insert} onKeyDown={insert}>
+                    <ArrowUpLeft />
+                  </Button>
+                </div>
+              </motion.li>
+            );
+          })}
       </motion.ul>
     </>
   );

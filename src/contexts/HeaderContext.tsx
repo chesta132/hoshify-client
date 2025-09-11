@@ -1,5 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { useViewportWidth } from "@/hooks/useViewport";
+import { MotionValue } from "motion";
+import { useMotionValue } from "motion/react";
 import { createContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 type SidebarValues = {
@@ -8,8 +10,7 @@ type SidebarValues = {
   sidebarRef: React.RefObject<HTMLDivElement | null>;
   headerRef: React.RefObject<HTMLHeadElement | null>;
   headerHeight: number;
-  isAnimating: boolean;
-  setIsAnimating: React.Dispatch<React.SetStateAction<boolean>>;
+  sidebarWidth: MotionValue<number>;
 };
 
 const defaultRef = { current: null };
@@ -20,8 +21,7 @@ export const HeaderContext = createContext<SidebarValues>({
   sidebarRef: defaultRef,
   headerRef: defaultRef,
   headerHeight: 0,
-  isAnimating: false,
-  setIsAnimating() {},
+  sidebarWidth: new MotionValue(0),
 });
 
 export const HeaderProvider = ({ children }: { children: React.ReactNode }) => {
@@ -29,7 +29,7 @@ export const HeaderProvider = ({ children }: { children: React.ReactNode }) => {
 
   const [sidebar, setSidebar] = useState(isDesktop);
   const [headerHeight, setHeaderHeight] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const sidebarWidth = useMotionValue(0);
 
   const sidebarRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLHeadElement>(null);
@@ -47,7 +47,7 @@ export const HeaderProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [headerRef]);
 
-  const values: SidebarValues = { headerHeight, headerRef, isAnimating, setIsAnimating, setSidebar, sidebar, sidebarRef };
+  const values: SidebarValues = { headerHeight, headerRef, setSidebar, sidebar, sidebarRef, sidebarWidth };
 
   return <HeaderContext.Provider value={values}>{children}</HeaderContext.Provider>;
 };

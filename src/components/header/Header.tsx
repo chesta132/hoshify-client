@@ -9,18 +9,15 @@ import { useViewportWidth } from "@/hooks/useViewport";
 import { motion } from "motion/react";
 
 export const Header = () => {
-  const { headerHeight, headerRef, sidebar, isAnimating, sidebarRef } = useHeader();
-  const { isDesktop, width } = useViewportWidth();
+  const { headerHeight, headerRef, sidebarWidth } = useHeader();
+  const { isDesktop } = useViewportWidth();
 
   return (
     <>
       <motion.header
         ref={headerRef}
-        className="px-5 py-4 flex items-center gap-5 justify-between fixed w-full bg-background z-50 transition-all duration-500 border-b-2 border-b-border right-0"
-        animate={{
-          width: (sidebar && isDesktop && !isAnimating && `${width - (sidebarRef.current?.getBoundingClientRect().width || 288)}px`) || "100%",
-        }}
-        transition={{ duration: 0.15 }}
+        className="px-5 py-4 flex items-center gap-5 justify-between fixed w-full bg-background z-50 border-b-2 border-b-border right-0 transition-[top] duration-400"
+        style={isDesktop ? { paddingLeft: sidebarWidth } : undefined}
       >
         <Nav />
         <Search />

@@ -15,7 +15,7 @@ type Pages = {
 }[];
 
 export const Sidebar = () => {
-  const { sidebarRef, setSidebar, headerRef, headerHeight, sidebar, setIsAnimating } = useHeader();
+  const { sidebarRef, setSidebar, headerRef, headerHeight, sidebar, sidebarWidth } = useHeader();
   const { isDesktop } = useViewportWidth();
   const location = useLocation();
 
@@ -42,12 +42,20 @@ export const Sidebar = () => {
         }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
         exit={{ left: "-50%" }}
-        layout
-        onAnimationStart={() => setIsAnimating(true)}
-        onAnimationComplete={() => setIsAnimating(false)}
+        layoutRoot
+        onUpdate={(latest) => {
+          if (typeof latest.width === "number") {
+            sidebarWidth.set(latest.width);
+          } else {
+            const width = sidebarRef.current?.getBoundingClientRect().width;
+            if (width) {
+              sidebarWidth.set(width);
+            }
+          }
+        }}
       >
         <div
-          className="border-b flex justify-between items-center relative overflow-hidden"
+          className="border-b flex justify-between items-center relative"
           style={{
             height: isDesktop ? headerHeight : undefined,
             padding: logoOnly ? "0" : isDesktop ? "0 1.25rem" : "1.5rem 0.75rem",
@@ -66,13 +74,20 @@ export const Sidebar = () => {
           </motion.div>
 
           {isDesktop && (
-            <div className={clsx(logoOnly && "absolute inset-0 flex items-center justify-center")}>
+            <motion.div
+              layout
+              className={logoOnly ? "absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center" : undefined}
+              animate={{
+                x: logoOnly ? 0 : undefined,
+              }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            >
               <SidebarToggle />
-            </div>
+            </motion.div>
           )}
         </div>
 
-        <div className="pt-5 flex flex-col gap-2 py-5 relative overflow-hidden">
+        <div className="mt-5 flex flex-col gap-2 my-5 relative overflow-hidden">
           <motion.div
             className="flex flex-col gap-2"
             animate={{

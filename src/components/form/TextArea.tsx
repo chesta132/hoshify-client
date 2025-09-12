@@ -23,6 +23,7 @@ export const TextArea = ({
   start,
   end,
   onValueChange,
+  focusRing,
   ...textAreaProps
 }: TextAreaProps) => {
   const [internalValue, setInternalValue] = useState(value);
@@ -48,6 +49,7 @@ export const TextArea = ({
         className={clsx(
           "w-full px-3 py-3 border border-accent text-accent-foreground rounded-md transition-all duration-200 ease-in-out focus:outline-none focus:border-accent",
           error && "border-red-500!",
+          focusRing && "focus:ring-2 focus:ring-primary/30",
           classTextArea
         )}
         style={padding}

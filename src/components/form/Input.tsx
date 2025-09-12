@@ -20,9 +20,10 @@ export type InputProps = {
   onSearch?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   size?: "sm" | "md" | "lg";
   suggestion?: SuggestionSource;
-  onValueChange?: (e: string) => void;
+  onValueChange?: (value: string) => void;
   inputRef?: React.RefObject<HTMLInputElement | null>;
   resetButton?: boolean;
+  focusRing?: boolean;
 } & Omit<React.ComponentProps<"input">, "size">;
 
 export const Input = ({
@@ -45,6 +46,7 @@ export const Input = ({
   onValueChange,
   inputRef: inputRefProps,
   resetButton,
+  focusRing,
   ...inputProps
 }: InputProps) => {
   const [internalValue, setInternalValue] = useState(value);
@@ -58,7 +60,7 @@ export const Input = ({
 
   const iconSize = size === "sm" ? 18 : size === "lg" ? 23 : 20;
   const isSuggestOpen = suggestion && suggestion.length !== 0 && isFocus;
-  const endClass = `cursor-pointer absolute top-0 right-0 h-full flex items-center pr-2 ${size === "lg" ? "top-1" : "top-0"}`;
+  const endClass = `cursor-pointer absolute right-2 flex items-center top-1/2 ${size === "lg" ? "-translate-y-1/3" : "-translate-y-1/2"}`;
 
   useLayoutEffect(() => {
     const start = startRef.current?.offsetWidth;
@@ -92,12 +94,13 @@ export const Input = ({
       <div className={clsx("relative", error && (classError || "mb-3"), className, size === "sm" && "py-1.5", size === "lg" && "h-13")}>
         <input
           className={clsx(
-            "w-full px-3 py-3 border border-accenttext-accent-foreground transition-all duration-200 ease-in-out focus:outline-none focus:border-accent",
+            "w-full px-4 py-3 border border-accent text-foreground transition-all duration-200 ease-in-out focus:outline-none focus:border-accent",
             (type === "password" || resetButton) && "pr-8",
             error && "border-red-500!",
             size === "sm" && "h-10",
             size === "lg" && "h-15",
             isSuggestOpen ? "rounded-t-md" : "rounded-md",
+            focusRing && "focus:ring-2 focus:ring-primary/30",
             classInput
           )}
           ref={ref}
@@ -120,27 +123,26 @@ export const Input = ({
         <FloatingLabel {...{ isFloat: isFocus || internalValue !== "", size, classLabel, padding, label, placeholder, optional }} />
 
         {type === "password" && !end && (
-          <div className={endClass}>
+          <button
+            type="button"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              setInputType((prev) => (prev === "password" ? "text" : "password"));
+            }}
+            onKeyDown={(e) => {
+              if (e.key !== "Enter" && e.key !== " ") return;
+              e.preventDefault();
+              setInputType((prev) => (prev === "password" ? "text" : "password"));
+            }}
+            className={clsx(endClass, "focus:outline-none focus:ring-2 focus:ring-primary/50")}
+            aria-label={inputType === "password" ? "Hide password" : "Show password"}
+          >
             {inputType === "password" ? (
-              <EyeOff
-                size={iconSize}
-                className="text-accent-foreground"
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  setInputType("text");
-                }}
-              />
+              <EyeOff size={iconSize} className="text-accent-foreground rounded-xs" />
             ) : (
-              <Eye
-                size={iconSize}
-                className="text-accent-foreground"
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  setInputType("password");
-                }}
-              />
+              <Eye size={iconSize} className="text-accent-foreground rounded-xs" />
             )}
-          </div>
+          </button>
         )}
         {type === "search" && !start && (
           <div

@@ -1,7 +1,7 @@
 import { useHeader } from "@/contexts";
 import { useViewportWidth } from "@/hooks/useViewport";
 import { getLabelFromPath } from "@/utils/aria";
-import { LayoutDashboard, LucideOctagonX, Settings } from "lucide-react";
+import { CalendarDays, CheckSquare, LayoutDashboard, LucideOctagonX, NotebookText, Settings, Wallet2 } from "lucide-react";
 import { motion } from "motion/react";
 import { Link, useLocation } from "react-router";
 import { useClickOutside } from "@/hooks/useEventListener";
@@ -23,6 +23,10 @@ export const Sidebar = () => {
 
   const pages: Pages = [
     { path: "/", label: "Dashboard", icon: <LayoutDashboard size={19} /> },
+    { path: "/todos", label: "To-Do List", icon: <CheckSquare size={19} /> },
+    { path: "/notes", label: "Notes", icon: <NotebookText size={19} /> },
+    { path: "/money", label: "Money", icon: <Wallet2 size={19} /> },
+    { path: "/calendar", label: "Calendar", icon: <CalendarDays size={19} /> },
     { path: "/settings", label: "Settings", icon: <Settings size={19} /> },
   ];
 
@@ -97,40 +101,38 @@ export const Sidebar = () => {
             }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
           >
-            {pages.map(({ icon, label, path }, idx) => (
-              <div key={path}>
-                <Link
-                  to={path}
-                  className={clsx(
-                    "relative h-15 flex items-center focus:outline-0 focus:bg-sidebar-accent-foreground/10 hover:bg-sidebar-accent-foreground/10 transition-all duration-200",
-                    location.pathname === path && "bg-sidebar-accent-foreground/15"
-                  )}
-                  onClick={(e) => {
-                    if (location.pathname === path) {
-                      window.scrollTo({
-                        top: 0,
-                        behavior: "smooth",
-                      });
-                    }
-                    setSidebar((prev) => isDesktop && prev);
-                    e.currentTarget.blur();
-                  }}
-                  aria-label={location.pathname === path ? `Back to top page of ${getLabelFromPath(path).toLowerCase()}` : getLabelFromPath(path)}
-                >
-                  {location.pathname === path && (
-                    <motion.div
-                      layoutId="page-nav-highlight"
-                      transition={{ duration: 0.2 }}
-                      className="absolute bg-sidebar-accent-foreground w-1 h-full rounded-r-md"
-                    />
-                  )}
-                  <div className="px-5 flex gap-2 items-center">
-                    {icon}
-                    <span className="font-bold text-[14px]">{label}</span>
-                  </div>
-                </Link>
-                {idx !== pages.length - 1 && <div role="separator" className="w-full h-[1px] bg-sidebar-accent-foreground/30" />}
-              </div>
+            {pages.map(({ icon, label, path }) => (
+              <Link
+                key={path}
+                to={path}
+                className={clsx(
+                  "relative h-13 flex items-center focus:outline-0 focus:bg-sidebar-accent-foreground/10 hover:bg-sidebar-accent-foreground/10 transition-all duration-200",
+                  location.pathname === path && "bg-sidebar-accent-foreground/15"
+                )}
+                onClick={(e) => {
+                  if (location.pathname === path) {
+                    window.scrollTo({
+                      top: 0,
+                      behavior: "smooth",
+                    });
+                  }
+                  setSidebar((prev) => isDesktop && prev);
+                  e.currentTarget.blur();
+                }}
+                aria-label={location.pathname === path ? `Back to top page of ${getLabelFromPath(path).toLowerCase()}` : getLabelFromPath(path)}
+              >
+                {location.pathname === path && (
+                  <motion.div
+                    layoutId="page-nav-highlight"
+                    transition={{ duration: 0.2 }}
+                    className="absolute bg-sidebar-accent-foreground w-1 h-full rounded-r-md"
+                  />
+                )}
+                <div className="px-5 flex gap-2 items-center">
+                  {icon}
+                  <span className="font-bold text-[14px]">{label}</span>
+                </div>
+              </Link>
             ))}
           </motion.div>
 

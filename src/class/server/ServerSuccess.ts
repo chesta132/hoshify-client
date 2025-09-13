@@ -4,7 +4,7 @@ import { omit } from "@/utils/manipulate/object";
 
 export type DataType = "FULL_AXIOS" | "FULL_RES" | "FULL_API_INSTANCE" | "DATA_RES";
 
-export type ReturnByDataType<T extends DataType, D> = T extends "FULL_AXIOS"
+export type ReturnByDataType<T extends DataType | undefined, D> = T extends "FULL_AXIOS"
   ? AxiosResponse<Response<D>>
   : T extends "FULL_RES"
   ? Response<D>
@@ -44,7 +44,7 @@ export class ServerSuccess<T> {
     setState(this.getData());
   }
 
-  getByDataType<DT extends DataType>(dataType?: DT): ReturnByDataType<DT, T> {
+  getByDataType<DT extends DataType | undefined>(dataType?: DT): ReturnByDataType<DT, T> {
     switch (dataType) {
       case "FULL_AXIOS":
         return { ...this.data, ...this.resMeta } as any;

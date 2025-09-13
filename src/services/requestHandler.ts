@@ -1,7 +1,6 @@
 import type { DataType, ReturnByDataType, ServerSuccess } from "@/class/server/ServerSuccess";
 
-export type FetchPropsBase = { withLoad?: boolean; directOnError?: boolean };
-export type FetchProps<T extends DataType> = FetchPropsBase & { dataType?: T };
+export type FetchProps<T extends DataType | undefined> = { withLoad?: boolean; directOnError?: boolean; dataType?: T };
 export type ReqHandlerOptions<D> = {
   finallyCb?: () => any;
   successCb?: (res: ServerSuccess<D>) => any;
@@ -11,7 +10,7 @@ export type ReqHandlerOptions<D> = {
   stopOnErrorCb?: boolean;
 };
 
-export const requestHandler = async <D, T extends DataType>(
+export const requestHandler = async <D, T extends DataType | undefined>(
   reqCb: () => Promise<ServerSuccess<D>>,
   props?: FetchProps<T>,
   options?: ReqHandlerOptions<D>
@@ -38,7 +37,7 @@ export const requestHandler = async <D, T extends DataType>(
 
 export const createRequestHandler =
   <O>(optionSchema: ReqHandlerOptions<O>) =>
-  async <D extends O, T extends DataType = DataType>(
+  async <D extends O, T extends DataType | undefined = undefined>(
     reqCb: () => Promise<ServerSuccess<D>>,
     props?: FetchProps<T>,
     options?: Partial<ReqHandlerOptions<D>>

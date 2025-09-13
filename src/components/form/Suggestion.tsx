@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
 import { ArrowUpLeft, Trash2 } from "lucide-react";
 import clsx from "clsx";
@@ -23,6 +23,7 @@ export type SuggestionProps = {
 export const Suggestion = ({ inputRef, source, setValue, className, style, max, setIsFocus, ...wrapperProps }: SuggestionProps) => {
   const [position, setPosition] = useState({ left: 0, top: 0, width: 0, height: 0 });
   const [highlight, setHighlight] = useState<null | number>(null);
+  const ulRef = useRef<HTMLUListElement>(null);
 
   useLayoutEffect(() => {
     if (!inputRef.current) return;
@@ -121,6 +122,7 @@ export const Suggestion = ({ inputRef, source, setValue, className, style, max, 
         initial={{ height: 0 }}
         animate={{ height: "auto" }}
         exit={{ height: 0 }}
+        ref={ulRef}
         {...wrapperProps}
       >
         {source
@@ -149,6 +151,9 @@ export const Suggestion = ({ inputRef, source, setValue, className, style, max, 
             const insert = (e: ButtonEvent) => {
               if ((e as React.KeyboardEvent<HTMLButtonElement>)?.key) {
                 if (!acceptableKey.includes((e as any).key)) {
+                  if (idx === source.length - 1 && (e as any).key === "Tab") {
+                    setIsFocus(false);
+                  }
                   return;
                 }
               }
@@ -164,7 +169,12 @@ export const Suggestion = ({ inputRef, source, setValue, className, style, max, 
                 role="option"
                 tabIndex={0}
                 onFocus={() => setHighlight(idx)}
-                onBlur={() => setHighlight(null)}
+                onBlur={() => {
+                  setHighlight(null);
+                  // if (idx === source.length - 1) {
+                  //   setIsFocus(false);
+                  // }
+                }}
               >
                 <AnimatePresence>
                   {highlight === idx && (

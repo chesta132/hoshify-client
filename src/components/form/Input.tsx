@@ -90,97 +90,95 @@ export const Input = ({
   };
 
   return (
-    <>
-      <div className={clsx("relative", error && (classError || "mb-3"), className, size === "sm" && "py-1.5", size === "lg" && "h-13")}>
-        <input
-          className={clsx(
-            "w-full px-4 py-3 border border-accent text-foreground transition-all duration-200 ease-in-out focus:outline-none focus:border-accent",
-            (type === "password" || resetButton) && "pr-8",
-            error && "border-red-500!",
-            size === "sm" && "h-10",
-            size === "lg" && "h-15",
-            isSuggestOpen ? "rounded-t-md" : "rounded-md",
-            focusRing && "focus:ring-2 focus:ring-primary/30",
-            classInput
+    <div className={clsx("relative", error && (classError || "mb-3"), className, size === "sm" && "py-1.5", size === "lg" && "h-13")}>
+      <input
+        className={clsx(
+          "w-full px-4 py-3 border border-accent text-foreground transition-all duration-200 ease-in-out focus:outline-none focus:border-accent",
+          (type === "password" || resetButton) && "pr-8",
+          error && "border-red-500!",
+          size === "sm" && "h-10",
+          size === "lg" && "h-15",
+          isSuggestOpen ? "rounded-t-md" : "rounded-md",
+          focusRing && "focus:ring-2 focus:ring-primary/30",
+          classInput
+        )}
+        ref={ref}
+        style={padding}
+        type={inputType}
+        id={label}
+        value={internalValue}
+        onInput={(e) => handleChange((e.target as HTMLInputElement).value)}
+        onFocus={() => {
+          setIsFocus(true);
+        }}
+        onBlur={(e) => {
+          if (e.relatedTarget?.closest(`.${label}-suggestions`)) return;
+          if (internalValue !== "") return;
+          setIsFocus(false);
+        }}
+        autoComplete="off"
+        {...inputProps}
+      />
+      <FloatingLabel {...{ isFloat: isFocus || internalValue !== "", size, classLabel, padding, label, placeholder, optional }} />
+
+      {type === "password" && !end && (
+        <button
+          type="button"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            setInputType((prev) => (prev === "password" ? "text" : "password"));
+          }}
+          onKeyDown={(e) => {
+            if (e.key !== "Enter" && e.key !== " ") return;
+            e.preventDefault();
+            setInputType((prev) => (prev === "password" ? "text" : "password"));
+          }}
+          className={clsx(endClass, "focus:outline-none focus:ring-2 focus:ring-primary/50")}
+          aria-label={inputType === "password" ? "Hide password" : "Show password"}
+        >
+          {inputType === "password" ? (
+            <EyeOff size={iconSize} className="text-accent-foreground rounded-xs" />
+          ) : (
+            <Eye size={iconSize} className="text-accent-foreground rounded-xs" />
           )}
-          ref={ref}
-          style={padding}
-          type={inputType}
-          id={label}
-          value={internalValue}
-          onInput={(e) => handleChange((e.target as HTMLInputElement).value)}
-          onFocus={() => {
+        </button>
+      )}
+      {type === "search" && !start && (
+        <div
+          onClick={handleSearch}
+          ref={startRef}
+          className={`absolute ${size === "sm" || size === "lg" ? "top-4.5" : "top-3.5"} left-3 cursor-pointer`}
+        >
+          <Search size={iconSize} className="text-accent-foreground" />
+        </div>
+      )}
+      {resetButton && type !== "password" && !end && internalValue !== "" && (
+        <div
+          className={endClass}
+          onClick={() => {
+            handleChange("");
+            ref.current?.focus();
             setIsFocus(true);
           }}
-          onBlur={(e) => {
-            if (e.relatedTarget?.closest(`.${label}-suggestions`)) return;
-            if (internalValue !== "") return;
-            setIsFocus(false);
-          }}
-          autoComplete="off"
-          {...inputProps}
-        />
-        <FloatingLabel {...{ isFloat: isFocus || internalValue !== "", size, classLabel, padding, label, placeholder, optional }} />
+        >
+          <X size={iconSize} className="text-accent-foreground" />
+        </div>
+      )}
 
-        {type === "password" && !end && (
-          <button
-            type="button"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              setInputType((prev) => (prev === "password" ? "text" : "password"));
-            }}
-            onKeyDown={(e) => {
-              if (e.key !== "Enter" && e.key !== " ") return;
-              e.preventDefault();
-              setInputType((prev) => (prev === "password" ? "text" : "password"));
-            }}
-            className={clsx(endClass, "focus:outline-none focus:ring-2 focus:ring-primary/50")}
-            aria-label={inputType === "password" ? "Hide password" : "Show password"}
-          >
-            {inputType === "password" ? (
-              <EyeOff size={iconSize} className="text-accent-foreground rounded-xs" />
-            ) : (
-              <Eye size={iconSize} className="text-accent-foreground rounded-xs" />
-            )}
-          </button>
+      <StartEnd {...{ start, end, setPadding }} />
+      {error && <p className="absolute text-red-500 text-[12px] text-start">{error}</p>}
+      <AnimatePresence>
+        {isSuggestOpen && type !== "password" && (
+          <Suggestion
+            className={`${label}-suggestions`}
+            max={5}
+            inputRef={ref}
+            source={suggestion}
+            setValue={(val) => onValueChange?.(val)}
+            setIsFocus={setIsFocus}
+          />
         )}
-        {type === "search" && !start && (
-          <div
-            onClick={handleSearch}
-            ref={startRef}
-            className={`absolute ${size === "sm" || size === "lg" ? "top-4.5" : "top-3.5"} left-3 cursor-pointer`}
-          >
-            <Search size={iconSize} className="text-accent-foreground" />
-          </div>
-        )}
-        {resetButton && type !== "password" && !end && internalValue !== "" && (
-          <div
-            className={endClass}
-            onClick={() => {
-              handleChange("");
-              ref.current?.focus();
-              setIsFocus(true);
-            }}
-          >
-            <X size={iconSize} className="text-accent-foreground" />
-          </div>
-        )}
-
-        <StartEnd {...{ start, end, setPadding }} />
-        {error && <p className="absolute text-red-500 text-[12px] text-start">{error}</p>}
-        <AnimatePresence>
-          {isSuggestOpen && type !== "password" && (
-            <Suggestion
-              className={`${label}-suggestions`}
-              max={5}
-              inputRef={ref}
-              source={suggestion}
-              setValue={(val) => onValueChange?.(val)}
-              setIsFocus={setIsFocus}
-            />
-          )}
-        </AnimatePresence>
-      </div>
-    </>
+      </AnimatePresence>
+    </div>
   );
 };

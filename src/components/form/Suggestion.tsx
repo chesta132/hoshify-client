@@ -151,7 +151,7 @@ export const Suggestion = ({ inputRef, source, setValue, className, style, max, 
             const insert = (e: ButtonEvent) => {
               if ((e as React.KeyboardEvent<HTMLButtonElement>)?.key) {
                 if (!acceptableKey.includes((e as any).key)) {
-                  if (idx === source.length - 1 && (e as any).key === "Tab") {
+                  if (idx === source.length - 1 && (e as any).key === "Tab" && !e.shiftKey) {
                     setIsFocus(false);
                   }
                   return;

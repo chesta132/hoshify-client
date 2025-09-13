@@ -3,6 +3,7 @@ import { AppearanceContext } from "./appearance/AppearanceContext";
 import { capital } from "@/utils/manipulate/string";
 import { HeaderContext } from "./HeaderContext";
 import { SearchContext } from "./search/SearchContext";
+import { UserContext } from "./UserContext";
 
 const useCreateContext = <T,>(context: React.Context<T>, name: string) => {
   const createdContext = useContext(context);
@@ -20,4 +21,8 @@ export const useHeader = () => {
 
 export const useSearch = () => {
   return useCreateContext(SearchContext, "search");
+};
+
+export const useUser = () => {
+  return useCreateContext(UserContext, "user");
 };

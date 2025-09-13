@@ -14,7 +14,7 @@ type Options =
     }
   | undefined;
 
-export default async function api<T = any>(endpoint: string = "", options: Options = { method: "GET", body: null, headers: {}, directToken: false }) {
+export default async function deprecated_api<T = any>(endpoint: string = "", options: Options = { method: "GET", body: null, headers: {}, directToken: false }) {
   const callerLine = new Error().stack?.split("\n")[2];
 
   try {

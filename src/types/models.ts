@@ -73,7 +73,7 @@ export interface Transaction {
 }
 
 export type UserRole = "OWNER" | "DEVELOPER" | "USER";
-export interface IUser {
+export interface User {
   id: string;
   fullName: string;
   email?: string;
@@ -86,7 +86,7 @@ export interface IUser {
   createdAt: Dayjs;
 }
 
-export interface InitiateUser extends IUser {
+export interface InitiateUser extends User {
   todos: Todo[];
   notes: Note[];
   transactions: Transaction[];

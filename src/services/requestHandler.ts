@@ -1,5 +1,6 @@
+import { ServerError } from "@/class/server/ServerError";
 import { ServerSuccess, type DataType, type ReturnByDataType } from "@/class/server/ServerSuccess";
-import type { StateErrorServer } from "@/types/server";
+import { codeErrorAuth, type CodeAuthError, type StateErrorServer } from "@/types/server";
 import { handleError } from "@/utils/server/handleError";
 
 export type FetchProps<D, T extends DataType | undefined> = {
@@ -39,6 +40,7 @@ export const requestHandler = async <D, T extends DataType | undefined, P extend
     return res.getByDataType(dataType);
   } catch (err) {
     if (throwOnError) throw err;
+
     await errorCb?.(err);
     await props?.errorCb?.(err);
     if (stopOnErrorCb && errorCb) return null;
@@ -49,7 +51,14 @@ export const requestHandler = async <D, T extends DataType | undefined, P extend
       handleError(err, setError);
     }
 
-    if (directOnAuthError) throw err;
+    if (err instanceof ServerError) {
+      if (directOnAuthError && codeErrorAuth.includes(err.getCode() as CodeAuthError)) {
+        if (window.location.pathname !== "/signin" && window.location.pathname !== "/signup") {
+          window.location.href = "/signin";
+        }
+      }
+    }
+
     return null;
   } finally {
     setLoading?.(false);

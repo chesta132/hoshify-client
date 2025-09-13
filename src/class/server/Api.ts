@@ -2,7 +2,7 @@ import axios, { isAxiosError, type AxiosInstance, type AxiosRequestConfig, type 
 import { ServerSuccess } from "@/class/server/ServerSuccess";
 import { ServerError } from "@/class/server/ServerError";
 import type { Response } from "@/types/server";
-import { VITE_SERVER_URL } from "@/config";
+import { VITE_ENV, VITE_SERVER_URL } from "@/config";
 import { normalizeDatesInObject } from "@/utils/server";
 
 type LogType = "default" | "none" | "super" | "no trace";
@@ -22,6 +22,7 @@ export class ApiClient {
     this.api.interceptors.response.use(
       (response) => response,
       (error) => {
+        if (VITE_ENV !== "production") console.error("Error in API call:", error);
         if (error.response?.data?.code === "CLIENT_REFRESH") {
           location.reload();
           return;

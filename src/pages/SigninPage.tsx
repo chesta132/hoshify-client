@@ -1,11 +1,12 @@
 import { Input } from "@/components/form/Input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { VITE_SERVER_URL } from "@/config";
 import { useError, useUser } from "@/contexts";
 import useForm from "@/hooks/useForm";
-import { handleFormError } from "@/utils/server/handleError";
+import { handleError, handleFormError } from "@/utils/server/handleError";
 import { InfoIcon, LucideOctagonX } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { useEffect, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
 
 const GoogleIcon = () => (
@@ -30,19 +31,21 @@ const GoogleIcon = () => (
 );
 
 export const SigninPage = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const {
     form: [form],
     error: [formError, setFormError],
     validate: { validateField, validateForm },
   } = useForm({ email: "", password: "" }, { email: { regex: true }, password: { min: 8 } });
-  const { signIn } = useUser();
+  const { signIn, loading, setLoading, isSignIn, user } = useUser();
   const { setError } = useError();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (isSignIn && user.role === "USER") navigate("/");
+  }, [isSignIn, navigate, user.role]);
+
   const handleSubmit = async (e: FormEvent) => {
     try {
-      setIsSubmitting(true);
       e.preventDefault();
       const valid = validateForm();
       if (!valid) return;
@@ -50,8 +53,17 @@ export const SigninPage = () => {
       navigate("/");
     } catch (err) {
       handleFormError(err, setFormError, setError);
+    }
+  };
+
+  const handleGoogle = async () => {
+    try {
+      setLoading(true);
+      window.location.href = `${VITE_SERVER_URL}/auth/google`;
+    } catch (err) {
+      handleError(err, setError);
     } finally {
-      setIsSubmitting(false);
+      setLoading(false);
     }
   };
 
@@ -104,7 +116,7 @@ export const SigninPage = () => {
             </div>
 
             <Button
-              disabled={isSubmitting}
+              disabled={loading}
               className="w-full inline-flex items-center justify-center h-10 px-3 rounded-lg bg-primary text-primary-foreground text-sm font-medium shadow disabled:opacity-70"
             >
               Sign In
@@ -120,7 +132,8 @@ export const SigninPage = () => {
               className="w-full text-foreground inline-flex items-center justify-center gap-2 h-10 px-3 rounded-lg border-2 border-foreground/80 text-sm font-medium shadow bg-card hover:bg-muted/40 hover:text-foreground/80"
               aria-label="Sign in with Google"
               type="button"
-              // onClick={onGoogle}
+              onClick={handleGoogle}
+              disabled={loading}
             >
               <GoogleIcon /> Sign in with Google
             </Button>
@@ -130,7 +143,8 @@ export const SigninPage = () => {
                 aria-describedby="guest-info"
                 type="button"
                 className="w-full text-foreground inline-flex items-center justify-center gap-2 h-10 px-3 rounded-lg border-1 border-border text-sm font-medium shadow bg-card hover:bg-muted/40 hover:text-foreground/80"
-                // onClick={onGuest}
+                disabled={loading}
+                // [WIP] - GUEST FEATURE
               >
                 Continue as Guest
               </Button>

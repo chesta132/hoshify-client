@@ -16,12 +16,12 @@ type UserValues = {
   getUser: <T extends DataType | undefined = undefined>(props?: FetchProps<User, T>) => Promise<ReturnByDataType<T, User> | null>;
   signIn: <T extends DataType | undefined = undefined>(
     data: Partial<User>,
-    props?: Omit<FetchProps<User, T>, "directOnAuthError">
-  ) => Promise<ReturnByDataType<T, User> | null>;
+    props?: Omit<FetchProps<InitiateUser, T>, "directOnAuthError">
+  ) => Promise<ReturnByDataType<T, InitiateUser> | null>;
   signUp: <T extends DataType | undefined = undefined>(
     data: Partial<User>,
-    props?: Omit<FetchProps<User, T>, "directOnAuthError">
-  ) => Promise<ReturnByDataType<T, User> | null>;
+    props?: Omit<FetchProps<InitiateUser, T>, "directOnAuthError">
+  ) => Promise<ReturnByDataType<T, InitiateUser> | null>;
 };
 
 const defaultUser: InitiateUser = {
@@ -61,30 +61,44 @@ export const UserContext = createContext<UserValues>(defaultValues);
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<InitiateUser>(defaultUser);
   const [loading, setLoading] = useState(false);
-  const [isSignIn, setIsSignIn] = useState(false);
+  const [isSignIn, setIsSignIn] = useState<boolean>(JSON.parse(localStorage.getItem("is-sign-in") || "false"));
 
   const setUserMerge = useMemo(() => createMergeSetter(setUser), [setUser]);
-  const handleReq = createRequestHandler({ setLoading, setState: setUserMerge });
+  const handleReq = createRequestHandler({
+    setLoading,
+    setState: setUserMerge,
+    successCb() {
+      setIsSignIn(true);
+    },
+  });
 
   const initiate = <T extends DataType | undefined>(props?: FetchProps<InitiateUser, T>) => {
-    return handleReq(() => api.get<InitiateUser>("/initiate"), { directOnAuthError: true, ...props });
+    return handleReq(() => api.get<InitiateUser>("/user/initiate"), { directOnAuthError: true, ...props });
   };
 
   useEffect(() => {
-    initiate();
+    initiate().catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("is-sign-in", JSON.stringify(isSignIn));
+  }, [isSignIn]);
+
+  useEffect(() => {
+    if (user.id === "") setIsSignIn(false)
+  }, [user.id])
 
   const getUser = <T extends DataType | undefined>(props?: FetchProps<User, T>) => {
     return handleReq(() => api.get<User>("/auth/"), props);
   };
 
-  const signIn = <T extends DataType | undefined>(data: Partial<User>, props?: Omit<FetchProps<User, T>, "directOnAuthError">) => {
-    return handleReq(() => api.post<User>("/auth/signin", data), props);
+  const signIn = <T extends DataType | undefined>(data: Partial<User>, props?: Omit<FetchProps<InitiateUser, T>, "directOnAuthError">) => {
+    return handleReq(() => api.post<InitiateUser>("/auth/signin", data), props);
   };
 
-  const signUp = <T extends DataType | undefined>(data: Partial<User>, props?: Omit<FetchProps<User, T>, "directOnAuthError">) => {
-    return handleReq(() => api.post<User>("/auth/signup", data), props);
+  const signUp = <T extends DataType | undefined>(data: Partial<User>, props?: Omit<FetchProps<InitiateUser, T>, "directOnAuthError">) => {
+    return handleReq(() => api.post<InitiateUser>("/auth/signup", data), props);
   };
 
   const value: UserValues = {

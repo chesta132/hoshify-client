@@ -23,15 +23,15 @@ export const handleError = (err: unknown, setError: React.Dispatch<React.SetStat
       setError({
         code: "SERVER_ERROR",
         message: err.message,
-        title: "Error",
+        title: "Oops! Something went wrong",
         details: err.stack,
       });
     }
   } else {
     setError({
       code: "SERVER_ERROR",
-      message: "Something went wrong. Please try again.",
-      title: "Unknown Error",
+      title: "Oops! Something went wrong",
+      message: "We encountered an unexpected error. Please try again or contact support if the problem persists.",
     });
   }
 };

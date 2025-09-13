@@ -87,3 +87,5 @@ export type CodeClientError =
 
 export type CodeServerError = "SERVER_ERROR" | "NOT_FOUND" | "BAD_GATEWAY";
 export type CodeError = CodeServerError | CodeFieldError | CodeAuthError | CodeClientError;
+
+export type StateErrorServer = Omit<ErrorResponse, "field">;

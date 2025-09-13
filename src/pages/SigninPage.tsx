@@ -1,10 +1,12 @@
 import { Input } from "@/components/form/Input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useError, useUser } from "@/contexts";
 import useForm from "@/hooks/useForm";
+import { handleFormError } from "@/utils/server/handleError";
 import { InfoIcon, LucideOctagonX } from "lucide-react";
 import { useState, type FormEvent } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 const GoogleIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 48 48">
@@ -31,16 +33,23 @@ export const SigninPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {
     form: [form],
-    error: [formError],
+    error: [formError, setFormError],
     validate: { validateField, validateForm },
   } = useForm({ email: "", password: "" }, { email: { regex: true }, password: { min: 8 } });
+  const { signIn } = useUser();
+  const { setError } = useError();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     try {
       setIsSubmitting(true);
       e.preventDefault();
       const valid = validateForm();
       if (!valid) return;
+      await signIn(form, { throwOnError: true });
+      navigate("/");
+    } catch (err) {
+      handleFormError(err, setFormError, setError);
     } finally {
       setIsSubmitting(false);
     }

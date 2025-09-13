@@ -4,6 +4,7 @@ import { capital } from "@/utils/manipulate/string";
 import { HeaderContext } from "./HeaderContext";
 import { SearchContext } from "./search/SearchContext";
 import { UserContext } from "./UserContext";
+import { ErrorContext } from "./ErrorContext";
 
 const useCreateContext = <T,>(context: React.Context<T>, name: string) => {
   const createdContext = useContext(context);
@@ -25,4 +26,8 @@ export const useSearch = () => {
 
 export const useUser = () => {
   return useCreateContext(UserContext, "user");
+};
+
+export const useError = () => {
+  return useCreateContext(ErrorContext, "error");
 };

@@ -12,15 +12,15 @@ type UserValues = {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   isSignIn: boolean;
   setIsSignIn: React.Dispatch<React.SetStateAction<boolean>>;
-  initiate: <T extends DataType | undefined = undefined>(props?: FetchProps<T>) => Promise<ReturnByDataType<T, InitiateUser> | null>;
-  getUser: <T extends DataType | undefined = undefined>(props?: FetchProps<T>) => Promise<ReturnByDataType<T, User> | null>;
+  initiate: <T extends DataType | undefined = undefined>(props?: FetchProps<InitiateUser, T>) => Promise<ReturnByDataType<T, InitiateUser> | null>;
+  getUser: <T extends DataType | undefined = undefined>(props?: FetchProps<User, T>) => Promise<ReturnByDataType<T, User> | null>;
   signIn: <T extends DataType | undefined = undefined>(
     data: Partial<User>,
-    props?: Omit<FetchProps<T>, "directOnError">
+    props?: Omit<FetchProps<User, T>, "directOnAuthError">
   ) => Promise<ReturnByDataType<T, User> | null>;
   signUp: <T extends DataType | undefined = undefined>(
     data: Partial<User>,
-    props?: Omit<FetchProps<T>, "directOnError">
+    props?: Omit<FetchProps<User, T>, "directOnAuthError">
   ) => Promise<ReturnByDataType<T, User> | null>;
 };
 
@@ -66,8 +66,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const setUserMerge = useMemo(() => createMergeSetter(setUser), [setUser]);
   const handleReq = createRequestHandler({ setLoading, setState: setUserMerge });
 
-  const initiate = <T extends DataType | undefined>(props?: FetchProps<T>) => {
-    return handleReq(() => api.get<InitiateUser>("/initiate"), { directOnError: true, ...props });
+  const initiate = <T extends DataType | undefined>(props?: FetchProps<InitiateUser, T>) => {
+    return handleReq(() => api.get<InitiateUser>("/initiate"), { directOnAuthError: true, ...props });
   };
 
   useEffect(() => {
@@ -75,16 +75,16 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const getUser = <T extends DataType | undefined>(props?: FetchProps<T>) => {
-    return handleReq(() => api.get<User>("/"), props);
+  const getUser = <T extends DataType | undefined>(props?: FetchProps<User, T>) => {
+    return handleReq(() => api.get<User>("/auth/"), props);
   };
 
-  const signIn = <T extends DataType | undefined>(data: Partial<User>, props?: Omit<FetchProps<T>, "directOnError">) => {
-    return handleReq(() => api.post<User>("/signin", data), props);
+  const signIn = <T extends DataType | undefined>(data: Partial<User>, props?: Omit<FetchProps<User, T>, "directOnAuthError">) => {
+    return handleReq(() => api.post<User>("/auth/signin", data), props);
   };
 
-  const signUp = <T extends DataType | undefined>(data: Partial<User>, props?: Omit<FetchProps<T>, "directOnError">) => {
-    return handleReq(() => api.post<User>("/signup", data), props);
+  const signUp = <T extends DataType | undefined>(data: Partial<User>, props?: Omit<FetchProps<User, T>, "directOnAuthError">) => {
+    return handleReq(() => api.post<User>("/auth/signup", data), props);
   };
 
   const value: UserValues = {

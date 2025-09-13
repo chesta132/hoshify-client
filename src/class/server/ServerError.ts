@@ -1,4 +1,5 @@
-import type { ErrorResponse, Response } from "@/types/server";
+import type { ErrorResponse, Response, StateErrorServer } from "@/types/server";
+import { omit } from "@/utils/manipulate/object";
 
 export class ServerError {
   error: Response<ErrorResponse, false>;
@@ -34,7 +35,7 @@ export class ServerError {
     return this.error.data.title;
   }
 
-  setToState(setState: React.Dispatch<React.SetStateAction<ErrorResponse>>) {
-    setState(this.getError());
+  setToState(setState: React.Dispatch<React.SetStateAction<StateErrorServer | null>>) {
+    setState(omit(this.getError(), ["field"]));
   }
 }

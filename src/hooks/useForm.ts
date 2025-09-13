@@ -16,7 +16,7 @@ const useForm = <T extends FormFields>(schema: T, config: Config<T>) => {
     } else {
       setFormError(record(formError, ""));
     }
-    return hasError;
+    return !hasError;
   };
 
   const validateField = (field: Partial<T>) => {
@@ -27,7 +27,7 @@ const useForm = <T extends FormFields>(schema: T, config: Config<T>) => {
     } else if (Object.typedKeys(field).some((key) => formError[key] !== "")) {
       setFormError((prev) => ({ ...prev, ...record(field, "") }));
     }
-    return hasError;
+    return !hasError;
   };
 
   return {

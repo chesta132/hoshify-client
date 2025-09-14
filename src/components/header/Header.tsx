@@ -23,11 +23,11 @@ export const Header = () => {
         <Search />
         <div className="flex items-center gap-2">
           <ThemeDropdown />
-          <Link to={"/settings"} aria-label="Navigate to settings" tabIndex={-1}>
-            <Button variant={"outline"} name="to-settings" role="link">
+          <Button variant={"outline"} asChild name="to-settings" role="link">
+            <Link to={"/settings"} aria-label="Navigate to settings">
               <Settings />
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       </motion.header>
       <div style={{ height: headerHeight }} />

@@ -1,12 +1,11 @@
-import { Input } from "@/components/form/Input";
+import { FormLayout } from "@/components/form/FormLayout";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { VITE_SERVER_URL } from "@/config";
 import { useError, useUser } from "@/contexts";
-import useForm from "@/hooks/useForm";
-import { handleError, handleFormError } from "@/utils/server/handleError";
+import { handleError } from "@/utils/server/handleError";
 import { InfoIcon, LucideOctagonX } from "lucide-react";
-import { useEffect, type FormEvent } from "react";
+import { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 
 const GoogleIcon = () => (
@@ -31,11 +30,6 @@ const GoogleIcon = () => (
 );
 
 export const SigninPage = () => {
-  const {
-    form: [form],
-    error: [formError, setFormError],
-    validate: { validateField, validateForm },
-  } = useForm({ email: "", password: "" }, { email: { regex: true }, password: { min: 8 } });
   const { signIn, loading, setLoading, isSignIn, user } = useUser();
   const { setError } = useError();
   const navigate = useNavigate();
@@ -44,16 +38,9 @@ export const SigninPage = () => {
     if (isSignIn && user.role === "USER") navigate("/");
   }, [isSignIn, navigate, user.role]);
 
-  const handleSubmit = async (e: FormEvent) => {
-    try {
-      e.preventDefault();
-      const valid = validateForm();
-      if (!valid) return;
-      await signIn(form, { throwOnError: true });
-      navigate("/");
-    } catch (err) {
-      handleFormError(err, setFormError, setError);
-    }
+  const handleSubmit = async (_: any, form: { email: string; password: string }) => {
+    await signIn(form, { throwOnError: true });
+    navigate("/");
   };
 
   const handleGoogle = async () => {
@@ -67,6 +54,13 @@ export const SigninPage = () => {
     }
   };
 
+  const inputField = {
+    elementType: "input",
+    size: "sm",
+    focusRing: true,
+    classLabel: "bg-card",
+  } as const;
+
   return (
     <div className="w-full h-dvh justify-center items-center flex">
       <div className="min-h-[70vh] grid place-items-center">
@@ -79,88 +73,78 @@ export const SigninPage = () => {
             <p className="text-sm text-muted-foreground">Welcome back to Hoshify</p>
           </div>
 
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <div className="flex flex-col gap-2">
-              <Input
-                size="sm"
-                placeholder="Your email"
-                label="email"
-                value={form.email}
-                onValueChange={(val) => validateField({ email: val })}
-                error={formError.email}
-                classLabel="bg-card"
-                focusRing
-              />
-              <Input
-                type="password"
-                size="sm"
-                placeholder="Password"
-                label="password"
-                onValueChange={(val) => validateField({ password: val })}
-                classLabel="bg-card"
-                focusRing
-                error={formError.password}
-                value={form.password}
-              />
-              <div className="flex justify-between text-sm">
-                <div className="flex items-center gap-2">
-                  <Checkbox id="remember-me" className="cursor-pointer" />
-                  <label htmlFor="remember-me" className="cursor-pointer">
-                    Remember Me
-                  </label>
-                </div>
-                <Link to={"forgot-password"} className="text-link">
-                  Forgot Password
-                </Link>
-              </div>
-            </div>
-
-            <Button
-              disabled={loading}
-              className="w-full inline-flex items-center justify-center h-10 px-3 rounded-lg bg-primary text-primary-foreground text-sm font-medium shadow disabled:opacity-70"
-            >
-              Sign In
-            </Button>
-
-            <div className="flex items-center gap-3 my-2" role="separator">
-              <div className="h-px bg-border flex-1" />
-              <span className="text-xs text-muted-foreground">OR</span>
-              <div className="h-px bg-border flex-1" />
-            </div>
-
-            <Button
-              className="w-full text-foreground inline-flex items-center justify-center gap-2 h-10 px-3 rounded-lg border-2 border-foreground/80 text-sm font-medium shadow bg-card hover:bg-muted/40 hover:text-foreground/80"
-              aria-label="Sign in with Google"
-              type="button"
-              onClick={handleGoogle}
-              disabled={loading}
-            >
-              <GoogleIcon /> Sign in with Google
-            </Button>
-
-            <div className="space-y-1.5">
-              <Button
-                aria-describedby="guest-info"
-                type="button"
-                className="w-full text-foreground inline-flex items-center justify-center gap-2 h-10 px-3 rounded-lg border-1 border-border text-sm font-medium shadow bg-card hover:bg-muted/40 hover:text-foreground/80"
-                disabled={loading}
-                // [WIP] - GUEST FEATURE
-              >
-                Continue as Guest
-              </Button>
-              <div className="flex justify-center items-center gap-2 text-muted-foreground" id="guest-info">
-                <InfoIcon size={14} aria-hidden />
-                <p className="text-xs text-center">Data will be stored locally on this device</p>
-              </div>
-            </div>
-
-            <div className="text-sm text-center">
-              New here?{" "}
-              <a href="/signup" className="text-link">
-                Create Account
-              </a>
-            </div>
-          </form>
+          <FormLayout
+            items={[
+              {
+                ...inputField,
+                placeholder: "Your email",
+                label: "email",
+                fieldId: "email",
+              },
+              {
+                ...inputField,
+                placeholder: "Your password",
+                label: "password",
+                fieldId: "password",
+                type: "password",
+              },
+              {
+                layoutDirection: "row",
+                className: "justify-between flex text-sm",
+                items: [
+                  <div className="flex items-center gap-2">
+                    <Checkbox id="remember-me" className="cursor-pointer" />
+                    <label htmlFor="remember-me" className="cursor-pointer">
+                      Remember Me
+                    </label>
+                  </div>,
+                  { elementType: "link", to: "/forgot-password", className: "text-link", children: "Forgot Password" },
+                ],
+              },
+              { elementType: "separator", label: "OR", afterSubmitButton: true },
+              {
+                layoutDirection: "column",
+                afterSubmitButton: true,
+                className: "flex gap-4",
+                items: [
+                  <Button
+                    className="w-full text-foreground inline-flex items-center justify-center gap-2 h-10 px-3 rounded-lg border-2 border-foreground/80 text-sm font-medium shadow bg-card hover:bg-muted/40 hover:text-foreground/80"
+                    aria-label="Sign in with Google"
+                    type="button"
+                    onClick={handleGoogle}
+                    disabled={loading}
+                  >
+                    <GoogleIcon /> Sign in with Google
+                  </Button>,
+                  {
+                    // [WIP] - GUEST FEATURE
+                    elementType: "button",
+                    disabled: loading,
+                    "aria-describedby": "guest-info",
+                    className:
+                      "w-full text-foreground inline-flex items-center justify-center gap-2 h-10 px-3 rounded-lg border-1 border-border text-sm font-medium shadow bg-card hover:bg-muted/40 hover:text-foreground/80",
+                    children: "Continue as Guest",
+                  },
+                  <div className="flex justify-center items-center gap-2 text-muted-foreground" id="guest-info">
+                    <InfoIcon size={14} aria-hidden />
+                    <p className="text-xs text-center">Data will be stored locally on this device</p>
+                  </div>,
+                  <div className="text-sm text-center">
+                    New here?{" "}
+                    <Link to="/signup" className="text-link">
+                      Create Account
+                    </Link>
+                  </div>,
+                ],
+              },
+            ]}
+            submitProps={{ children: "Sign In", disabled: loading }}
+            form={[
+              { email: "", password: "" },
+              { email: { regex: true }, password: { min: 8 } },
+            ]}
+            onFormSubmit={handleSubmit}
+          />
         </div>
       </div>
     </div>

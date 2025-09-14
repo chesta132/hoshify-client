@@ -1,4 +1,5 @@
 import type { FieldValidations, FormFields } from "@/types/form";
+import { isValidEmail } from "./validator";
 
 export const VALIDATION_RULES: FieldValidations<FormFields> = {
   title: [
@@ -35,8 +36,7 @@ export const VALIDATION_RULES: FieldValidations<FormFields> = {
       message: "Email is required",
     },
     {
-      condition: (value, config) =>
-        typeof config.email !== "boolean" && !!config.email?.regex && !!value && !/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value),
+      condition: (value, config) => typeof config.email !== "boolean" && !!config.email?.regex && !!value && !isValidEmail(value),
       message: "Please input a valid email",
     },
   ],

@@ -96,3 +96,6 @@ export interface InitiateUser extends User {
   updatedAt: Dayjs;
   createdAt: Dayjs;
 }
+
+export type Models = User | Transaction | Schedule | Todo | Note | Money | Link
+export type ModelNames = "user" | "transaction" | "schedule" | "todo" | "note" | "money" | "link"

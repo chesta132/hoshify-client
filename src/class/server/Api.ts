@@ -4,13 +4,51 @@ import { ServerError } from "@/class/server/ServerError";
 import type { Response } from "@/types/server";
 import { VITE_ENV, VITE_SERVER_URL } from "@/config";
 import { normalizeDatesInObject } from "@/utils/server";
+import type { Models, InitiateUser, User, ModelNames, Todo, Schedule, Money, Transaction, Link } from "@/types/models";
 
 type LogType = "default" | "none" | "super" | "no trace";
+type Endpoint<T extends Models, E extends string, O extends string = ""> = Omit<ApiClient<T, E>, ModelNames | "auth" | O>;
+type BaseEndpoint = "/" | `/${string}`;
+type RestoreEndPoint = "/restores" | `/restores/${string}`;
 
-export class ApiClient {
+export type AuthEndpoints =
+  | "/signup"
+  | "/signin"
+  | "/google"
+  | "/google/callback"
+  | "/signout"
+  | "/send-email-verif"
+  | "/verify-email"
+  | "/bind-local"
+  | "/google-bind"
+  | "/google-bind/callback"
+  | "/send-otp"
+  | "/update-email"
+  | "/reset-password"
+  | "/update-password"
+  | "/request-role"
+  | "/accept-request-role";
+export type UserEndpoints = "/initiate" | "/";
+export type TodoEndpoints = BaseEndpoint | RestoreEndPoint;
+export type ScheduleEndpoints = BaseEndpoint | RestoreEndPoint;
+export type MoneyEndpoints = `/refresh/${string}` | BaseEndpoint;
+export type TransactionEndpoints = BaseEndpoint | RestoreEndPoint;
+export type LinkEndpoints = BaseEndpoint;
+
+export class ApiClient<M extends Models = any, E extends string = string> {
   private api: AxiosInstance;
+  private endpoint: string;
 
-  constructor(baseURL: string) {
+  readonly auth!: Endpoint<InitiateUser | User, AuthEndpoints>;
+  readonly user!: Endpoint<User, UserEndpoints, "patch">;
+  readonly todo!: Endpoint<Todo, TodoEndpoints>;
+  readonly schedule!: Endpoint<Schedule, ScheduleEndpoints>;
+  readonly money!: Endpoint<Money, MoneyEndpoints, "delete">;
+  readonly transaction!: Endpoint<Transaction, TransactionEndpoints>;
+  readonly link!: Endpoint<Link, LinkEndpoints, "patch">;
+
+  constructor(baseURL: string, endpoint = "", initiate = true) {
+    this.endpoint = endpoint;
     this.api = axios.create({
       baseURL,
       withCredentials: true,
@@ -18,6 +56,16 @@ export class ApiClient {
         "Content-Type": "application/json",
       },
     });
+
+    if (initiate) {
+      this.auth = new ApiClient(baseURL, "/auth", false);
+      this.user = new ApiClient(baseURL, "/user", false);
+      this.todo = new ApiClient(baseURL, "/todos", false);
+      this.schedule = new ApiClient(baseURL, "/schedules", false);
+      this.money = new ApiClient(baseURL, "/money", false);
+      this.transaction = new ApiClient(baseURL, "/transactions", false);
+      this.link = new ApiClient(baseURL, "/links", false);
+    }
 
     this.api.interceptors.response.use(
       (response) => response,
@@ -49,9 +97,12 @@ export class ApiClient {
     }
   }
 
-  private async request<T = any>(config: AxiosRequestConfig & { logType?: LogType }): Promise<ServerSuccess<T>> {
+  private async request<T = M>(config: AxiosRequestConfig & { logType?: LogType }): Promise<ServerSuccess<T>> {
     try {
-      const response = (await this.api.request<T>(config)) as AxiosResponse<Response<T>>;
+      const response = (await this.api.request<T>({
+        ...config,
+        url: `${this.endpoint}${config.url}`.replace(/\/{2,}/g, "/"),
+      })) as AxiosResponse<Response<T>>;
       response.data = normalizeDatesInObject(response.data);
       this.logResponse(response, config.logType);
       return new ServerSuccess(response);
@@ -63,23 +114,23 @@ export class ApiClient {
     }
   }
 
-  get<T = any>(url: string, config?: AxiosRequestConfig) {
+  get<T = M>(url: E, config?: AxiosRequestConfig) {
     return this.request<T>({ ...config, url, method: "GET" });
   }
 
-  post<T = any>(url: string, data?: any, config?: AxiosRequestConfig) {
+  post<T = M>(url: E, data?: any, config?: AxiosRequestConfig) {
     return this.request<T>({ ...config, url, method: "POST", data });
   }
 
-  patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig) {
+  patch<T = M>(url: E, data?: any, config?: AxiosRequestConfig) {
     return this.request<T>({ ...config, url, method: "PATCH", data });
   }
 
-  put<T = any>(url: string, data?: any, config?: AxiosRequestConfig) {
+  put<T = M>(url: E, data?: any, config?: AxiosRequestConfig) {
     return this.request<T>({ ...config, url, method: "PUT", data });
   }
 
-  delete<T = any>(url: string, config?: AxiosRequestConfig) {
+  delete<T = M>(url: E, config?: AxiosRequestConfig) {
     return this.request<T>({ ...config, url, method: "DELETE" });
   }
 }

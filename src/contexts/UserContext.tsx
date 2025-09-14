@@ -73,10 +73,11 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   });
 
   const initiate = <T extends DataType | undefined>(props?: FetchProps<InitiateUser, T>) => {
-    return handleReq(() => api.get<InitiateUser>("/user/initiate"), { directOnAuthError: true, ...props });
+    return handleReq(() => api.user.get<InitiateUser>("/initiate"), { directOnAuthError: true, ...props });
   };
 
   useEffect(() => {
+    // disable log on throw
     initiate().catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -86,19 +87,19 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   }, [isSignIn]);
 
   useEffect(() => {
-    if (user.id === "") setIsSignIn(false)
-  }, [user.id])
+    if (user.id === "") setIsSignIn(false);
+  }, [user.id]);
 
   const getUser = <T extends DataType | undefined>(props?: FetchProps<User, T>) => {
-    return handleReq(() => api.get<User>("/auth/"), props);
+    return handleReq(() => api.user.get("/"), props);
   };
 
   const signIn = <T extends DataType | undefined>(data: Partial<User>, props?: Omit<FetchProps<InitiateUser, T>, "directOnAuthError">) => {
-    return handleReq(() => api.post<InitiateUser>("/auth/signin", data), props);
+    return handleReq(() => api.auth.post<InitiateUser>("/signin", data), props);
   };
 
   const signUp = <T extends DataType | undefined>(data: Partial<User>, props?: Omit<FetchProps<InitiateUser, T>, "directOnAuthError">) => {
-    return handleReq(() => api.post<InitiateUser>("/auth/signup", data), props);
+    return handleReq(() => api.auth.post<InitiateUser>("/signup", data), props);
   };
 
   const value: UserValues = {

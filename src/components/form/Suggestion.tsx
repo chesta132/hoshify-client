@@ -106,6 +106,8 @@ export const Suggestion = ({ inputRef, source, setValue, className, style, max, 
     };
   }, [inputRef, setIsFocus, setValue, source]);
 
+  const acceptableKey = ["Enter", " "];
+
   return (
     <>
       <motion.ul
@@ -129,7 +131,6 @@ export const Suggestion = ({ inputRef, source, setValue, className, style, max, 
           .filter((_, idx) => max == null || idx < max)
           .map(({ action, suggestion, deletes, icon }, idx) => {
             type ButtonEvent = React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLButtonElement>;
-            const acceptableKey = ["Enter", " "];
 
             const act = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
               handleClick(e);
@@ -171,9 +172,6 @@ export const Suggestion = ({ inputRef, source, setValue, className, style, max, 
                 onFocus={() => setHighlight(idx)}
                 onBlur={() => {
                   setHighlight(null);
-                  // if (idx === source.length - 1) {
-                  //   setIsFocus(false);
-                  // }
                 }}
               >
                 <AnimatePresence>

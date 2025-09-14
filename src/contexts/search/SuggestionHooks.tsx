@@ -12,7 +12,9 @@ type UseSuggestionProps = {
 export function useSuggestion({ setSearchVal, search, searchVal }: UseSuggestionProps) {
   const getHistoryFromLocal = () => {
     const local = noClone(JSON.parse(localStorage.getItem("search-history") || "[]")) as string[];
-    if (local.length > 100) local.pop();
+    while (local.length > 100) {
+      local.pop();
+    }
     return local;
   };
 

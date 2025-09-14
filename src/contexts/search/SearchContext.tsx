@@ -43,17 +43,16 @@ export const SearchProvider = ({ children }: { children: React.ReactNode }) => {
       console.log(search);
       setSearched(search);
     },
-    // setHistory block scope
     [searchVal, searched]
   );
 
   const { history, setHistory, setSuggestion, suggestion } = useSuggestion({ setSearchVal, search, searchVal });
 
-  const debounce = useDebounce(search, 600);
+  const debounceSearch = useDebounce(search, 600);
 
   useEffect(() => {
-    debounce(searchVal);
-  }, [searchVal, debounce]);
+    debounceSearch(searchVal);
+  }, [searchVal, debounceSearch]);
 
   const value: SearchValues = {
     history,

@@ -139,7 +139,7 @@ function RenderLayout<F extends FormFields, D extends Direction>({ items, form, 
           if (!shouldRender) return null;
 
           return (
-            <div key={`form-element-${idx}`} {...omit(item, ["items", "afterSubmitButton"])}>
+            <div key={`form-element-${idx}`} {...omit(item, ["items", "afterSubmitButton", "layoutDirection"])}>
               <FormLayout
                 items={item.items}
                 submitButton={null}
@@ -153,6 +153,7 @@ function RenderLayout<F extends FormFields, D extends Direction>({ items, form, 
 
         const formItem = item as FormItemBase<F>;
         const { fieldId } = formItem;
+        const elementProps = omit(formItem, ["elementType", "afterSubmitButton", "fieldId"]);
         const shouldRender = afterSubmit ? formItem.afterSubmitButton === true : !formItem.afterSubmitButton;
 
         if (!shouldRender) return null;
@@ -166,11 +167,11 @@ function RenderLayout<F extends FormFields, D extends Direction>({ items, form, 
                   onValueChange={(val) => validateField({ [fieldId]: val } as Partial<F>)}
                   error={formErr[fieldId]}
                   key={`form-input-${idx}`}
-                  {...formItem}
+                  {...(elementProps as any)}
                 />
               );
             }
-            return <Input key={`form-input-${idx}`} {...formItem} />;
+            return <Input key={`form-input-${idx}`} {...(elementProps as any)} />;
 
           case "checkbox":
             if (fieldId) {
@@ -180,14 +181,14 @@ function RenderLayout<F extends FormFields, D extends Direction>({ items, form, 
                   onCheckedChange={(val) => validateField({ [fieldId]: val } as Partial<F>)}
                   error={formErr[fieldId]}
                   key={`form-checkbox-${idx}`}
-                  {...(formItem as any)}
+                  {...(elementProps as any)}
                 />
               );
             }
-            return <Checkbox key={`form-checkbox-${idx}`} {...formItem} />;
+            return <Checkbox key={`form-checkbox-${idx}`} {...(elementProps as any)} />;
 
           case "link":
-            return <Link key={`form-link-${idx}`} {...formItem} />;
+            return <Link key={`form-link-${idx}`} {...(elementProps as any)} />;
 
           case "button":
             if (fieldId) {
@@ -198,11 +199,11 @@ function RenderLayout<F extends FormFields, D extends Direction>({ items, form, 
                   onChange={(e) => validateField({ [fieldId]: e.currentTarget.value } as Partial<F>)}
                   error={formErr[fieldId]}
                   key={`form-button${idx}`}
-                  {...(formItem as any)}
+                  {...(elementProps as any)}
                 />
               );
             }
-            return <Button type="button" key={`form-button${idx}`} {...formItem} />;
+            return <Button type="button" key={`form-button${idx}`} {...(elementProps as any)} />;
 
           case "textarea":
             if (fieldId) {
@@ -212,11 +213,11 @@ function RenderLayout<F extends FormFields, D extends Direction>({ items, form, 
                   onValueChange={(val) => validateField({ [fieldId]: val } as Partial<F>)}
                   error={formErr[fieldId]}
                   key={`form-textarea-${idx}`}
-                  {...formItem}
+                  {...(elementProps as any)}
                 />
               );
             }
-            return <TextArea key={`form-textarea-${idx}`} {...formItem} />;
+            return <TextArea key={`form-textarea-${idx}`} {...(elementProps as any)} />;
 
           case "separator":
             return (

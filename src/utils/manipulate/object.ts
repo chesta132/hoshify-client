@@ -5,7 +5,7 @@
  * @param picks - Keys of data to pick.
  * @returns The object with only picked properties.
  */
-export const pick = <T extends Record<string, any>, Z extends (keyof T)[]>(data: T, picks?: Z): Pick<T, Z[number]> => {
+export const pick = <T extends Record<string, any>, Z extends (keyof T)[] = []>(data: T, picks?: Z): Pick<T, Z[number]> => {
   const pickedData = { ...data };
   if (picks)
     for (const pick of Object.keys(pickedData)) {
@@ -23,7 +23,7 @@ export const pick = <T extends Record<string, any>, Z extends (keyof T)[]>(data:
  * @param omits - Keys of data to omit.
  * @returns The object with omitted properties.
  */
-export const omit = <T extends Record<string, any>, Z extends (keyof T)[]>(data: T, omits?: Z): Omit<T, Z[number]> => {
+export const omit = <T extends Record<string, any>, Z extends (keyof T)[] = []>(data: T, omits?: Z): Omit<T, Z[number]> => {
   const omittedData = { ...data };
   if (omits)
     for (const omit of omits) {
@@ -33,7 +33,7 @@ export const omit = <T extends Record<string, any>, Z extends (keyof T)[]>(data:
 };
 
 /**
- * Creates a new object with the same keys as the given object, 
+ * Creates a new object with the same keys as the given object,
  * but all values replaced with a fixed type/value.
  *
  * @param data - Original object to get the keys from

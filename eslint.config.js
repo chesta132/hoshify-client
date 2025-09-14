@@ -22,7 +22,17 @@ export default tseslint.config(
       "@typescript-eslint/no-explicit-any": "off",
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "allowObjectTypes": "off",
-      "@typescript-eslint/no-unsafe-function-type": "off"
+      "@typescript-eslint/no-unsafe-function-type": "off",
+      "@typescript-eslint/no-unused-vars": [
+          "error",
+          {
+            "argsIgnorePattern": "^_",
+            "caughtErrorsIgnorePattern": "^_",
+            "destructuredArrayIgnorePattern": "^_",
+            "varsIgnorePattern": "^_",
+            "ignoreRestSiblings": true
+          }
+        ]
     },
   }
 );

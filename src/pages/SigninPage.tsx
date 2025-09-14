@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { VITE_SERVER_URL } from "@/config";
 import { useError, useUser } from "@/contexts";
+import useForm from "@/hooks/useForm";
 import { handleError } from "@/utils/server/handleError";
 import { InfoIcon, LucideOctagonX } from "lucide-react";
 import { useEffect } from "react";
@@ -33,13 +34,17 @@ export const SigninPage = () => {
   const { signIn, loading, setLoading, isSignIn, user } = useUser();
   const { setError } = useError();
   const navigate = useNavigate();
+  const form = useForm({ email: "", password: "" }, { email: { regex: true }, password: { min: 8 } });
+  const {
+    form: [formVal],
+  } = form;
 
   useEffect(() => {
     if (isSignIn && user.role === "USER") navigate("/");
   }, [isSignIn, navigate, user.role]);
 
-  const handleSubmit = async (_: any, form: { email: string; password: string }) => {
-    await signIn(form, { throwOnError: true });
+  const handleSubmit = async () => {
+    await signIn(formVal, { throwOnError: true });
     navigate("/");
   };
 
@@ -139,10 +144,7 @@ export const SigninPage = () => {
               },
             ]}
             submitProps={{ children: "Sign In", disabled: loading }}
-            form={[
-              { email: "", password: "" },
-              { email: { regex: true }, password: { min: 8 } },
-            ]}
+            form={form}
             onFormSubmit={handleSubmit}
           />
         </div>

@@ -7,8 +7,8 @@ import { TextArea, type TextAreaProps } from "./TextArea";
 import React from "react";
 import { Checkbox } from "../ui/checkbox";
 import type { OneFieldOnly } from "@/types";
-import useForm from "@/hooks/useForm";
-import type { Config, FormFields } from "@/types/form";
+import type { UseFormReturn } from "@/hooks/useForm";
+import type { FormFields } from "@/types/form";
 import { useError } from "@/contexts";
 import { handleFormError } from "@/utils/server/handleError";
 import clsx from "clsx";
@@ -47,10 +47,12 @@ type FormColumn<F extends FormFields, D extends Direction> = {
   afterSubmitButton?: boolean;
   items: (FormItems<F, D> | React.ReactNode)[];
 } & React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
+
 export type FormItems<F extends FormFields, D extends Direction = "row"> = FormItemBase<F> | FormColumn<F, D>;
+
 export type FormLayoutProps<F extends FormFields, C extends boolean, D extends Direction> = {
   items: (FormItems<F, D> | React.ReactNode)[];
-  form?: Parameters<typeof useForm<F>>;
+  form: UseFormReturn<F>;
   asChild?: C;
   onFormSubmit?: (event: React.FormEvent<HTMLDivElement> | React.FormEvent<HTMLFormElement>, formValue: F) => any;
 } & (C extends true
@@ -70,26 +72,23 @@ export const FormLayout = <F extends FormFields, C extends boolean, D extends Di
   onFormSubmit,
   ...wrapperProps
 }: FormLayoutProps<F, C, D>) => {
-  const schema = form ? form[0] : ({} as FormFields);
-  const config = form ? form[1] : {};
   const {
     form: [formVal],
-    error: [formErr, setFormError],
-    validate: { validateField, validateForm },
-  } = useForm(schema, config);
+    error: [_, setFormError],
+    validate: { validateForm },
+  } = form;
+
   const { setError } = useError();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement> | React.FormEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!form) {
-      await onFormSubmit?.(e, formVal as F);
-      return;
-    }
+
     const valid = validateForm();
     if (!valid) return;
+
     try {
-      await onFormSubmit?.(e, formVal as F);
+      await onFormSubmit?.(e, formVal);
     } catch (err) {
       handleFormError(err, setFormError, setError);
     }
@@ -99,7 +98,7 @@ export const FormLayout = <F extends FormFields, C extends boolean, D extends Di
 
   return (
     <Wrapper className="flex flex-col gap-2" onSubmit={handleSubmit} {...(wrapperProps as any)}>
-      <RenderLayout {...{ formErr, formVal, items, validateField, form, afterSubmit: false }} />
+      <RenderLayout items={items} form={form} afterSubmit={false} />
       {submitButton === undefined ? (
         <Button
           className="w-full inline-flex items-center justify-center h-10 px-3 rounded-lg bg-primary text-primary-foreground text-sm font-medium shadow disabled:opacity-70"
@@ -109,28 +108,23 @@ export const FormLayout = <F extends FormFields, C extends boolean, D extends Di
       ) : (
         submitButton
       )}
-      <RenderLayout {...{ formErr, formVal, items, validateField, form, afterSubmit: true }} />
+      <RenderLayout items={items} form={form} afterSubmit={true} />
     </Wrapper>
   );
 };
 
 type RenderLayoutProps<F extends FormFields, D extends Direction> = {
   items: (React.ReactNode | FormItems<F, D>)[];
-  form?: [schema: F, config: Config<F>];
-  formVal: FormFields;
-  formErr: FormFields;
-  validateField: (field: FormFields) => boolean;
+  form: UseFormReturn<F>;
   afterSubmit: boolean;
 };
 
-function RenderLayout<F extends FormFields, D extends Direction>({
-  items,
-  form,
-  formVal,
-  formErr,
-  validateField,
-  afterSubmit,
-}: RenderLayoutProps<F, D>) {
+function RenderLayout<F extends FormFields, D extends Direction>({ items, form, afterSubmit }: RenderLayoutProps<F, D>) {
+  const {
+    form: [formVal],
+    error: [formErr],
+    validate: { validateField },
+  } = form;
   return (
     <>
       {items.map((item, idx) => {
@@ -168,9 +162,9 @@ function RenderLayout<F extends FormFields, D extends Direction>({
             if (fieldId) {
               return (
                 <Input
-                  value={formVal[fieldId]}
-                  onValueChange={(val) => validateField({ [fieldId]: val })}
-                  error={formErr[fieldId as keyof typeof formErr]}
+                  value={String(formVal[fieldId])}
+                  onValueChange={(val) => validateField({ [fieldId]: val } as Partial<F>)}
+                  error={formErr[fieldId]}
                   key={`form-input-${idx}`}
                   {...formItem}
                 />
@@ -183,8 +177,8 @@ function RenderLayout<F extends FormFields, D extends Direction>({
               return (
                 <Checkbox
                   value={formVal[fieldId]}
-                  onCheckedChange={(val) => validateField({ [fieldId]: val })}
-                  error={formErr[fieldId as keyof typeof formErr]}
+                  onCheckedChange={(val) => validateField({ [fieldId]: val } as Partial<F>)}
+                  error={formErr[fieldId]}
                   key={`form-checkbox-${idx}`}
                   {...(formItem as any)}
                 />
@@ -201,8 +195,8 @@ function RenderLayout<F extends FormFields, D extends Direction>({
                 <Button
                   type="button"
                   value={formVal[fieldId]}
-                  onChange={(e) => validateField({ [fieldId]: e.currentTarget.value })}
-                  error={formErr[fieldId as keyof typeof formErr]}
+                  onChange={(e) => validateField({ [fieldId]: e.currentTarget.value } as Partial<F>)}
+                  error={formErr[fieldId]}
                   key={`form-button${idx}`}
                   {...(formItem as any)}
                 />
@@ -214,9 +208,9 @@ function RenderLayout<F extends FormFields, D extends Direction>({
             if (fieldId) {
               return (
                 <TextArea
-                  value={formVal[fieldId]}
-                  onValueChange={(val) => validateField({ [fieldId]: val })}
-                  error={formErr[fieldId as keyof typeof formErr]}
+                  value={String(formVal[fieldId])}
+                  onValueChange={(val) => validateField({ [fieldId]: val } as Partial<F>)}
+                  error={formErr[fieldId]}
                   key={`form-textarea-${idx}`}
                   {...formItem}
                 />

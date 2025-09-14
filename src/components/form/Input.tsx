@@ -133,7 +133,7 @@ export const Input = ({
             e.preventDefault();
             setInputType((prev) => (prev === "password" ? "text" : "password"));
           }}
-          className={clsx(endClass, "focus:outline-none focus:ring-2 focus:ring-primary/50")}
+          className={clsx(endClass, "focus:outline-none focus:ring-2 focus:ring-primary/50 rounded-sm")}
           aria-label={inputType === "password" ? "Hide password" : "Show password"}
         >
           {inputType === "password" ? (

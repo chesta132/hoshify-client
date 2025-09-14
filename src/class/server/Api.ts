@@ -81,8 +81,13 @@ export class ApiClient<M extends Models = any, E extends string = string> {
   }
 
   private logResponse(response: AxiosResponse<Response<any>>, logType?: LogType) {
+    const callerStack = new Error().stack;
+    const callerLine = callerStack
+      ?.slice(callerStack.indexOf(")", callerStack.indexOf("ApiClient.request")) + 1)
+      .trim()
+      .slice(3);
+    const endpoint = `Endpoint:\n${response.config.url}\n\nResponse:`;
     if (logType !== "none") {
-      const endpoint = `Endpoint:\n${response.config.url?.slice(VITE_SERVER_URL.length)}`;
       switch (logType) {
         case "super":
           console.debug("SUPER_TRACE", endpoint, response);
@@ -91,7 +96,7 @@ export class ApiClient<M extends Models = any, E extends string = string> {
           console.debug("NO_TRACE", endpoint, response);
           break;
         default:
-          console.debug(endpoint, response);
+          console.debug("NO_TRACE", `Trace:\n${callerLine}\n\n${endpoint}`, response);
           break;
       }
     }

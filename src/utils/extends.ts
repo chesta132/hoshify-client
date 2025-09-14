@@ -36,8 +36,9 @@ console.debug = function (message?: ("NO_TRACE" | "SUPER_TRACE") & {}, ...data: 
   const superTrace = message === "SUPER_TRACE";
 
   if (!"[vite]".includes(message || "") && !noTrace) {
-    this.log("Called by: " + callerLine);
-  } else if (superTrace) this.trace();
+    if (superTrace) this.trace();
+    else this.log("Called by: " + callerLine);
+  }
 
   if (noTrace || superTrace) {
     this.log(...data);

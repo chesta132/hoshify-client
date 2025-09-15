@@ -2,7 +2,7 @@ import { Settings } from "lucide-react";
 import { Button } from "../ui/button";
 import { Link } from "react-router";
 import { ThemeDropdown } from "./ThemeDropdown";
-import { Search } from "./Search";
+import { Search } from "./search/Search";
 import { Nav } from "./Nav";
 import { useHeader } from "@/contexts";
 import { useViewportWidth } from "@/hooks/useViewport";

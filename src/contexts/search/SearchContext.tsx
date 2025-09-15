@@ -3,6 +3,7 @@ import type { SuggestionSource } from "@/components/form/Suggestion";
 import { useDebounce } from "@/hooks/useDebounce";
 import { createContext, useCallback, useEffect, useState } from "react";
 import { useSuggestion } from "./SuggestionHooks";
+import { useFilter, type Order, type SortBy } from "./FIlterHooks";
 
 export type SearchValues = {
   history: string[];
@@ -14,6 +15,12 @@ export type SearchValues = {
   search: (searchVal: string) => void;
   suggestion: SuggestionSource;
   setSuggestion: React.Dispatch<React.SetStateAction<SuggestionSource>>;
+  filterModel: string[];
+  setFilterModel: React.Dispatch<React.SetStateAction<string[]>>;
+  sortBy: SortBy;
+  setSortBy: React.Dispatch<React.SetStateAction<SortBy>>;
+  order: Order;
+  setOrder: React.Dispatch<React.SetStateAction<Order>>;
 };
 
 const defaultValues: SearchValues = {
@@ -21,11 +28,17 @@ const defaultValues: SearchValues = {
   searchVal: "",
   searched: "",
   suggestion: [],
+  filterModel: [],
+  order: "desc",
+  sortBy: "date",
   setSearchVal() {},
   setSearched() {},
   setHistory() {},
   search() {},
   setSuggestion() {},
+  setFilterModel() {},
+  setOrder() {},
+  setSortBy() {},
 };
 
 export const SearchContext = createContext(defaultValues);
@@ -33,9 +46,10 @@ export const SearchContext = createContext(defaultValues);
 export const SearchProvider = ({ children }: { children: React.ReactNode }) => {
   const [searchVal, setSearchVal] = useState("");
   const [searched, setSearched] = useState("");
+  const { filterModel, order, sortBy, setFilterModel, setOrder, setSortBy } = useFilter();
 
   const search = useCallback(
-    (search: string = searchVal) => {
+    (search = searchVal) => {
       if (searched === search) return;
       if (search.trim() === "") return;
 
@@ -59,11 +73,17 @@ export const SearchProvider = ({ children }: { children: React.ReactNode }) => {
     searchVal,
     searched,
     suggestion,
+    filterModel,
+    order,
+    sortBy,
     setSearchVal,
     setSearched,
     setHistory,
     search,
     setSuggestion,
+    setFilterModel,
+    setOrder,
+    setSortBy,
   };
 
   return <SearchContext.Provider value={value}>{children}</SearchContext.Provider>;

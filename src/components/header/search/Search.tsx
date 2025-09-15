@@ -1,8 +1,9 @@
 import { noClone } from "@/utils/manipulate/array";
-import { Input } from "../form/Input";
+import { Input } from "../../form/Input";
 import { useSearch } from "@/contexts";
 import { useScrollingHeader } from "@/hooks/useScrollingHeader";
 import { useEffect, useRef } from "react";
+import { FilterSearch } from "./FilterSearch";
 
 export const Search = () => {
   // WIP
@@ -51,7 +52,7 @@ export const Search = () => {
   }, []);
 
   return (
-    <form className="w-full flex justify-center" onSubmit={handleSubmit} role="search">
+    <form className="w-full flex items-center gap-4" onSubmit={handleSubmit} role="search">
       <Input
         value={searchVal}
         onValueChange={setSearchVal}
@@ -67,6 +68,7 @@ export const Search = () => {
         resetButton
         aria-label="Search"
       />
+      <FilterSearch />
     </form>
   );
 };

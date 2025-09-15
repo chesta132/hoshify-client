@@ -51,7 +51,7 @@ export const Search = () => {
   }, []);
 
   return (
-    <form className="w-full flex justify-center" onSubmit={handleSubmit}>
+    <form className="w-full flex justify-center" onSubmit={handleSubmit} role="search">
       <Input
         value={searchVal}
         onValueChange={setSearchVal}
@@ -65,6 +65,7 @@ export const Search = () => {
         suggestion={suggestion}
         inputRef={searchRef}
         resetButton
+        aria-label="Search"
       />
     </form>
   );

@@ -90,7 +90,7 @@ export const Input = ({
     onValueChange?.(value);
   };
 
-  const hypenLabel = kebab(label?.toLowerCase() || placeholder?.toLowerCase() || "unknown");
+  const hypenId = kebab(inputProps.id?.toLowerCase() || label?.toLowerCase() || placeholder?.toLowerCase() || "unknown");
 
   return (
     <div className={clsx("relative", error && (classError || "mb-3"), className, size === "sm" && "py-1.5", size === "lg" && "h-13")}>
@@ -108,24 +108,25 @@ export const Input = ({
         ref={ref}
         style={style}
         type={inputType}
-        id={hypenLabel}
+        id={hypenId}
         value={internalValue}
         onInput={(e) => handleChange((e.target as HTMLInputElement).value)}
         onFocus={() => {
           setIsFocus(true);
         }}
         onBlur={(e) => {
-          if (e.relatedTarget?.closest(`.${hypenLabel}-suggestions`)) return;
+          if (e.relatedTarget?.closest(`.${hypenId}-suggestions`)) return;
           if (internalValue !== "") return;
           setIsFocus(false);
         }}
         autoComplete="off"
+        {...(suggestion && { "aria-autocomplete": "list", "aria-controls": `${hypenId}-suggestions`, "aria-expanded": isFocus })}
         {...inputProps}
       />
       <FloatingLabel
         isFloat={isFocus || internalValue !== ""}
         className={classLabel}
-        htmlFor={hypenLabel}
+        htmlFor={hypenId}
         style={{ marginLeft: style.paddingLeft, marginRight: style.paddingRight }}
         {...{ size, label, placeholder, optional }}
       />
@@ -170,7 +171,7 @@ export const Input = ({
             setIsFocus(true);
           }}
         >
-          <X size={iconSize} className="text-accent-foreground" />
+          <X size={iconSize} className="text-accent-foreground" aria-label="Clear input value" />
         </div>
       )}
 
@@ -179,7 +180,7 @@ export const Input = ({
       <AnimatePresence>
         {isSuggestOpen && type !== "password" && (
           <Suggestion
-            className={`${label}-suggestions`}
+            id={`${hypenId}-suggestions`}
             max={5}
             inputRef={ref}
             source={suggestion}

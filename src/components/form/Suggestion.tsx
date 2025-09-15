@@ -108,6 +108,8 @@ export const Suggestion = ({ inputRef, source, setValue, className, style, max, 
 
   const acceptableKey = ["Enter", " "];
 
+  const src = source.filter((_, idx) => max == null || idx < max);
+
   return (
     <>
       <motion.ul
@@ -125,92 +127,92 @@ export const Suggestion = ({ inputRef, source, setValue, className, style, max, 
         animate={{ height: "auto" }}
         exit={{ height: 0 }}
         ref={ulRef}
+        aria-live={src.length !== 0 ? "polite" : undefined}
         {...wrapperProps}
       >
-        {source
-          .filter((_, idx) => max == null || idx < max)
-          .map(({ action, suggestion, deletes, icon }, idx) => {
-            type ButtonEvent = React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLButtonElement>;
+        {src.map(({ action, suggestion, deletes, icon }, idx) => {
+          type ButtonEvent = React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLButtonElement>;
 
-            const act = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
-              handleClick(e);
-              queueMicrotask(() => action(suggestion));
-              inputRef.current?.blur();
-              setIsFocus(false);
-            };
+          const act = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
+            handleClick(e);
+            queueMicrotask(() => action(suggestion));
+            inputRef.current?.blur();
+            setIsFocus(false);
+          };
 
-            const del = (e: ButtonEvent) => {
-              if ((e as React.KeyboardEvent<HTMLButtonElement>)?.key) {
-                if (!acceptableKey.includes((e as any).key)) {
-                  return;
-                }
+          const del = (e: ButtonEvent) => {
+            if ((e as React.KeyboardEvent<HTMLButtonElement>)?.key) {
+              if (!acceptableKey.includes((e as any).key)) {
+                return;
               }
-              handleClick(e);
-              deletes(suggestion);
-            };
+            }
+            handleClick(e);
+            deletes(suggestion);
+          };
 
-            const insert = (e: ButtonEvent) => {
-              if ((e as React.KeyboardEvent<HTMLButtonElement>)?.key) {
-                if (!acceptableKey.includes((e as any).key)) {
-                  if (idx === source.length - 1 && (e as any).key === "Tab" && !e.shiftKey) {
-                    setIsFocus(false);
-                  }
-                  return;
+          const insert = (e: ButtonEvent) => {
+            if ((e as React.KeyboardEvent<HTMLButtonElement>)?.key) {
+              if (!acceptableKey.includes((e as any).key)) {
+                if (idx === source.length - 1 && (e as any).key === "Tab" && !e.shiftKey) {
+                  setIsFocus(false);
                 }
+                return;
               }
-              handleClick(e);
-              setValue(suggestion);
-            };
+            }
+            handleClick(e);
+            setValue(suggestion);
+          };
 
-            return (
-              <motion.li
-                key={suggestion}
-                onMouseDown={act}
-                className="flex justify-between p-2 items-center cursor-pointer hover:bg-popover-foreground/10 focus:outline-0 transition-all relative overflow-hidden border-b border-b-popover-foreground/10"
-                role="option"
-                tabIndex={0}
-                onFocus={() => setHighlight(idx)}
-                onBlur={() => {
-                  setHighlight(null);
-                }}
-              >
-                <AnimatePresence>
-                  {highlight === idx && (
-                    <>
-                      <motion.div
-                        transition={{ type: "keyframes", ease: "easeInOut", duration: 0.2 }}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 100 }}
-                        exit={{ opacity: 0 }}
-                        layoutId="suggestion-left-highlight"
-                        className="bg-popover-foreground/50 absolute left-0 h-1/2 w-0.5"
-                      />
-                      <motion.div
-                        layoutId={"suggestion-highlight"}
-                        transition={{ type: "keyframes", ease: "easeInOut", duration: 0.2 }}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 100 }}
-                        exit={{ opacity: 0 }}
-                        className="bg-popover-foreground/10 absolute h-full w-full left-0"
-                      />
-                    </>
-                  )}
-                </AnimatePresence>
-                <div className="flex gap-2 items-center">
-                  {icon}
-                  <span className="text-[13.5px]">{ellipsis(suggestion, { width: { px: position.width - 100, fontSize: 13.5 } })}</span>
-                </div>
-                <div className="flex gap-1">
-                  <Button aria-label="Delete suggestion" type="button" variant={"ghost"} size={"icon"} onMouseDown={del} onKeyDown={del}>
-                    <Trash2 />
-                  </Button>
-                  <Button type="button" variant={"ghost"} size={"icon"} onMouseDown={insert} onKeyDown={insert}>
-                    <ArrowUpLeft />
-                  </Button>
-                </div>
-              </motion.li>
-            );
-          })}
+          return (
+            <motion.li
+              key={suggestion}
+              onMouseDown={act}
+              className="flex justify-between p-2 items-center cursor-pointer hover:bg-popover-foreground/10 focus:outline-0 transition-all relative overflow-hidden border-b border-b-popover-foreground/10"
+              role="option"
+              tabIndex={0}
+              onFocus={() => setHighlight(idx)}
+              onBlur={() => {
+                setHighlight(null);
+              }}
+              aria-selected={highlight === idx}
+            >
+              <AnimatePresence>
+                {highlight === idx && (
+                  <>
+                    <motion.div
+                      transition={{ type: "keyframes", ease: "easeInOut", duration: 0.2 }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 100 }}
+                      exit={{ opacity: 0 }}
+                      layoutId="suggestion-left-highlight"
+                      className="bg-popover-foreground/50 absolute left-0 h-1/2 w-0.5"
+                    />
+                    <motion.div
+                      layoutId={"suggestion-highlight"}
+                      transition={{ type: "keyframes", ease: "easeInOut", duration: 0.2 }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 100 }}
+                      exit={{ opacity: 0 }}
+                      className="bg-popover-foreground/10 absolute h-full w-full left-0"
+                    />
+                  </>
+                )}
+              </AnimatePresence>
+              <div className="flex gap-2 items-center">
+                {icon}
+                <span className="text-[13.5px]">{ellipsis(suggestion, { width: { px: position.width - 100, fontSize: 13.5 } })}</span>
+              </div>
+              <div className="flex gap-1">
+                <Button aria-label="Delete suggestion" type="button" variant={"ghost"} size={"icon"} onMouseDown={del} onKeyDown={del}>
+                  <Trash2 />
+                </Button>
+                <Button type="button" variant={"ghost"} size={"icon"} onMouseDown={insert} onKeyDown={insert}>
+                  <ArrowUpLeft />
+                </Button>
+              </div>
+            </motion.li>
+          );
+        })}
       </motion.ul>
     </>
   );

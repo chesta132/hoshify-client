@@ -43,7 +43,7 @@ export const TextArea = ({
     onValueChange?.(value);
   };
 
-  const hypenLabel = kebab(label?.toLowerCase() || placeholder?.toLowerCase() || "unknown");
+  const hypenId = kebab(textAreaProps.id?.toLowerCase() || label?.toLowerCase() || placeholder?.toLowerCase() || "unknown");
 
   return (
     <div className={clsx("relative", error && (classError || "mb-3"), className)}>
@@ -56,7 +56,7 @@ export const TextArea = ({
           classTextArea
         )}
         style={style}
-        id={hypenLabel}
+        id={hypenId}
         value={internalValue}
         onInput={(e) => handleChange((e.target as HTMLTextAreaElement).value)}
         onFocus={() => setIsFocus(true)}
@@ -67,7 +67,7 @@ export const TextArea = ({
       <FloatingLabel
         isFloat={isFocus || internalValue !== ""}
         className={classLabel}
-        htmlFor={hypenLabel}
+        htmlFor={hypenId}
         size={"sm"}
         style={{ marginLeft: style.paddingLeft, marginRight: style.paddingRight }}
         {...{ label, placeholder, optional }}

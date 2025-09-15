@@ -5,14 +5,12 @@ import type { InputProps } from "./Input";
 type FloatingLabelProps = {
   label?: string;
   optional?: boolean;
-  classLabel?: string;
   isFloat: boolean;
   size?: InputProps["size"];
-  padding: React.CSSProperties;
   placeholder?: string;
-};
+} & React.DetailedHTMLProps<React.LabelHTMLAttributes<HTMLLabelElement>, HTMLLabelElement>;
 
-export const FloatingLabel = ({ isFloat, size, classLabel, padding, label, placeholder, optional }: FloatingLabelProps) => {
+export const FloatingLabel = ({ isFloat, size, label, placeholder, optional, className, ...rest }: FloatingLabelProps) => {
   return (
     <label
       className={clsx(
@@ -20,13 +18,9 @@ export const FloatingLabel = ({ isFloat, size, classLabel, padding, label, place
         isFloat
           ? `-left-1 text-xs font-medium px-1 bg-background ${size === "sm" ? "-top-1" : "-top-2.5"}`
           : `${size === "lg" ? "top-4.5" : "top-4"} left-0 text-sm text-foreground/80`,
-        classLabel
+        className
       )}
-      style={{
-        marginLeft: padding.paddingLeft,
-        marginRight: padding.paddingRight,
-      }}
-      htmlFor={label}
+      {...rest}
     >
       {isFloat ? capitalEach(label || "") : placeholder} {isFloat && optional && <span className="text-gray">(Optional)</span>}
     </label>

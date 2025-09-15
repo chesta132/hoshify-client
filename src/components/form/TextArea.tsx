@@ -29,7 +29,7 @@ export const TextArea = ({
 }: TextAreaProps) => {
   const [internalValue, setInternalValue] = useState(value);
   const [isFocus, setIsFocus] = useState(focus === undefined ? internalValue !== "" : focus);
-  const [padding, setPadding] = useState<React.CSSProperties>({});
+  const [style, setStyle] = useState<React.CSSProperties>({});
 
   const { textAreaRef } = useAutosizeTextArea(internalValue);
 
@@ -55,7 +55,7 @@ export const TextArea = ({
           focusRing && "focus:ring-2 focus:ring-primary/30",
           classTextArea
         )}
-        style={padding}
+        style={style}
         id={hypenLabel}
         value={internalValue}
         onInput={(e) => handleChange((e.target as HTMLTextAreaElement).value)}
@@ -64,9 +64,16 @@ export const TextArea = ({
         autoComplete="off"
         {...textAreaProps}
       />
-      <FloatingLabel {...{ isFloat: isFocus || internalValue !== "", size: "sm", classLabel, padding, label, placeholder, optional }} />
+      <FloatingLabel
+        isFloat={isFocus || internalValue !== ""}
+        className={classLabel}
+        htmlFor={hypenLabel}
+        size={"sm"}
+        style={{ marginLeft: style.paddingLeft, marginRight: style.paddingRight }}
+        {...{ label, placeholder, optional }}
+      />
 
-      <StartEnd {...{ start, end, setPadding }} />
+      <StartEnd {...{ start, end, setStyle }} />
 
       {error && <p className="absolute text-red-500 text-[12px] text-start">{error}</p>}
     </div>

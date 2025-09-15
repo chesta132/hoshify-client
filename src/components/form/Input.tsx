@@ -53,7 +53,7 @@ export const Input = ({
   const [internalValue, setInternalValue] = useState(value);
   const [isFocus, setIsFocus] = useState(focus === undefined ? internalValue !== "" : focus);
   const [inputType, setInputType] = useState(type);
-  const [padding, setPadding] = useState<React.CSSProperties>({});
+  const [style, setStyle] = useState<React.CSSProperties>({});
 
   const inputRef = useRef<HTMLInputElement>(null);
   const startRef = useRef<HTMLDivElement>(null);
@@ -66,7 +66,7 @@ export const Input = ({
   useLayoutEffect(() => {
     const start = startRef.current?.offsetWidth;
     if (start) {
-      setPadding({ paddingLeft: start ? start + 20 : undefined });
+      setStyle({ paddingLeft: start ? start + 20 : undefined });
     }
   }, [start, end]);
 
@@ -106,7 +106,7 @@ export const Input = ({
           classInput
         )}
         ref={ref}
-        style={padding}
+        style={style}
         type={inputType}
         id={hypenLabel}
         value={internalValue}
@@ -122,7 +122,13 @@ export const Input = ({
         autoComplete="off"
         {...inputProps}
       />
-      <FloatingLabel {...{ isFloat: isFocus || internalValue !== "", size, classLabel, padding, label, placeholder, optional }} />
+      <FloatingLabel
+        isFloat={isFocus || internalValue !== ""}
+        className={classLabel}
+        htmlFor={hypenLabel}
+        style={{ marginLeft: style.paddingLeft, marginRight: style.paddingRight }}
+        {...{ size, label, placeholder, optional }}
+      />
 
       {type === "password" && !end && (
         <button
@@ -168,7 +174,7 @@ export const Input = ({
         </div>
       )}
 
-      <StartEnd {...{ start, end, setPadding }} />
+      <StartEnd {...{ start, end, setStyle }} />
       {error && <p className="absolute text-red-500 text-[12px] text-start">{error}</p>}
       <AnimatePresence>
         {isSuggestOpen && type !== "password" && (

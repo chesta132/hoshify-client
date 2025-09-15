@@ -3,10 +3,10 @@ import React, { useLayoutEffect, useRef } from "react";
 type StartEndProps = {
   start?: React.ReactNode;
   end?: React.ReactNode;
-  setPadding: React.Dispatch<React.SetStateAction<React.CSSProperties>>;
+  setStyle: React.Dispatch<React.SetStateAction<React.CSSProperties>>;
 };
 
-export const StartEnd = ({ start, end, setPadding }: StartEndProps) => {
+export const StartEnd = ({ start, end, setStyle }: StartEndProps) => {
   const startRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
@@ -14,9 +14,9 @@ export const StartEnd = ({ start, end, setPadding }: StartEndProps) => {
     const start = startRef.current?.offsetWidth;
     const end = endRef.current?.offsetWidth;
     if (start || end) {
-      setPadding({ paddingLeft: start ? start + 20 : undefined, paddingRight: end ? end + 20 : undefined });
+      setStyle({ paddingLeft: start ? start + 20 : undefined, paddingRight: end ? end + 20 : undefined });
     }
-  }, [start, end, setPadding]);
+  }, [start, end, setStyle]);
 
   return (
     <>

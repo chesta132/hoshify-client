@@ -1,12 +1,13 @@
 import { useHeader } from "@/contexts";
 import { useViewportWidth } from "@/hooks/useViewport";
 import { getLabelFromPath } from "@/utils/aria";
-import { CalendarDays, CheckSquare, LayoutDashboard, LucideOctagonX, NotebookText, Settings, Wallet2 } from "lucide-react";
+import { CalendarDays, CheckSquare, LayoutDashboard, NotebookText, Settings, Wallet2 } from "lucide-react";
 import { motion } from "motion/react";
 import { Link, useLocation } from "react-router";
 import { useClickOutside } from "@/hooks/useEventListener";
 import { SidebarToggle } from "./SidebarToggle";
 import clsx from "clsx";
+import { HoshifyLogo } from "../ui/logo";
 
 type Pages = {
   path: string;
@@ -73,7 +74,7 @@ export const Sidebar = () => {
             }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
           >
-            <LucideOctagonX />
+            <HoshifyLogo />
             <h1 className="font-heading font-bold text-[18px] leading-4.5">Hoshify</h1>
           </motion.div>
 
@@ -178,8 +179,8 @@ export const Sidebar = () => {
           }}
           transition={{ duration: 0.3, ease: "easeInOut", delay: logoOnly ? 0.1 : 0 }}
         >
-          <div className="w-8 h-8 flex items-center justify-center">
-            <LucideOctagonX size={20} />
+          <div className="size-5 flex items-center justify-center">
+            <HoshifyLogo />
           </div>
         </motion.div>
       </motion.div>

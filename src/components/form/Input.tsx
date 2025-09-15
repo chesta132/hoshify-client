@@ -5,6 +5,7 @@ import { FloatingLabel } from "./FloatingLabel";
 import { StartEnd } from "./StartEnd";
 import { Suggestion, type SuggestionSource } from "./Suggestion";
 import { AnimatePresence } from "motion/react";
+import { kebab } from "@/utils/manipulate/string";
 
 export type InputProps = {
   error?: string | null;
@@ -89,6 +90,8 @@ export const Input = ({
     onValueChange?.(value);
   };
 
+  const hypenLabel = kebab(label?.toLowerCase() || placeholder?.toLowerCase() || "unknown");
+
   return (
     <div className={clsx("relative", error && (classError || "mb-3"), className, size === "sm" && "py-1.5", size === "lg" && "h-13")}>
       <input
@@ -105,14 +108,14 @@ export const Input = ({
         ref={ref}
         style={padding}
         type={inputType}
-        id={label}
+        id={hypenLabel}
         value={internalValue}
         onInput={(e) => handleChange((e.target as HTMLInputElement).value)}
         onFocus={() => {
           setIsFocus(true);
         }}
         onBlur={(e) => {
-          if (e.relatedTarget?.closest(`.${label}-suggestions`)) return;
+          if (e.relatedTarget?.closest(`.${hypenLabel}-suggestions`)) return;
           if (internalValue !== "") return;
           setIsFocus(false);
         }}

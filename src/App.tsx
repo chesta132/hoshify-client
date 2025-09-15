@@ -10,8 +10,8 @@ import { TodoPage } from "./pages/TodoPage";
 import { NotePage } from "./pages/NotePage";
 import { MoneyPage } from "./pages/MoneyPage";
 import { CalendarPage } from "./pages/CalendarPage";
-import { SignupPage } from "./pages/SignupPage";
-import { SigninPage } from "./pages/SigninPage";
+import { SignupPage } from "./pages/auth/SignupPage";
+import { SigninPage } from "./pages/auth/SigninPage";
 import { UserProvider } from "./contexts/UserContext";
 import { ErrorProvider } from "./contexts/ErrorContext";
 

@@ -4,6 +4,7 @@ import type { InputProps } from "./Input";
 import clsx from "clsx";
 import { FloatingLabel } from "./FloatingLabel";
 import { StartEnd } from "./StartEnd";
+import { kebab } from "@/utils/manipulate/string";
 
 type OmittedInputProps = Omit<InputProps, keyof Omit<React.ComponentProps<"input">, "classInput" | "onSearch"> | "size" | "suggestion">;
 type OmittedTextAreaProps = Omit<React.ComponentProps<"textarea">, "value">;
@@ -42,6 +43,8 @@ export const TextArea = ({
     onValueChange?.(value);
   };
 
+  const hypenLabel = kebab(label?.toLowerCase() || placeholder?.toLowerCase() || "unknown");
+
   return (
     <div className={clsx("relative", error && (classError || "mb-3"), className)}>
       <textarea
@@ -53,7 +56,7 @@ export const TextArea = ({
           classTextArea
         )}
         style={padding}
-        id={label}
+        id={hypenLabel}
         value={internalValue}
         onInput={(e) => handleChange((e.target as HTMLTextAreaElement).value)}
         onFocus={() => setIsFocus(true)}

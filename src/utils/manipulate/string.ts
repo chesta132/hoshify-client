@@ -105,16 +105,31 @@ export const capitalEach = (str: string, start?: string | number, end?: string |
  * @example
  * spacing("newUser") // new user
  */
-export const spacing = (string: string) => {
+export const spacing = (str: string) => {
   let spaced = "";
-  for (const letter of string) {
-    if (new RegExp("[A-Z]").test(letter)) {
-      spaced = `${spaced} ${letter.toLowerCase()}`;
-      continue;
-    } else if (letter === "_") {
-      spaced = `${spaced} `;
-      continue;
-    } else spaced = spaced + letter;
+  for (const letter of str) {
+    const idx = spaced.length - 1;
+    if (str[idx - 1] !== " " && /[A-Z]/.test(letter)) {
+      console.debug(spaced);
+      spaced += " " + letter;
+    } else if (letter === "_" || letter === "-") {
+      spaced += " ";
+    } else {
+      spaced += letter;
+    }
   }
-  return spaced;
+  return spaced.trim();
+};
+
+/**
+ * Give hypens to original string.
+ *
+ * @param string - Original string.
+ * @returns The string with hypens.
+ *
+ * @example
+ * kebab("newUser") // new-user
+ */
+export const kebab = (str: string) => {
+  return spacing(str).replaceAll(" ", "-");
 };

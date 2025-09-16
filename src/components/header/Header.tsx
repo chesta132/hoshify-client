@@ -30,7 +30,7 @@ export const Header = () => {
           </Button>
         </div>
       </motion.header>
-      <div style={{ height: headerHeight }} />
+      <div style={{ height: headerHeight }} aria-hidden />
     </>
   );
 };

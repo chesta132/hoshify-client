@@ -3,7 +3,7 @@ import { codeErrorAuth, type ErrorResponse, type Response } from "@/types/server
 import { VITE_ENV, VITE_SERVER_URL } from "@/config";
 import { ServerError } from "@/class/server/ServerError";
 import { ServerSuccess } from "@/class/server/ServerSuccess";
-import { normalizeDatesInObject } from ".";
+import { normalizeDates } from ".";
 
 type Options =
   | {
@@ -14,7 +14,10 @@ type Options =
     }
   | undefined;
 
-export default async function deprecated_api<T = any>(endpoint: string = "", options: Options = { method: "GET", body: null, headers: {}, directToken: false }) {
+export default async function deprecated_api<T = any>(
+  endpoint: string = "",
+  options: Options = { method: "GET", body: null, headers: {}, directToken: false }
+) {
   const callerLine = new Error().stack?.split("\n")[2];
 
   try {
@@ -32,7 +35,7 @@ export default async function deprecated_api<T = any>(endpoint: string = "", opt
     if (VITE_ENV !== "production") {
       console.log(`Endpoint:\n${response.config.url?.slice(VITE_SERVER_URL.length)}\n\nCalled by: ${callerLine?.trim()}\n\n`, response);
     }
-    normalizeDatesInObject(response.data);
+    normalizeDates(response.data);
     return new ServerSuccess(response);
   } catch (error) {
     if (VITE_ENV !== "production") console.error("Error in API call:", error);

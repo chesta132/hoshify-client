@@ -25,7 +25,7 @@ export const SignupPage = () => {
   }, [isSignIn, navigate, user.role]);
 
   const handleSubmit = async () => {
-    await signUp(omit(formVal, ["verifyPassword"]), { throwOnError: true });
+    await signUp(omit(formVal, ["verifyPassword"]));
     navigate("/");
   };
 

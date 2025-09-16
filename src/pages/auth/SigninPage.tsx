@@ -21,7 +21,7 @@ export const SigninPage = () => {
   }, [isSignIn, navigate, user.role]);
 
   const handleSubmit = async () => {
-    await signIn(formVal, { throwOnError: true });
+    await signIn(formVal);
     navigate("/");
   };
 

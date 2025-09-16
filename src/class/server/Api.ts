@@ -3,7 +3,7 @@ import { ServerSuccess } from "@/class/server/ServerSuccess";
 import { ServerError } from "@/class/server/ServerError";
 import type { Response } from "@/types/server";
 import { VITE_ENV, VITE_SERVER_URL } from "@/config";
-import { normalizeDatesInObject } from "@/utils/server";
+import { normalizeDates } from "@/utils/server";
 import type { Models, InitiateUser, User, ModelNames, Todo, Schedule, Money, Transaction, Link } from "@/types/models";
 
 type LogType = "default" | "none" | "super" | "no trace";
@@ -68,7 +68,12 @@ export class ApiClient<M extends Models = any, E extends string = string> {
     }
 
     this.api.interceptors.response.use(
-      (response) => response,
+      (response) => {
+        if (response.data.data) {
+          response.data.data = normalizeDates(response.data.data);
+        }
+        return response;
+      },
       (error) => {
         if (VITE_ENV !== "production") console.error("Error in API call:", error);
         if (error.response?.data?.code === "CLIENT_REFRESH") {
@@ -108,7 +113,6 @@ export class ApiClient<M extends Models = any, E extends string = string> {
         ...config,
         url: `${this.endpoint}${config.url}`.replace(/\/{2,}/g, "/"),
       })) as AxiosResponse<Response<T>>;
-      response.data = normalizeDatesInObject(response.data);
       this.logResponse(response, config.logType);
       return new ServerSuccess(response);
     } catch (error) {

@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { DropdownMenu } from "./dropdown-menu";
+import clsx from "clsx";
 
 type StringOrNode = string | React.ReactNode;
 
@@ -27,7 +28,7 @@ type DropdownRadioProps = {
   menuProps?: DropdownMenuProps;
   triggerProps?: DropdownMenuTriggerProps & React.RefAttributes<HTMLButtonElement>;
   contentProps?: DropdownMenuContentProps & React.RefAttributes<HTMLDivElement>;
-  labelProps?: DropdownMenuLabelProps & React.RefAttributes<HTMLDivElement>;
+  titleProps?: DropdownMenuLabelProps & React.RefAttributes<HTMLDivElement>;
   separatorProps?: DropdownMenuSeparatorProps & React.RefAttributes<HTMLDivElement>;
   radioGroupProps?: DropdownMenuRadioGroupProps & React.RefAttributes<HTMLDivElement>;
   radioItemProps?: DropdownMenuRadioItemProps & React.RefAttributes<HTMLDivElement>;
@@ -39,7 +40,7 @@ export const DropdownRadio = ({
   trigger,
   onValueChange,
   contentProps,
-  labelProps,
+  titleProps,
   menuProps,
   radioGroupProps,
   radioItemProps,
@@ -51,15 +52,18 @@ export const DropdownRadio = ({
       <DropdownMenuTrigger asChild {...triggerProps}>
         {trigger}
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="text-center" {...contentProps}>
-        <DropdownMenuLabel {...labelProps}>{title}</DropdownMenuLabel>
+      <DropdownMenuContent {...contentProps} className={clsx("text-center", contentProps?.className)}>
+        <DropdownMenuLabel {...titleProps}>{title}</DropdownMenuLabel>
         <DropdownMenuSeparator {...separatorProps} />
         <DropdownMenuRadioGroup onValueChange={onValueChange} {...radioGroupProps}>
           {items.map(({ label, ...rest }, idx) => (
             <DropdownMenuRadioItem
               key={typeof label === "string" ? label : `idx-${idx}`}
-              className="cursor-pointer hover:bg-popover-foreground/10 focus:bg-popover-foreground/10 focus:text-foreground"
               {...radioItemProps}
+              className={clsx(
+                "cursor-pointer hover:bg-popover-foreground/10 focus:bg-popover-foreground/10 focus:text-foreground",
+                radioItemProps?.className
+              )}
               {...rest}
             >
               {label}

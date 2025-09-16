@@ -25,7 +25,7 @@ export const requestHandler = async <D, T extends DataType>(
   try {
     if (withLoad) setLoading?.(true);
     const res = await reqCb();
-    setState?.(res.getData());
+    setState?.(res.data);
     await successCb?.(res);
     return res.getByDataType(dataType);
   } catch (err) {

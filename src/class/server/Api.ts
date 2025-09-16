@@ -117,7 +117,7 @@ export class ApiClient<M extends Models = any, E extends string = string> {
       return new ServerSuccess(response);
     } catch (error) {
       if (isAxiosError(error) && error.response) {
-        throw new ServerError(error.response.data);
+        throw new ServerError(error);
       }
       throw error;
     }

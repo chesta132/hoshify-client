@@ -1,5 +1,5 @@
 import type { StateErrorServer } from "@/types/server";
-import { createContext, useState } from "react";
+import { createContext, useCallback, useState } from "react";
 
 type ErrorValues = {
   error: StateErrorServer | null;
@@ -19,9 +19,9 @@ export const ErrorContext = createContext<ErrorValues>(defaultValues);
 export const ErrorProvider = ({ children }: { children: React.ReactNode }) => {
   const [error, setError] = useState<StateErrorServer | null>(null);
 
-  const clearError = () => {
+  const clearError = useCallback(() => {
     setError(null);
-  };
+  }, []);
 
   return <ErrorContext.Provider value={{ error, setError, clearError }}>{children}</ErrorContext.Provider>;
 };

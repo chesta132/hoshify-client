@@ -1,11 +1,12 @@
 import api from "@/class/server/Api";
+import { ServerError } from "@/class/server/ServerError";
 import type { DataType, ReturnByDataType } from "@/class/server/ServerSuccess";
 import { createRequestHandler, type ReqHandlerOptions } from "@/services/requestHandler";
 import type { InitiateUser, User } from "@/types/models";
 import { createMergeState } from "@/utils/hookUtils";
 import dayjs from "dayjs";
-import { createContext, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router";
+import { createContext, useCallback, useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router";
 
 type UserValues = {
   user: InitiateUser;
@@ -63,7 +64,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<InitiateUser>(defaultUser);
   const [loading, setLoading] = useState(false);
   const [isSignIn, setIsSignIn] = useState<boolean>(JSON.parse(localStorage.getItem("is-sign-in") || "false"));
+  const [isInitiated, setIsInitiated] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const isSignPage = location.pathname === "/signin" || location.pathname === "/signup";
 
   const setUserMerge = useMemo(() => createMergeState<InitiateUser, User>(setUser), [setUser]);
   const handleReq = createRequestHandler({
@@ -74,13 +78,23 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     },
   });
 
-  const initiate = <T extends DataType>(options?: ReqHandlerOptions<InitiateUser, T>) => {
-    return handleReq<InitiateUser, T>(() => api.user.get("/initiate"), { directOnAuthError: navigate, ...options });
-  };
+  const initiate = useCallback(
+    <T extends DataType>(options?: ReqHandlerOptions<InitiateUser, T>) => {
+      return handleReq<InitiateUser, T>(() => api.user.get("/initiate"), { directOnAuthError: navigate, ...options });
+    },
+    [handleReq, navigate]
+  );
 
   useEffect(() => {
-    // disable log on throw
-    initiate().catch(() => {});
+    initiate()
+      .catch((err) => {
+        if (err instanceof ServerError && err.getCode() === "INVALID_TOKEN") {
+          if (!isSignPage) {
+            navigate("/signin");
+          }
+        }
+      })
+      .finally(() => setIsInitiated(true));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -89,20 +103,37 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   }, [isSignIn]);
 
   useEffect(() => {
-    if (user.id === "") setIsSignIn(false);
-  }, [user.id]);
+    if (user.id === "" && isInitiated) {
+      setIsSignIn(false);
+    }
+  }, [isInitiated, user.id]);
 
-  const getUser = <T extends DataType>(options?: ReqHandlerOptions<User, T>) => {
-    return handleReq<User, T>(() => api.user.get("/"), options);
-  };
+  useEffect(() => {
+    if (!isSignIn && isInitiated && !isSignPage) {
+      navigate("/signin");
+    }
+  }, [isInitiated, isSignIn, isSignPage, navigate]);
 
-  const signIn = <T extends DataType>(data: Partial<User>, options?: Omit<ReqHandlerOptions<InitiateUser, T>, "directOnAuthError">) => {
-    return handleReq<InitiateUser, T>(() => api.auth.post("/signin", data), options);
-  };
+  const getUser = useCallback(
+    <T extends DataType>(options?: ReqHandlerOptions<User, T>) => {
+      return handleReq<User, T>(() => api.user.get("/"), options);
+    },
+    [handleReq]
+  );
 
-  const signUp = <T extends DataType>(data: Partial<User>, options?: Omit<ReqHandlerOptions<InitiateUser, T>, "directOnAuthError">) => {
-    return handleReq<InitiateUser, T>(() => api.auth.post("/signup", data), options);
-  };
+  const signIn = useCallback(
+    <T extends DataType>(data: Partial<User>, options?: Omit<ReqHandlerOptions<InitiateUser, T>, "directOnAuthError">) => {
+      return handleReq<InitiateUser, T>(() => api.auth.post("/signin", data), options);
+    },
+    [handleReq]
+  );
+
+  const signUp = useCallback(
+    <T extends DataType>(data: Partial<User>, options?: Omit<ReqHandlerOptions<InitiateUser, T>, "directOnAuthError">) => {
+      return handleReq<InitiateUser, T>(() => api.auth.post("/signup", data), options);
+    },
+    [handleReq]
+  );
 
   const value: UserValues = {
     initiate,

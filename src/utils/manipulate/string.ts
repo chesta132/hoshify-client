@@ -110,7 +110,6 @@ export const spacing = (str: string) => {
   for (const letter of str) {
     const idx = spaced.length - 1;
     if (str[idx - 1] !== " " && /[A-Z]/.test(letter)) {
-      console.debug(spaced);
       spaced += " " + letter;
     } else if (letter === "_" || letter === "-") {
       spaced += " ";

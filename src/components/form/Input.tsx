@@ -61,7 +61,7 @@ export const Input = ({
 
   const iconSize = size === "sm" ? 18 : size === "lg" ? 23 : 20;
   const isSuggestOpen = suggestion && suggestion.length !== 0 && isFocus;
-  const endClass = `cursor-pointer absolute right-2 flex items-center top-1/2 ${size === "lg" ? "-translate-y-1/3" : "-translate-y-1/2"}`;
+  const endClass = `cursor-pointer absolute right-2 flex items-center top-1/2 ${size === "md" ? "-translate-y-1/2" : "-translate-y-1/3"}`;
 
   useLayoutEffect(() => {
     const start = startRef.current?.offsetWidth;
@@ -93,7 +93,7 @@ export const Input = ({
   const hypenId = kebab(inputProps.id?.toLowerCase() || label?.toLowerCase() || placeholder?.toLowerCase() || "unknown");
 
   return (
-    <div className={clsx("relative", error && (classError || "mb-3"), className, size === "sm" && "py-1.5", size === "lg" && "h-13")}>
+    <div className={clsx("relative", error && (classError || "mb-3"), className, size === "sm" && "py-1.5 h-12", size === "lg" && "h-13")}>
       <input
         className={clsx(
           "w-full px-4 py-3 border border-accent text-foreground transition-all duration-200 ease-in-out focus:outline-none focus:border-accent",
@@ -143,14 +143,10 @@ export const Input = ({
             e.preventDefault();
             setInputType((prev) => (prev === "password" ? "text" : "password"));
           }}
-          className={clsx(endClass, "focus:outline-none focus:ring-2 focus:ring-primary/50 rounded-sm")}
+          className={clsx(endClass, "focus:outline-none focus:ring-2 focus:ring-primary/50 rounded-sm text-accent-foreground")}
           aria-label={inputType === "password" ? "Hide password" : "Show password"}
         >
-          {inputType === "password" ? (
-            <EyeOff size={iconSize} className="text-accent-foreground rounded-xs" />
-          ) : (
-            <Eye size={iconSize} className="text-accent-foreground rounded-xs" />
-          )}
+          {inputType === "password" ? <EyeOff size={iconSize} /> : <Eye size={iconSize} />}
         </button>
       )}
       {type === "search" && !start && (

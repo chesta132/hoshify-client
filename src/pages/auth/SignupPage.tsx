@@ -1,6 +1,6 @@
 import { FormLayout } from "@/components/form/FormLayout";
 import { secAuthMethod } from "@/components/form layout template/secAuthMethod";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Checkbox } from "@/components/form/checkbox";
 import { VITE_SERVER_URL } from "@/config";
 import { useUser } from "@/contexts";
 import useForm from "@/hooks/useForm";

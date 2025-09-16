@@ -2,10 +2,10 @@ import type { CheckboxProps } from "@radix-ui/react-checkbox";
 import { Input, type InputProps } from "./Input";
 import { Link, type LinkProps } from "react-router";
 import type { VariantProps } from "class-variance-authority";
-import { Button, type buttonVariants } from "../ui/button";
+import { Button, type buttonVariants } from "./button";
 import { TextArea, type TextAreaProps } from "./TextArea";
 import React from "react";
-import { Checkbox } from "../ui/checkbox";
+import { Checkbox } from "./checkbox";
 import type { OneFieldOnly } from "@/types";
 import type { UseFormReturn } from "@/hooks/useForm";
 import type { FormFields } from "@/types/form";
@@ -13,11 +13,12 @@ import { useError } from "@/contexts";
 import { handleFormError } from "@/utils/server/handleError";
 import clsx from "clsx";
 import { omit } from "@/utils/manipulate/object";
+import { cn } from "@/lib/utils";
 
 type ButtonElement = React.ReactElement<React.ButtonHTMLAttributes<HTMLButtonElement>>;
 type Direction = "row" | "column";
 
-export type ElementTypes = "input" | "checkbox" | "link" | "button" | "textarea" | "separator";
+export type ElementTypes = "input" | "checkbox" | "link" | "button" | "textarea" | "separator" | "custom";
 type ElementProps<T extends ElementTypes> = T extends "input"
   ? InputProps
   : T extends "checkbox"
@@ -40,18 +41,19 @@ export type FormItemBase<F extends FormFields> = (
   | ({ elementType: "button" } & ElementProps<"button">)
   | ({ elementType: "textarea" } & ElementProps<"textarea">)
   | ({ elementType: "separator"; label?: string } & ElementProps<"separator">)
+  | { elementType: "custom"; render: React.ReactNode; fieldId?: undefined }
 ) & { fieldId?: keyof F; afterSubmitButton?: boolean };
 
 type FormColumn<F extends FormFields, D extends Direction> = {
   layoutDirection: "column" | "row";
   afterSubmitButton?: boolean;
-  items: (FormItems<F, D> | React.ReactNode)[];
+  items: FormItems<F, D>[];
 } & React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
 
 export type FormItems<F extends FormFields, D extends Direction = "row"> = FormItemBase<F> | FormColumn<F, D>;
 
 export type FormLayoutProps<F extends FormFields, C extends boolean, D extends Direction> = {
-  items: (FormItems<F, D> | React.ReactNode)[];
+  items: FormItems<F, D>[];
   form: UseFormReturn<F>;
   asChild?: C;
   onFormSubmit?: (event: React.FormEvent<HTMLDivElement> | React.FormEvent<HTMLFormElement>, formValue: F) => any;
@@ -97,7 +99,7 @@ export const FormLayout = <F extends FormFields, C extends boolean, D extends Di
   const Wrapper: React.ElementType = asChild ? "div" : "form";
 
   return (
-    <Wrapper className="flex flex-col gap-2" onSubmit={handleSubmit} {...(wrapperProps as any)}>
+    <Wrapper className={cn("flex flex-col gap-1", asChild && "gap-2")} onSubmit={handleSubmit} {...(wrapperProps as any)}>
       <RenderLayout items={items} form={form} afterSubmit={false} />
       {submitButton === undefined ? (
         <Button
@@ -114,7 +116,7 @@ export const FormLayout = <F extends FormFields, C extends boolean, D extends Di
 };
 
 type RenderLayoutProps<F extends FormFields, D extends Direction> = {
-  items: (React.ReactNode | FormItems<F, D>)[];
+  items: FormItems<F, D>[];
   form: UseFormReturn<F>;
   afterSubmit: boolean;
 };
@@ -128,11 +130,13 @@ function RenderLayout<F extends FormFields, D extends Direction>({ items, form, 
   return (
     <>
       {items.map((item, idx) => {
-        if (React.isValidElement(item)) {
-          if (afterSubmit) return null;
-          return <React.Fragment key={`form-element-${idx}`}>{item}</React.Fragment>;
+        const baseItem = ((item as FormItemBase<F>)?.elementType && item) as FormItemBase<F> | undefined;
+        if (baseItem?.elementType === "custom") {
+          if (React.isValidElement(baseItem.render)) {
+            if (afterSubmit) return null;
+            return <React.Fragment key={`form-element-${idx}`}>{baseItem.render}</React.Fragment>;
+          }
         }
-
         if (typeof item === "object" && item != null && "items" in item) {
           const shouldRender = afterSubmit ? item.afterSubmitButton === true : !item.afterSubmitButton;
 

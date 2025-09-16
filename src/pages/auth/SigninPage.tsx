@@ -1,6 +1,6 @@
 import { FormLayout } from "@/components/form/FormLayout";
 import { secAuthMethod } from "@/components/form layout template/secAuthMethod";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Checkbox } from "@/components/form/checkbox";
 import { VITE_SERVER_URL } from "@/config";
 import { useUser } from "@/contexts";
 import useForm from "@/hooks/useForm";
@@ -69,12 +69,10 @@ export const SigninPage = () => {
                 layoutDirection: "row",
                 className: "justify-between flex text-sm",
                 items: [
-                  <div className="flex items-center gap-2">
-                    <Checkbox id="remember-me" className="cursor-pointer" />
-                    <label htmlFor="remember-me" className="cursor-pointer">
-                      Remember Me
-                    </label>
-                  </div>,
+                  {
+                    elementType: "custom",
+                    render: <Checkbox id="remember-me" className="cursor-pointer" label="Remember Me" />,
+                  },
                   { elementType: "link", to: "/forgot-password", className: "text-link", children: "Forgot Password" },
                 ],
               },

@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Button } from "../ui/button";
+import { Button } from "./button";
 import { ArrowUpLeft, Trash2 } from "lucide-react";
 import clsx from "clsx";
 import { ellipsis } from "@/utils/manipulate/string";

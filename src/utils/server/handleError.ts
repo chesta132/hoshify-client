@@ -1,13 +1,14 @@
 import { ServerError } from "@/class/server/ServerError";
 import { codeErrorAuth, type CodeAuthError, type StateErrorServer } from "@/types/server";
+import type { NavigateFunction } from "react-router";
 
-type HandleErrorOptions = { directIfAuth?: boolean };
+export type HandleErrorOptions = { directOnAuthError?: NavigateFunction };
 
 export const handleError = (err: unknown, setError: React.Dispatch<React.SetStateAction<StateErrorServer | null>>, options?: HandleErrorOptions) => {
   if (err instanceof ServerError) {
-    if (options?.directIfAuth) {
+    if (options?.directOnAuthError && window.location.pathname !== "/signin" && window.location.pathname !== "/signup") {
       if (codeErrorAuth.includes(err.getCode() as CodeAuthError)) {
-        window.location.href = "/signin";
+        options.directOnAuthError("/signin");
         return;
       }
     }

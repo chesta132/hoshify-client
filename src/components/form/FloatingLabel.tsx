@@ -1,6 +1,6 @@
 import { capitalEach } from "@/utils/manipulate/string";
-import clsx from "clsx";
 import type { InputProps } from "./Input";
+import { cn } from "@/lib/utils";
 
 type FloatingLabelProps = {
   label?: string;
@@ -13,7 +13,7 @@ type FloatingLabelProps = {
 export const FloatingLabel = ({ isFloat, size, label, placeholder, optional, className, ...rest }: FloatingLabelProps) => {
   return (
     <label
-      className={clsx(
+      className={cn(
         "absolute transition-all duration-200 ease-in-out select-none z-10 pointer-events-none whitespace-nowrap mx-3",
         isFloat
           ? `-left-1 text-xs font-medium px-1 bg-background ${size === "sm" ? "-top-1" : "-top-2.5"}`

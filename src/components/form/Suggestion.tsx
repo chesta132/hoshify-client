@@ -1,9 +1,9 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Button } from "./button";
 import { ArrowUpLeft, Trash2 } from "lucide-react";
-import clsx from "clsx";
 import { ellipsis } from "@/utils/manipulate/string";
 import { AnimatePresence, motion, type HTMLMotionProps } from "motion/react";
+import { cn } from "@/lib/utils";
 
 export type SuggestionSource = {
   action: (suggest: string) => void;
@@ -117,7 +117,7 @@ export const Suggestion = ({ inputRef, source, setValue, className, style, max, 
           ...style,
           width: position.width,
         }}
-        className={clsx(
+        className={cn(
           "bg-popover absolute scroll-bar border rounded-b-md overflow-hidden",
           max == null && "max-h-72 overflow-y-auto overflow-x-hidden",
           className

@@ -1,11 +1,11 @@
 import { Eye, EyeOff, Search, X } from "lucide-react";
 import { useLayoutEffect, useRef, useState } from "react";
-import clsx from "clsx";
 import { FloatingLabel } from "./FloatingLabel";
 import { StartEnd } from "./StartEnd";
 import { Suggestion, type SuggestionSource } from "./Suggestion";
 import { AnimatePresence } from "motion/react";
 import { kebab } from "@/utils/manipulate/string";
+import { cn } from "@/lib/utils";
 
 export type InputProps = {
   error?: string | null;
@@ -93,9 +93,9 @@ export const Input = ({
   const hypenId = kebab(inputProps.id?.toLowerCase() || label?.toLowerCase() || placeholder?.toLowerCase() || "unknown");
 
   return (
-    <div className={clsx("relative", error && (classError || "mb-3"), className, size === "sm" && "py-1.5 h-12", size === "lg" && "h-13")}>
+    <div className={cn("relative", error && (classError || "mb-3"), className, size === "sm" && "py-1.5 h-12", size === "lg" && "h-13")}>
       <input
-        className={clsx(
+        className={cn(
           "w-full px-4 py-3 border border-accent text-foreground transition-all duration-200 ease-in-out focus:outline-none focus:border-accent",
           (type === "password" || resetButton) && "pr-8",
           error && "border-red-500!",
@@ -143,7 +143,7 @@ export const Input = ({
             e.preventDefault();
             setInputType((prev) => (prev === "password" ? "text" : "password"));
           }}
-          className={clsx(endClass, "focus:outline-none focus:ring-2 focus:ring-primary/50 rounded-sm text-accent-foreground")}
+          className={cn(endClass, "focus:outline-none focus:ring-2 focus:ring-primary/50 rounded-sm text-accent-foreground")}
           aria-label={inputType === "password" ? "Hide password" : "Show password"}
         >
           {inputType === "password" ? <EyeOff size={iconSize} /> : <Eye size={iconSize} />}

@@ -6,8 +6,8 @@ import { motion } from "motion/react";
 import { Link, useLocation } from "react-router";
 import { useClickOutside } from "@/hooks/useEventListener";
 import { SidebarToggle } from "./SidebarToggle";
-import clsx from "clsx";
 import { HoshifyLogo } from "../ui/logo";
+import { cn } from "@/lib/utils";
 
 type Pages = {
   path: string;
@@ -106,7 +106,7 @@ export const Sidebar = () => {
               <Link
                 key={path}
                 to={path}
-                className={clsx(
+                className={cn(
                   "relative h-13 flex items-center focus:outline-0 focus:bg-sidebar-accent-foreground/10 hover:bg-sidebar-accent-foreground/10 transition-all duration-200",
                   location.pathname === path && "bg-sidebar-accent-foreground/15"
                 )}
@@ -150,7 +150,7 @@ export const Sidebar = () => {
               <Link
                 key={`logo-${path}`}
                 to={path}
-                className={clsx(
+                className={cn(
                   "relative w-12 h-12 flex items-center justify-center rounded-lg focus:outline-0 focus:bg-sidebar-accent-foreground/10 hover:bg-sidebar-accent-foreground/10 transition-all duration-200",
                   location.pathname === path && "bg-sidebar-accent-foreground/8"
                 )}

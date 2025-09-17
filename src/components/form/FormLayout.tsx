@@ -11,7 +11,6 @@ import type { UseFormReturn } from "@/hooks/useForm";
 import type { FormFields } from "@/types/form";
 import { useError } from "@/contexts";
 import { handleFormError } from "@/utils/server/handleError";
-import clsx from "clsx";
 import { omit } from "@/utils/manipulate/object";
 import { cn } from "@/lib/utils";
 
@@ -148,7 +147,7 @@ function RenderLayout<F extends FormFields, D extends Direction>({ items, form, 
                 items={item.items}
                 submitButton={null}
                 form={form}
-                className={clsx("flex gap-2 w-full justify-between", item.layoutDirection === "column" ? "flex-col" : "flex-row", item.className)}
+                className={cn("flex gap-2 w-full justify-between", item.layoutDirection === "column" ? "flex-col" : "flex-row", item.className)}
                 asChild
               />
             </div>
@@ -231,7 +230,7 @@ function RenderLayout<F extends FormFields, D extends Direction>({ items, form, 
                 role="separator"
                 {...omit(formItem, ["elementType", "label", "afterSubmitButton", "fieldId"])}
               >
-                <div className={clsx("h-px bg-border", formItem.label ? "flex-1" : "w-full")} />
+                <div className={cn("h-px bg-border", formItem.label ? "flex-1" : "w-full")} />
                 {formItem.label && <span className="text-xs text-muted-foreground">{formItem.label}</span>}
                 {formItem.label && <div className="h-px bg-border flex-1" />}
               </div>

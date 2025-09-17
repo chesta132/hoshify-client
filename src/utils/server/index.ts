@@ -1,9 +1,17 @@
 import { isIsoDateValid } from "@/utils/manipulate/date";
 import dayjs, { Dayjs } from "dayjs";
 
-type NormalizedDates<T> = {
-  [K in keyof T]: [T] extends [Date] ? T[K] : Dayjs;
-};
+type NormalizedDates<T> = T extends (infer U)[]
+  ? NormalizedDates<U>[]
+  : {
+      [K in keyof T]: T[K] extends Date
+        ? Dayjs
+        : T[K] extends Date | undefined
+        ? Dayjs | undefined
+        : T[K] extends object
+        ? NormalizedDates<T[K]>
+        : T[K];
+    };
 
 export const normalizeDates = <T extends Record<string, any> | any[]>(
   data: T

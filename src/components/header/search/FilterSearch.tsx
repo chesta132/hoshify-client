@@ -4,10 +4,10 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import { Checkbox } from "@/components/form/checkbox";
 import { ArrowUpNarrowWide, Filter, X } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import clsx from "clsx";
 import { capital } from "@/utils/manipulate/string";
 import { useSearch } from "@/contexts";
 import { searchableModels } from "@/contexts/search/FIlterHooks";
+import { cn } from "@/lib/utils";
 
 export function FilterSearch() {
   const { filterModel, setFilterModel, sortBy, setSortBy, order: searchOrder, setOrder: setSearchOrder } = useSearch();
@@ -96,7 +96,7 @@ export function FilterSearch() {
               onClick={() => setOrder(order === "asc" ? "desc" : "asc")}
               aria-label={`Change sort order to ${order === "asc" ? "descending" : "ascending"}`}
             >
-              <ArrowUpNarrowWide aria-hidden="true" className={clsx("transition-transform", order === "desc" && "rotate-180")} />
+              <ArrowUpNarrowWide aria-hidden="true" className={cn("transition-transform", order === "desc" && "rotate-180")} />
               {capital(order)}
             </Button>
           </div>

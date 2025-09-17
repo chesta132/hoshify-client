@@ -1,10 +1,10 @@
 import { useAutosizeTextArea } from "@/hooks/useAutosizeTextArea";
 import { useLayoutEffect, useState } from "react";
 import type { InputProps } from "./Input";
-import clsx from "clsx";
 import { FloatingLabel } from "./FloatingLabel";
 import { StartEnd } from "./StartEnd";
 import { kebab } from "@/utils/manipulate/string";
+import { cn } from "@/lib/utils";
 
 type OmittedInputProps = Omit<InputProps, keyof Omit<React.ComponentProps<"input">, "classInput" | "onSearch"> | "size" | "suggestion">;
 type OmittedTextAreaProps = Omit<React.ComponentProps<"textarea">, "value">;
@@ -46,10 +46,10 @@ export const TextArea = ({
   const hypenId = kebab(textAreaProps.id?.toLowerCase() || label?.toLowerCase() || placeholder?.toLowerCase() || "unknown");
 
   return (
-    <div className={clsx("relative", error && (classError || "mb-3"), className)}>
+    <div className={cn("relative", error && (classError || "mb-3"), className)}>
       <textarea
         ref={textAreaRef}
-        className={clsx(
+        className={cn(
           "w-full px-3 py-3 border border-accent text-accent-foreground rounded-md transition-all duration-200 ease-in-out focus:outline-none focus:border-accent",
           error && "border-red-500!",
           focusRing && "focus:ring-2 focus:ring-primary/30",

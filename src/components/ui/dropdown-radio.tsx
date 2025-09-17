@@ -16,7 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { DropdownMenu } from "./dropdown-menu";
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
 
 type StringOrNode = string | React.ReactNode;
 
@@ -52,7 +52,7 @@ export const DropdownRadio = ({
       <DropdownMenuTrigger asChild {...triggerProps}>
         {trigger}
       </DropdownMenuTrigger>
-      <DropdownMenuContent {...contentProps} className={clsx("text-center", contentProps?.className)}>
+      <DropdownMenuContent {...contentProps} className={cn("text-center", contentProps?.className)}>
         <DropdownMenuLabel {...titleProps}>{title}</DropdownMenuLabel>
         <DropdownMenuSeparator {...separatorProps} />
         <DropdownMenuRadioGroup onValueChange={onValueChange} {...radioGroupProps}>
@@ -60,7 +60,7 @@ export const DropdownRadio = ({
             <DropdownMenuRadioItem
               key={typeof label === "string" ? label : `idx-${idx}`}
               {...radioItemProps}
-              className={clsx(
+              className={cn(
                 "cursor-pointer hover:bg-popover-foreground/10 focus:bg-popover-foreground/10 focus:text-foreground",
                 radioItemProps?.className
               )}

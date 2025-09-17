@@ -5,6 +5,7 @@ import type { Response } from "@/types/server";
 import { VITE_ENV, VITE_SERVER_URL } from "@/config";
 import { normalizeDates } from "@/utils/server";
 import type { Models, InitiateUser, User, ModelNames, Todo, Schedule, Money, Transaction, Link } from "@/types/models";
+import { pick } from "@/utils/manipulate/object";
 
 type LogType = "default" | "none" | "super" | "no trace";
 type Endpoint<T extends Models, E extends string, O extends string = ""> = Omit<ApiClient<T, E>, ModelNames | "auth" | O>;
@@ -75,7 +76,8 @@ export class ApiClient<M extends Models = any, E extends string = string> {
         return response;
       },
       (error) => {
-        if (VITE_ENV !== "production") console.error("Error in API call:", error);
+        if (VITE_ENV !== "production") console.error("Error in API call:\n", error);
+        else console.error("Server request failed.\n", { ...pick(error, ["code", "message", "status"]), ...error?.response?.data?.data });
         if (error.response?.data?.code === "CLIENT_REFRESH") {
           location.reload();
           return;

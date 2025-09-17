@@ -4,13 +4,18 @@ import type { NavigateFunction } from "react-router";
 
 export type HandleErrorOptions = { directOnAuthError?: NavigateFunction };
 
+export const directOnAuthError = (err: ServerError, nav: NavigateFunction) => {
+  if (window.location.pathname !== "/signin" && window.location.pathname !== "/signup") {
+    if (codeErrorAuth.includes(err.getCode() as CodeAuthError)) {
+      nav("/signin");
+    }
+  }
+};
+
 export const handleError = (err: unknown, setError: React.Dispatch<React.SetStateAction<StateErrorServer | null>>, options?: HandleErrorOptions) => {
   if (err instanceof ServerError) {
-    if (options?.directOnAuthError && window.location.pathname !== "/signin" && window.location.pathname !== "/signup") {
-      if (codeErrorAuth.includes(err.getCode() as CodeAuthError)) {
-        options.directOnAuthError("/signin");
-        return;
-      }
+    if (options?.directOnAuthError) {
+      directOnAuthError(err, options.directOnAuthError);
     }
     err.setToState(setError);
   } else if (err instanceof Error) {

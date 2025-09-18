@@ -1,6 +1,6 @@
 import { ServerError } from "@/class/server/ServerError";
 import { ServerSuccess } from "@/class/server/ServerSuccess";
-import { codeErrorAuth, type CodeAuthError } from "@/types/server";
+import { codeErrorAuth, type CodeAuthError } from "@/types/server/codes";
 import { type NavigateFunction } from "react-router";
 
 export type ReqHandlerOptions<D> = {

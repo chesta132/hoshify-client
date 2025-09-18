@@ -1,6 +1,6 @@
 import { useError } from "@/contexts";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { handleError as errorHandler, type HandleErrorOptions } from "@/utils/server/handleError";
+import { handleError as errorHandler, type HandleErrorOptions } from "@/services/handleError";
 import type { ServerSuccess } from "@/class/server/ServerSuccess";
 import { createRequestHandler, type CreateReqHandlerOptions } from "@/services/requestHandler";
 import { createMergeState } from "@/utils/hookUtils";

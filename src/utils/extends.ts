@@ -60,6 +60,13 @@ console.debugTable = function (tabularData, properties, trace) {
   this.table(tabularData, properties);
 };
 
+console.debugTrace = function (...message: any[]) {
+  if (VITE_ENV === "production") return;
+  console.groupCollapsed(...message);
+  console.trace();
+  console.groupEnd();
+};
+
 Object.isObject = function <T>(object: T) {
   if (typeof object === "object" && object !== null && !(object instanceof Date)) return true;
   return false;

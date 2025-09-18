@@ -1,12 +1,11 @@
-import api from "@/class/server/ApiClient";
+import api, { type ApiConfig } from "@/class/server/ApiClient";
 import { Request, type RequestFetcher } from "@/class/server/Request";
 import type { InitiateUser, User } from "@/types/models";
-import type { AxiosRequestConfig } from "axios";
 import dayjs from "dayjs";
 import { createContext, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 
-type SignAuth = Request<InitiateUser, [body: Partial<User>, config?: AxiosRequestConfig<any> | undefined]>;
+type SignAuth = Request<InitiateUser, [body: Partial<User>, config?: ApiConfig | undefined]>;
 
 type UserValues = {
   user: InitiateUser;
@@ -14,8 +13,8 @@ type UserValues = {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   isSignIn: boolean;
   setIsSignIn: React.Dispatch<React.SetStateAction<boolean>>;
-  initiate: Request<InitiateUser, [config?: AxiosRequestConfig<any> | undefined]>;
-  getUser: Request<User, [config?: AxiosRequestConfig<any> | undefined]>;
+  initiate: Request<InitiateUser, [config?: ApiConfig | undefined]>;
+  getUser: Request<User, [config?: ApiConfig | undefined]>;
   signIn: SignAuth;
   signUp: SignAuth;
 };
@@ -75,7 +74,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       .onSuccess(() => setIsSignIn(true))
       .mergeState(setUser);
 
-  const initiate = useMemo(() => reqInitial(({ signal }, config?: AxiosRequestConfig) => api.user.get("/initiate", { signal, ...config })), []);
+  const initiate = useMemo(() => reqInitial(({ signal }, config?: ApiConfig) => api.user.get("/initiate", { signal, ...config })), []);
 
   useEffect(() => {
     initiate.safeExec().finally(() => setIsInitiated(true));
@@ -98,17 +97,17 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [isInitiated, isSignIn, isSignPage, navigate]);
 
-  const getUser = useMemo(() => reqUser(({ signal }, config?: AxiosRequestConfig) => api.user.get("/", { signal, ...config })), []).retry(2);
+  const getUser = useMemo(() => reqUser(({ signal }, config?: ApiConfig) => api.user.get("/", { signal, ...config })), []).retry(2);
 
   const signIn = useMemo(
     () =>
-      reqInitial(({ signal }, body: Partial<User>, config?: AxiosRequestConfig) => api.auth.post("/signin", body, { signal, ...config })).retry(3),
+      reqInitial(({ signal }, body: Partial<User>, config?: ApiConfig) => api.auth.post("/signin", body, { signal, ...config })).retry(3),
     []
   );
 
   const signUp = useMemo(
     () =>
-      reqInitial(({ signal }, body: Partial<User>, config?: AxiosRequestConfig) => api.auth.post("/signup", body, { signal, ...config })).retry(3),
+      reqInitial(({ signal }, body: Partial<User>, config?: ApiConfig) => api.auth.post("/signup", body, { signal, ...config })).retry(3),
     []
   );
 

@@ -134,20 +134,3 @@ export class Request<T, A extends any[] = [], E extends boolean = false, N exten
     }
   };
 }
-
-type RequestProps<T, A extends any[], N extends NavigateFunction | undefined = undefined> = Partial<
-  Omit<Request<T, A, false, N>, "exec" | "controller">
->;
-
-export function createRequestSchema<T, A extends any[] = [], N extends NavigateFunction | undefined = undefined>(
-  defaultProps?: RequestProps<T, A, N>
-) {
-  return (fetcher: RequestFetcher<T, A>, overrideProps?: RequestProps<T, A, N>) => {
-    const req = new Request<T, A, false, N>(fetcher);
-
-    // assign defaultProps + overrideProps ke instance
-    Object.assign(req, defaultProps || {}, overrideProps || {});
-
-    return req;
-  };
-}

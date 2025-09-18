@@ -10,26 +10,45 @@ export type Config<N> = {
   handleError?: { setError: React.Dispatch<React.SetStateAction<StateErrorServer | null>> } & HandleErrorOptions;
   withLoad?: boolean;
 };
-
 export type Retry = { counted: number; count: number; interval: number };
-
 export type RequestFetcher<T, A extends any[]> = (controller: AbortController, ...args: A) => Promise<ServerSuccess<T>>;
+export type SafeExcResult<T> = { ok: true; data: T } | { ok: false; error: unknown };
 
-export class Request<T, A extends any[] = [], E extends boolean = false, N extends NavigateFunction | undefined = undefined> {
+export class Request<T, A extends any[] = [], N extends NavigateFunction | undefined = undefined> {
   private _fetcher: RequestFetcher<T, A>;
   private _setState?: React.Dispatch<React.SetStateAction<T>>;
   private _navigate?: N;
   private _config: Config<N> = {};
-  private _throwError = false;
   private _onSuccess?: (response: ServerSuccess<T>) => any;
   private _onError?: (error: unknown) => any;
   private _onFinally?: () => any;
   private _retry?: Retry;
   private _transform?: (res: ServerSuccess<T>) => ServerSuccess<T>;
   private _setLoading?: React.Dispatch<React.SetStateAction<boolean>>;
+  private _controller = new AbortController();
 
   constructor(fetcher: RequestFetcher<T, A>) {
     this._fetcher = fetcher;
+  }
+
+  static from<T, A extends any[] = [], N extends NavigateFunction | undefined = undefined>(instance: Request<T, A, N>) {
+    return instance.clone();
+  }
+
+  clone<NT = T, NA extends any[] = A>(fetcher?: RequestFetcher<NT, NA>) {
+    const newInstance = new Request<NT, NA, N>((fetcher as any) ?? this._fetcher);
+    const unclonable = ["_fetcher", "_controller"];
+    Object.getOwnPropertyNames(this).forEach((key) => {
+      if (!unclonable.includes(key)) {
+        (newInstance as any)[key] = (this as any)[key];
+      }
+    });
+    return newInstance;
+  }
+
+  setFetcher<NT, NA extends any[]>(fetcher: RequestFetcher<NT, NA>) {
+    this._fetcher = fetcher as any;
+    return this as unknown as Request<NT, NA, N>;
   }
 
   mergeState<S extends T>(setState: React.Dispatch<React.SetStateAction<S>>) {
@@ -43,8 +62,8 @@ export class Request<T, A extends any[] = [], E extends boolean = false, N exten
   }
 
   navigate(navigate: NavigateFunction) {
-    (this._navigate as any) = navigate;
-    return this as Request<T, A, E, NavigateFunction>;
+    this._navigate = navigate as N;
+    return this as Request<T, A, NavigateFunction>;
   }
 
   setConfig(config: Config<N>) {
@@ -55,11 +74,6 @@ export class Request<T, A extends any[] = [], E extends boolean = false, N exten
   setLoading(setLoading: React.Dispatch<React.SetStateAction<boolean>>) {
     this._setLoading = setLoading;
     return this;
-  }
-
-  throwError<B extends boolean>(throwErr: B) {
-    this._throwError = throwErr;
-    return this as Request<T, A, B, N>;
   }
 
   onSuccess(cb: (response: ServerSuccess<T>) => any) {
@@ -84,19 +98,22 @@ export class Request<T, A extends any[] = [], E extends boolean = false, N exten
 
   transform(cb: (res: ServerSuccess<T>) => ServerSuccess<T>) {
     this._transform = cb;
+    return this;
   }
 
-  abort = new AbortController().abort;
+  abort() {
+    this._controller.abort();
+  }
 
   async initiate(...args: A) {
     await this.exec(...args);
     return this;
   }
 
-  exec: E extends false ? (...args: A) => Promise<ServerSuccess<T> | void> : (...args: A) => Promise<ServerSuccess<T>> = async (...args: A) => {
+  async exec(...args: A): Promise<ServerSuccess<T>> {
     const controller = new AbortController();
-    this.abort = controller.abort;
-    const { _config, _fetcher, _navigate, _throwError, _onError, _onFinally, _onSuccess, _setState, _retry, _transform, _setLoading } = this;
+    this._controller = controller;
+    const { _config, _fetcher, _navigate, _onError, _onFinally, _onSuccess, _setState, _retry, _transform, _setLoading } = this;
     if (_config.withLoad !== false) {
       _setLoading?.(true);
     }
@@ -109,7 +126,7 @@ export class Request<T, A extends any[] = [], E extends boolean = false, N exten
       await _onSuccess?.(res);
       return res;
     } catch (err) {
-      if ((err as Error).name === "AbortError") return;
+      if ((err as Error).name === "AbortError") throw err;
       if (_retry) {
         _retry.counted++;
         if (_retry.counted <= _retry.count) {
@@ -120,17 +137,25 @@ export class Request<T, A extends any[] = [], E extends boolean = false, N exten
       await _onError?.(err);
       if (err instanceof ServerError) {
         if (_config.directOnAuthError) {
-          directOnAuthError(err, _navigate!);
+          directOnAuthError(err, _navigate);
         }
       }
       if (_config.handleError) {
         handleError(err, _config.handleError.setError, _config.handleError);
       }
-      if (_throwError) throw err;
-      return undefined as any;
+      throw err;
     } finally {
       _setLoading?.(false);
       await _onFinally?.();
     }
-  };
+  }
+
+  async safeExec(...args: A): Promise<SafeExcResult<ServerSuccess<T>>> {
+    try {
+      const data = await this.exec(...args);
+      return { ok: true, data };
+    } catch (error) {
+      return { ok: false, error };
+    }
+  }
 }

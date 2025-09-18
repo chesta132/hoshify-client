@@ -1,11 +1,12 @@
-import api from "@/class/server/Api";
-import type { ServerSuccess } from "@/class/server/ServerSuccess";
-import { createRequestHandler, type CreateReqHandlerOptions } from "@/services/requestHandler";
+import api from "@/class/server/ApiClient";
+import { Request, type RequestFetcher } from "@/class/server/Request";
 import type { InitiateUser, User } from "@/types/models";
-import { createMergeState } from "@/utils/hookUtils";
+import type { AxiosRequestConfig } from "axios";
 import dayjs from "dayjs";
-import { createContext, useCallback, useEffect, useMemo, useState } from "react";
+import { createContext, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
+
+type SignAuth = Request<InitiateUser, [body: Partial<User>, config?: AxiosRequestConfig<any> | undefined]>;
 
 type UserValues = {
   user: InitiateUser;
@@ -13,10 +14,10 @@ type UserValues = {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   isSignIn: boolean;
   setIsSignIn: React.Dispatch<React.SetStateAction<boolean>>;
-  initiate: (options?: CreateReqHandlerOptions<InitiateUser>) => Promise<ServerSuccess<InitiateUser>>;
-  getUser: (options?: CreateReqHandlerOptions<User>) => Promise<ServerSuccess<User>>;
-  signIn: (data: Partial<User>, options?: Omit<CreateReqHandlerOptions<InitiateUser>, "directOnAuthError">) => Promise<ServerSuccess<InitiateUser>>;
-  signUp: (data: Partial<User>, options?: Omit<CreateReqHandlerOptions<InitiateUser>, "directOnAuthError">) => Promise<ServerSuccess<InitiateUser>>;
+  initiate: Request<InitiateUser, [config?: AxiosRequestConfig<any> | undefined]>;
+  getUser: Request<User, [config?: AxiosRequestConfig<any> | undefined]>;
+  signIn: SignAuth;
+  signUp: SignAuth;
 };
 
 const defaultUser: InitiateUser = {
@@ -40,10 +41,10 @@ const defaultUser: InitiateUser = {
 
 const defaultValues: UserValues = {
   user: defaultUser,
-  initiate: async () => defaultUser as any,
-  getUser: async () => defaultUser as any,
-  signIn: async () => defaultUser as any,
-  signUp: async () => defaultUser as any,
+  initiate: new Request(() => api.user.get("/")),
+  getUser: new Request(() => api.user.get("/")),
+  signIn: new Request(() => api.user.get("/")),
+  signUp: new Request(() => api.user.get("/")),
   loading: false,
   setLoading() {},
   isSignIn: false,
@@ -62,28 +63,22 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
   const isSignPage = location.pathname === "/signin" || location.pathname === "/signup";
 
-  const mergeUser = useMemo(() => createMergeState<InitiateUser, User>(setUser), [setUser]);
-  const createReqConfig = {
-    setLoading,
-    onSuccess() {
-      setIsSignIn(true);
-    },
-  } as const;
-  const reqInitial = createRequestHandler({ ...createReqConfig, setState: setUser });
-  const reqUser = createRequestHandler({ ...createReqConfig, setState: mergeUser });
+  const reqInitial = <A extends any[]>(fetcher: RequestFetcher<InitiateUser, A>) =>
+    new Request(fetcher)
+      .setLoading(setLoading)
+      .onSuccess(() => setIsSignIn(true))
+      .setState(setUser);
 
-  const initiate = useCallback(
-    (options?: CreateReqHandlerOptions<InitiateUser>) => {
-      return reqInitial<InitiateUser>(() => api.user.get("/initiate"), { directOnAuthError: navigate, ...options });
-    },
-    [reqInitial, navigate]
-  );
+  const reqUser = <A extends any[]>(fetcher: RequestFetcher<User, A>) =>
+    new Request(fetcher)
+      .setLoading(setLoading)
+      .onSuccess(() => setIsSignIn(true))
+      .mergeState(setUser);
+
+  const initiate = useMemo(() => reqInitial(({ signal }, config?: AxiosRequestConfig) => api.user.get("/initiate", { signal, ...config })), []);
 
   useEffect(() => {
-    initiate()
-      // PREVENT ERROR LOG
-      .catch(() => {})
-      .finally(() => setIsInitiated(true));
+    initiate.safeExec().finally(() => setIsInitiated(true));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -103,25 +98,18 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [isInitiated, isSignIn, isSignPage, navigate]);
 
-  const getUser = useCallback(
-    (options?: CreateReqHandlerOptions<User>) => {
-      return reqUser(() => api.user.get("/"), options);
-    },
-    [reqUser]
+  const getUser = useMemo(() => reqUser(({ signal }, config?: AxiosRequestConfig) => api.user.get("/", { signal, ...config })), []).retry(2);
+
+  const signIn = useMemo(
+    () =>
+      reqInitial(({ signal }, body: Partial<User>, config?: AxiosRequestConfig) => api.auth.post("/signin", body, { signal, ...config })).retry(3),
+    []
   );
 
-  const signIn = useCallback(
-    (data: Partial<User>, options?: Omit<CreateReqHandlerOptions<InitiateUser>, "directOnAuthError">) => {
-      return reqInitial<InitiateUser>(() => api.auth.post("/signin", data), options);
-    },
-    [reqInitial]
-  );
-
-  const signUp = useCallback(
-    (data: Partial<User>, options?: Omit<CreateReqHandlerOptions<InitiateUser>, "directOnAuthError">) => {
-      return reqInitial<InitiateUser>(() => api.auth.post("/signup", data), options);
-    },
-    [reqInitial]
+  const signUp = useMemo(
+    () =>
+      reqInitial(({ signal }, body: Partial<User>, config?: AxiosRequestConfig) => api.auth.post("/signup", body, { signal, ...config })).retry(3),
+    []
   );
 
   const value: UserValues = {

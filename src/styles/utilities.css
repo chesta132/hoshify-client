@@ -10,4 +10,9 @@
   .fixed-center {
     @apply fixed top-1/2 left-1/2 -translate-1/2;
   }
+
+  .scroll-bar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
 }

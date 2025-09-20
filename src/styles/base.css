@@ -114,11 +114,6 @@
   --sidebar-ring: oklch(0.729 0.031 123.6);
 }
 
-.scroll-bar {
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
-}
-
 .scroll-bar::-webkit-scrollbar {
   width: 8px;
   height: 8px;

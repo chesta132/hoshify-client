@@ -14,7 +14,7 @@ export type Retry = { counted: number; count: number; interval: number };
 export type RequestFetcher<T, A extends any[]> = (controller: AbortController, ...args: A) => Promise<ServerSuccess<T>>;
 export type SafeExcResult<T> = { ok: true; data: T } | { ok: false; error: unknown };
 
-export class Request<T, A extends any[] = [], N extends NavigateFunction | undefined = undefined> {
+export class Request<T, A extends any[] = [], N extends NavigateFunction | undefined = undefined, L = boolean> {
   private _fetcher: RequestFetcher<T, A>;
   private _setState?: React.Dispatch<React.SetStateAction<T>>;
   private _navigate?: N;
@@ -24,19 +24,19 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
   private _onFinally?: () => any;
   private _retry?: Retry;
   private _transform?: (res: ServerSuccess<T>) => ServerSuccess<T>;
-  private _setLoading?: React.Dispatch<React.SetStateAction<boolean>>;
+  private _loading?: { set: React.Dispatch<React.SetStateAction<L>>; load: L; unLoad: L };
   private _controller = new AbortController();
 
   constructor(fetcher: RequestFetcher<T, A>) {
     this._fetcher = fetcher;
   }
 
-  static from<T, A extends any[] = [], N extends NavigateFunction | undefined = undefined>(instance: Request<T, A, N>) {
+  static from<T, A extends any[] = [], N extends NavigateFunction | undefined = undefined, L = boolean>(instance: Request<T, A, N, L>) {
     return instance.clone();
   }
 
   clone<NT = T, NA extends any[] = A>(fetcher?: RequestFetcher<NT, NA>) {
-    const newInstance = new Request<NT, NA, N>((fetcher as any) ?? this._fetcher);
+    const newInstance = new Request<NT, NA, N, L>((fetcher as any) ?? this._fetcher);
     const unclonable = ["_fetcher", "_controller"];
     Object.getOwnPropertyNames(this).forEach((key) => {
       if (!unclonable.includes(key)) {
@@ -48,7 +48,7 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
 
   setFetcher<NT, NA extends any[]>(fetcher: RequestFetcher<NT, NA>) {
     this._fetcher = fetcher as any;
-    return this as unknown as Request<NT, NA, N>;
+    return this as unknown as Request<NT, NA, N, L>;
   }
 
   mergeState<S extends T>(setState: React.Dispatch<React.SetStateAction<S>>) {
@@ -63,7 +63,7 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
 
   navigate(navigate: NavigateFunction) {
     this._navigate = navigate as N;
-    return this as Request<T, A, NavigateFunction>;
+    return this as Request<T, A, NavigateFunction, L>;
   }
 
   setConfig(config: Config<N>) {
@@ -71,9 +71,12 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
     return this;
   }
 
-  setLoading(setLoading: React.Dispatch<React.SetStateAction<boolean>>) {
-    this._setLoading = setLoading;
-    return this;
+  setLoading<L>(setLoading: React.Dispatch<React.SetStateAction<L>>, value?: { load: L; unLoad: L }) {
+    if (!value) {
+      value = { load: true, unLoad: false } as any;
+    }
+    this._loading = { set: setLoading as any, load: value?.load as any, unLoad: value?.load as any };
+    return this as Request<T, A, N, L>;
   }
 
   onSuccess(cb: (response: ServerSuccess<T>) => any) {
@@ -113,9 +116,9 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
   async exec(...args: A): Promise<ServerSuccess<T>> {
     const controller = new AbortController();
     this._controller = controller;
-    const { _config, _fetcher, _navigate, _onError, _onFinally, _onSuccess, _setState, _retry, _transform, _setLoading } = this;
+    const { _config, _fetcher, _navigate, _onError, _onFinally, _onSuccess, _setState, _retry, _transform, _loading } = this;
     if (_config.withLoad !== false) {
-      _setLoading?.(true);
+      _loading?.set(_loading.load);
     }
     try {
       let res = await _fetcher(controller, ...args);
@@ -145,7 +148,7 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
       }
       throw err;
     } finally {
-      _setLoading?.(false);
+      _loading?.set(_loading.unLoad);
       await _onFinally?.();
     }
   }

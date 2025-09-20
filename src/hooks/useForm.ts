@@ -3,13 +3,13 @@ import type { Config, FormFields } from "@/types/form";
 import { record } from "@/utils/manipulate/object";
 import { useState } from "react";
 
-export type UseFormReturn<T extends FormFields> = {
+export type UseFormReturn<T extends Partial<FormFields>> = {
   readonly form: [T, React.Dispatch<React.SetStateAction<T>>];
   readonly error: [Record<keyof T, "">, React.Dispatch<React.SetStateAction<Record<keyof T, "">>>];
   readonly validate: { validateForm: () => boolean; validateField: (field: Partial<T>) => boolean };
 };
 
-const useForm = <T extends FormFields>(schema: T, config: Config<T>): UseFormReturn<T> => {
+const useForm = <T extends Partial<FormFields>>(schema: T, config: Config<T>): UseFormReturn<T> => {
   const [form, setForm] = useState(schema);
   const [formError, setFormError] = useState(record(schema, ""));
 

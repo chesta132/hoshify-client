@@ -1,24 +1,32 @@
 import type { ErrorResponse } from "./server";
 
-export type ServerFields =
-  | "password"
-  | "newPassword"
-  | "email"
-  | "newEmail"
-  | "newFullName"
-  | "token"
-  | "type"
-  | "refreshMoney"
-  | "title"
-  | "details"
-  | "fullName";
+type FieldPlaces = "server" | "local";
 
 export type StringFields = {
-  server: ServerFields;
+  server:
+    | "password"
+    | "newPassword"
+    | "email"
+    | "newEmail"
+    | "newFullName"
+    | "token"
+    | "type"
+    | "refreshMoney"
+    | "title"
+    | "details"
+    | "fullName"
+    | "link";
   local: "verifyPassword";
 };
 
-export type FormFields = Partial<Record<StringFields[keyof StringFields], string>>;
+export type BooleanFields = {
+  server: "rememberMe";
+  local: never;
+};
+
+export type ServerFields = StringFields["server"] | BooleanFields["server"];
+
+export type FormFields = Partial<Record<StringFields[FieldPlaces], string> & Record<BooleanFields[FieldPlaces], boolean>>;
 
 export type BooleanUnion<T> = {
   [K in keyof T]: T[K] | boolean;
@@ -39,7 +47,7 @@ export type CustomRuleS = Partial<
 
 export type ConfigRuleS<T> = Partial<Record<keyof Omit<T, keyof CustomRuleS>, boolean>>;
 
-export type Config<T extends Partial<FormFields> = FormFields> = ConfigRuleS<T> & Pick<CustomRuleS, Extract<keyof T, keyof CustomRuleS>>;
+export type Config<T extends FormFields = FormFields> = ConfigRuleS<T> & Pick<CustomRuleS, Extract<keyof T, keyof CustomRuleS>>;
 
 export type ValidationRule<T> = {
   condition: (value: T, config: Config, allValue?: Partial<FormFields>) => boolean;

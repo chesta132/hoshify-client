@@ -1,7 +1,7 @@
 import type { Config, FormFields } from "@/types/form";
 import { VALIDATION_RULES } from "@/class/form validator/rule";
 
-export class FormValidator<T extends FormFields> {
+export class FormValidator<T extends Partial<FormFields>> {
   form: T;
   private config: Config<T>;
 
@@ -24,7 +24,7 @@ export class FormValidator<T extends FormFields> {
       if (!rules || value == null) continue;
 
       for (const rule of rules) {
-        if (rule.condition(value.toString(), config, form)) {
+        if (rule.condition(value as any, config, form)) {
           const message = typeof rule.message === "function" ? rule.message(config) : rule.message;
           errors[key] = message;
           hasError = true;

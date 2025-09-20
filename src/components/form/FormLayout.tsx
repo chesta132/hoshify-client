@@ -1,16 +1,15 @@
-import type { CheckboxProps } from "@radix-ui/react-checkbox";
 import { Input, type InputProps } from "./Input";
 import { Link, type LinkProps } from "react-router";
 import type { VariantProps } from "class-variance-authority";
 import { Button, type buttonVariants } from "./button";
 import { TextArea, type TextAreaProps } from "./TextArea";
 import React from "react";
-import { Checkbox } from "./checkbox";
+import { Checkbox, type CheckboxProps } from "./checkbox";
 import type { OneFieldOnly } from "@/types";
 import type { UseFormReturn } from "@/hooks/useForm";
 import type { FormFields } from "@/types/form";
 import { useError } from "@/contexts";
-import { handleFormError } from "@/utils/server/handleError";
+import { handleFormError } from "@/services/handleError";
 import { omit } from "@/utils/manipulate/object";
 import { cn } from "@/lib/utils";
 
@@ -21,7 +20,7 @@ export type ElementTypes = "input" | "checkbox" | "link" | "button" | "textarea"
 type ElementProps<T extends ElementTypes> = T extends "input"
   ? InputProps
   : T extends "checkbox"
-  ? CheckboxProps & React.RefAttributes<HTMLButtonElement>
+  ? CheckboxProps
   : T extends "link"
   ? LinkProps & React.RefAttributes<HTMLAnchorElement>
   : T extends "button"

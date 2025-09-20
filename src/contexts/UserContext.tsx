@@ -56,7 +56,7 @@ export const UserContext = createContext<UserValues>(defaultValues);
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<InitiateUser>(defaultUser);
   const [loading, setLoading] = useState(false);
-  const [isSignIn, setIsSignIn] = useState<boolean>(Boolean(localStorage.getItem("is-sign-in") || "false"));
+  const [isSignIn, setIsSignIn] = useState<boolean>(JSON.safeParse(localStorage.getItem("is-sign-in")!, false));
   const [isInitiated, setIsInitiated] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -100,14 +100,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const getUser = useMemo(() => reqUser(({ signal }, config?: ApiConfig) => api.user.get("/", { signal, ...config })), []).retry(2);
 
   const signIn = useMemo(
-    () =>
-      reqInitial(({ signal }, body: Partial<User>, config?: ApiConfig) => api.auth.post("/signin", body, { signal, ...config })).retry(3),
+    () => reqInitial(({ signal }, body: Partial<User>, config?: ApiConfig) => api.auth.post("/signin", body, { signal, ...config })).retry(3),
     []
   );
 
   const signUp = useMemo(
-    () =>
-      reqInitial(({ signal }, body: Partial<User>, config?: ApiConfig) => api.auth.post("/signup", body, { signal, ...config })).retry(3),
+    () => reqInitial(({ signal }, body: Partial<User>, config?: ApiConfig) => api.auth.post("/signup", body, { signal, ...config })).retry(3),
     []
   );
 

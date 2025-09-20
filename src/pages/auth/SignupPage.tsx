@@ -1,6 +1,5 @@
 import { FormLayout } from "@/components/form/FormLayout";
 import { secAuthMethod } from "@/components/form layout template/secAuthMethod";
-import { Checkbox } from "@/components/form/checkbox";
 import { VITE_SERVER_URL } from "@/config";
 import { useUser } from "@/contexts";
 import useForm from "@/hooks/useForm";
@@ -13,7 +12,7 @@ export const SignupPage = () => {
   const { signUp, loading, setLoading, isSignIn, user } = useUser();
   const navigate = useNavigate();
   const form = useForm(
-    { email: "", password: "", fullName: "", verifyPassword: "" },
+    { email: "", password: "", fullName: "", verifyPassword: "", rememberMe: false },
     { email: { regex: true }, password: { min: 8 }, fullName: true, verifyPassword: true }
   );
   const {
@@ -25,7 +24,7 @@ export const SignupPage = () => {
   }, [isSignIn, navigate, user.role]);
 
   const handleSubmit = async () => {
-    await signUp(omit(formVal, ["verifyPassword"]));
+    await signUp.exec(omit(formVal, ["verifyPassword"]));
     navigate("/");
   };
 
@@ -82,12 +81,7 @@ export const SignupPage = () => {
                 fieldId: "verifyPassword",
                 type: "password",
               },
-              <div className="flex items-center gap-2 text-sm">
-                <Checkbox id="remember-me" className="cursor-pointer" />
-                <label htmlFor="remember-me" className="cursor-pointer">
-                  Remember Me
-                </label>
-              </div>,
+              { elementType: "checkbox", label: "Remember Me", className: "text-sm", fieldId: "rememberMe" },
               { elementType: "separator", label: "OR", afterSubmitButton: true },
               secAuthMethod<typeof formVal>(loading, handleGoogle, "signup"),
             ]}

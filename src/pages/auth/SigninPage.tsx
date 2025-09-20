@@ -1,6 +1,5 @@
 import { FormLayout } from "@/components/form/FormLayout";
 import { secAuthMethod } from "@/components/form layout template/secAuthMethod";
-import { Checkbox } from "@/components/form/checkbox";
 import { VITE_SERVER_URL } from "@/config";
 import { useUser } from "@/contexts";
 import useForm from "@/hooks/useForm";
@@ -11,7 +10,7 @@ import { HoshifyLogo } from "@/components/ui/logo";
 export const SigninPage = () => {
   const { signIn, loading, setLoading, isSignIn, user } = useUser();
   const navigate = useNavigate();
-  const form = useForm({ email: "", password: "" }, { email: { regex: true }, password: { min: 8 } });
+  const form = useForm({ email: "", password: "", rememberMe: false }, { email: { regex: true }, password: { min: 8 } });
   const {
     form: [formVal],
   } = form;
@@ -21,7 +20,7 @@ export const SigninPage = () => {
   }, [isSignIn, navigate, user.role]);
 
   const handleSubmit = async () => {
-    await signIn(formVal);
+    await signIn.exec(formVal);
     navigate("/");
   };
 
@@ -69,10 +68,7 @@ export const SigninPage = () => {
                 layoutDirection: "row",
                 className: "justify-between flex text-sm",
                 items: [
-                  {
-                    elementType: "custom",
-                    render: <Checkbox id="remember-me" className="cursor-pointer" label="Remember Me" />,
-                  },
+                  { elementType: "checkbox", label: "Remember Me", className: "text-sm", fieldId: "rememberMe" },
                   { elementType: "link", to: "/forgot-password", className: "text-link", children: "Forgot Password" },
                 ],
               },

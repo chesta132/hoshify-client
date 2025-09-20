@@ -1,11 +1,19 @@
 import { VITE_ENV } from "@/config";
 
-JSON.isJSON = function (item: any) {
+JSON.isJSON = function (text) {
   try {
-    JSON.parse(item);
+    JSON.parse(text);
     return true;
   } catch {
     return false;
+  }
+};
+
+JSON.safeParse = function <T>(text?: string, fallback?: T) {
+  try {
+    return this.parse(text || "invalid");
+  } catch {
+    return fallback;
   }
 };
 

@@ -19,14 +19,29 @@ interface JSON {
   /**
    * Checks if a given value is a valid JSON string.
    *
-   * @param item - The value to test
+   * @param text - The value to test
    * @returns True if the value is a valid JSON string, false otherwise
    *
    * @example
    * JSON.isJSON('{"a":1}') // true
    * JSON.isJSON('invalid') // false
    */
-  isJSON: (item: any) => boolean;
+  isJSON: (text: string) => boolean;
+
+  /**
+   * Safely parses a JSON string into a JavaScript value.
+   * Returns the parsed value if valid, or the given fallback value if parsing fails.
+   *
+   * @param text - The JSON string to parse.
+   * @param fallback - The value to return if parsing fails (default: undefined).
+   * @returns The parsed value if valid JSON, otherwise the fallback.
+   *
+   * @example
+   * JSON.safeParse('{"a":1}') // { a: 1 }
+   * JSON.safeParse<number>("123", 0) // 123
+   * JSON.safeParse<number>("not-a-number", 0) // 0
+   */
+  safeParse: <T = any>(text?: string, fallback?: T) => T;
 }
 
 interface ObjectConstructor {

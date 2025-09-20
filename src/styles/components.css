@@ -1,0 +1,17 @@
+@custom-variant hover (&:hover);
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50 font-manrope;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+input::-webkit-search-cancel-button,
+input::-webkit-clear-button {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}

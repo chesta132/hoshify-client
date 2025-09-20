@@ -1,0 +1,13 @@
+@layer utilities {
+  .text-link {
+    @apply text-primary underline hover:text-primary/80 transition-colors focus:outline-none focus:text-primary/80;
+  }
+
+  .absolute-center {
+    @apply absolute top-1/2 left-1/2 -translate-1/2;
+  }
+
+  .fixed-center {
+    @apply fixed top-1/2 left-1/2 -translate-1/2;
+  }
+}

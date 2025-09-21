@@ -1,5 +1,6 @@
 import type { FieldValidations, FormFields } from "@/types/form";
 import { isValidEmail } from "./validator";
+import { isValidUrl } from "@/utils/manipulate/string";
 
 export const VALIDATION_RULES: FieldValidations<FormFields> = {
   title: [
@@ -72,4 +73,5 @@ export const VALIDATION_RULES: FieldValidations<FormFields> = {
       message: "New full name is required",
     },
   ],
+  link: [{ condition: (value, config) => !!(config.link && !isValidUrl(value!)), message: "Invalid URL" }],
 };

@@ -5,7 +5,18 @@ import { handleFormError } from "./handleError";
 import type { FormGroup } from "@/hooks/useForm";
 import type { Popup } from "@/pages/dashboard/quick links/QuickLinks";
 
-export const useDeleteLink = ({ setOptionIndex }: { setOptionIndex: React.Dispatch<React.SetStateAction<number | null>> }) => {
+type LinkServiceProps = {
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  formGroup: FormGroup<{
+    link: string;
+    title: string;
+  }>;
+  handlePopup: (action: Popup) => void;
+  editId: string | false;
+  setOptionIndex: React.Dispatch<React.SetStateAction<number | null>>;
+};
+
+export const useDeleteLink = ({ setOptionIndex }: Pick<LinkServiceProps, "setOptionIndex">) => {
   const { setUser } = useUser();
   const { setError } = useError();
 
@@ -26,18 +37,7 @@ export const useDeleteLink = ({ setOptionIndex }: { setOptionIndex: React.Dispat
   };
 };
 
-export const useUpdateLink = ({
-  setLoading,
-  formGroup,
-  handlePopup,
-}: {
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  formGroup: FormGroup<{
-    link: string;
-    title: string;
-  }>;
-  handlePopup: (action: Popup) => void;
-}) => {
+export const useUpdateLink = ({ setLoading, formGroup, handlePopup }: Pick<LinkServiceProps, "formGroup" | "setLoading" | "handlePopup">) => {
   const { setError } = useError();
   const { setUser } = useUser();
 
@@ -66,15 +66,7 @@ export const useCreateLink = ({
   formGroup,
   handlePopup,
   editId,
-}: {
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  formGroup: FormGroup<{
-    link: string;
-    title: string;
-  }>;
-  handlePopup: (action: Popup) => void;
-  editId: string | false;
-}) => {
+}: Pick<LinkServiceProps, "editId" | "handlePopup" | "formGroup" | "setLoading">) => {
   const { setError } = useError();
   const { setUser, user } = useUser();
 

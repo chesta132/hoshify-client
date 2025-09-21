@@ -32,7 +32,7 @@ export const Input = ({
   placeholder,
   error,
   label,
-  value = "",
+  value,
   className,
   optional,
   classLabel,
@@ -50,7 +50,7 @@ export const Input = ({
   focusRing,
   ...inputProps
 }: InputProps) => {
-  const [internalValue, setInternalValue] = useState(value);
+  const [internalValue, setInternalValue] = useState(value || "");
   const [isFocus, setIsFocus] = useState(focus === undefined ? internalValue !== "" : focus);
   const [inputType, setInputType] = useState(type);
   const [style, setStyle] = useState<React.CSSProperties>({});
@@ -71,7 +71,7 @@ export const Input = ({
   }, [start, end]);
 
   useLayoutEffect(() => {
-    if (value !== internalValue) setInternalValue(value);
+    if (value && value !== internalValue) setInternalValue(value);
     if (internalValue !== "") setIsFocus(true);
   }, [value, internalValue]);
 

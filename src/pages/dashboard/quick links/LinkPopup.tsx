@@ -6,7 +6,7 @@ import useForm from "@/hooks/useForm";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { formSchema, type Popup } from "./QuickLinks";
-import { useUpdateLink, useCreateLink } from "@/services/linkService";
+import { useCreateLink, useUpdateLink } from "@/services/linkService";
 
 export function LinkPopup({ popup, setPopup }: { popup: Popup; setPopup: React.Dispatch<React.SetStateAction<Popup>> }) {
   const inputField = { elementType: "input", size: "sm", classLabel: "bg-popover" } as const;
@@ -34,8 +34,8 @@ export function LinkPopup({ popup, setPopup }: { popup: Popup; setPopup: React.D
     setPopup(action);
   };
 
-  const handleCreate = useUpdateLink({ formGroup, handlePopup, setLoading });
-  const handleEdit = useCreateLink({ editId, formGroup, handlePopup, setLoading });
+  const handleCreate = useCreateLink({ formGroup, handlePopup, setLoading });
+  const handleEdit = useUpdateLink({ editId, formGroup, handlePopup, setLoading });
 
   return (
     <PopupWrapper blur>

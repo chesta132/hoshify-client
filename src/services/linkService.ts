@@ -1,9 +1,10 @@
 import api from "@/class/server/ApiClient";
-import { Request } from "@/class/server/Request";
+import { Request, type RequestFetcher } from "@/class/server/Request";
 import { useError, useUser } from "@/contexts";
 import { handleFormError } from "./handleError";
 import type { FormGroup } from "@/hooks/useForm";
 import type { Popup } from "@/pages/dashboard/quick links/QuickLinks";
+import type { SetGlobalError } from "@/contexts/ErrorContext";
 
 type LinkServiceProps = {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -14,6 +15,22 @@ type LinkServiceProps = {
   handlePopup: (action: Popup) => void;
   editId: string | false;
   setOptionIndex: React.Dispatch<React.SetStateAction<number | null>>;
+};
+
+const createRequest = <T, A extends any[]>(
+  fetcher: RequestFetcher<T, A>,
+  {
+    setLoading,
+    setFormError,
+    setError,
+  }: Pick<LinkServiceProps, "setLoading"> & { setFormError: LinkServiceProps["formGroup"]["error"][1]; setError: SetGlobalError }
+) => {
+  return new Request(fetcher)
+    .loading(setLoading)
+    .retry(3)
+    .onError((err) => {
+      handleFormError(err, setFormError, setError);
+    });
 };
 
 export const useDeleteLink = ({ setOptionIndex }: Pick<LinkServiceProps, "setOptionIndex">) => {
@@ -37,7 +54,7 @@ export const useDeleteLink = ({ setOptionIndex }: Pick<LinkServiceProps, "setOpt
   };
 };
 
-export const useUpdateLink = ({ setLoading, formGroup, handlePopup }: Pick<LinkServiceProps, "formGroup" | "setLoading" | "handlePopup">) => {
+export const useCreateLink = ({ setLoading, formGroup, handlePopup }: Pick<LinkServiceProps, "formGroup" | "setLoading" | "handlePopup">) => {
   const { setError } = useError();
   const { setUser } = useUser();
 
@@ -47,12 +64,7 @@ export const useUpdateLink = ({ setLoading, formGroup, handlePopup }: Pick<LinkS
       error: [_, setFormError],
     } = formGroup;
 
-    return new Request(({ signal }) => api.link.post("/", form, { signal }))
-      .loading(setLoading)
-      .retry(3)
-      .onError((err) => {
-        handleFormError(err, setFormError, setError);
-      })
+    return createRequest(({ signal }) => api.link.post("/", form, { signal }), { setError, setFormError, setLoading })
       .onSuccess((res) => {
         setUser((prev) => ({ ...prev, links: [...prev.links, res.data] }));
         handlePopup("closed");
@@ -61,7 +73,7 @@ export const useUpdateLink = ({ setLoading, formGroup, handlePopup }: Pick<LinkS
   };
 };
 
-export const useCreateLink = ({
+export const useUpdateLink = ({
   setLoading,
   formGroup,
   handlePopup,
@@ -81,14 +93,7 @@ export const useCreateLink = ({
     if (!link) return handlePopup("closed");
     if (compareOld(link)) return;
 
-    const updateLink = new Request(({ signal }) => api.link.put(`/${editId}`, form, { signal }))
-      .loading(setLoading)
-      .retry(3)
-      .onError((err) => {
-        handleFormError(err, setFormError, setError);
-      });
-
-    return updateLink
+    return createRequest(({ signal }) => api.link.put(`/${editId}`, form, { signal }), { setError, setFormError, setLoading })
       .onSuccess((res) => {
         setUser((prev) => {
           const linkPosition = prev.links.findIndex((link) => link.id === editId);

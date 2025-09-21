@@ -1,5 +1,7 @@
-import type { StateErrorServer } from "@/types/server";
+import type { StateErrorServer } from "@/types/server/codes";
 import { createContext, useCallback, useState } from "react";
+
+export type SetGlobalError = React.Dispatch<React.SetStateAction<StateErrorServer | null>>;
 
 type ErrorValues = {
   error: StateErrorServer | null;

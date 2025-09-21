@@ -9,6 +9,7 @@ type SignAuth = Request<InitiateUser, [body: Partial<User>, config?: ApiConfig |
 
 type UserValues = {
   user: InitiateUser;
+  setUser: React.Dispatch<React.SetStateAction<InitiateUser>>;
   loading: boolean;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   isSignIn: boolean;
@@ -40,6 +41,7 @@ const defaultUser: InitiateUser = {
 
 const defaultValues: UserValues = {
   user: defaultUser,
+  setUser() {},
   initiate: new Request(() => api.user.get("/")),
   getUser: new Request(() => api.user.get("/")),
   signIn: new Request(() => api.user.get("/")),
@@ -64,13 +66,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const reqInitial = <A extends any[]>(fetcher: RequestFetcher<InitiateUser, A>) =>
     new Request(fetcher)
-      .setLoading(setLoading)
+      .loading(setLoading)
       .onSuccess(() => setIsSignIn(true))
       .setState(setUser);
 
   const reqUser = <A extends any[]>(fetcher: RequestFetcher<User, A>) =>
     new Request(fetcher)
-      .setLoading(setLoading)
+      .loading(setLoading)
       .onSuccess(() => setIsSignIn(true))
       .mergeState(setUser);
 
@@ -112,6 +114,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const value: UserValues = {
     initiate,
     user,
+    setUser,
     loading,
     setLoading,
     getUser,

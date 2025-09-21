@@ -71,7 +71,9 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
     return this;
   }
 
-  setLoading<L>(setLoading: React.Dispatch<React.SetStateAction<L>>, value?: { load: L; unLoad: L }) {
+  loading(setLoading: React.Dispatch<React.SetStateAction<boolean>>, value?: { load: boolean; unLoad: boolean }): Request<T, A, N, boolean>;
+  loading<L>(setLoading: React.Dispatch<React.SetStateAction<L>>, value: { load: L; unLoad: L }): Request<T, A, N, L>;
+  loading<L>(setLoading: React.Dispatch<React.SetStateAction<L>>, value?: { load: L; unLoad: L }) {
     if (!value) {
       value = { load: true, unLoad: false } as any;
     }

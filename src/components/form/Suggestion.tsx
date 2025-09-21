@@ -200,7 +200,7 @@ export const Suggestion = ({ inputRef, source, setValue, className, style, max, 
               </AnimatePresence>
               <div className="flex gap-2 items-center">
                 {icon}
-                <span className="text-[13.5px]">{ellipsis(suggestion, { width: { px: position.width - 100, fontSize: 13.5 } })}</span>
+                <span className="text-[13.5px]">{ellipsis(suggestion, { px: position.width - 100, fontSize: 13.5 })}</span>
               </div>
               <div className="flex gap-1">
                 <Button aria-label="Delete suggestion" type="button" variant={"ghost"} size={"icon"} onMouseDown={del} onKeyDown={del}>

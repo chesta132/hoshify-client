@@ -36,7 +36,7 @@ export const Search = () => {
             }
             break;
           case "/":
-            if (active !== current) {
+            if (active !== current && e.ctrlKey) {
               e.preventDefault();
               current.focus();
             }

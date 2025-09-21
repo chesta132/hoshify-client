@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/form/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Checkbox } from "@/components/form/checkbox";
-import { ArrowUpNarrowWide, Filter, X } from "lucide-react";
+import { ArrowUpNarrowWide, Filter } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { capital } from "@/utils/manipulate/string";
 import { useSearch } from "@/contexts";
@@ -45,13 +45,10 @@ export function FilterSearch() {
         </Button>
       </PopoverTrigger>
       <PopoverContent id="filter-popover-content" className="w-64 p-4 space-y-4" aria-label="Filter and sort options">
-        <div className="relative">
+        <div>
           <h4 id="filter-section-title" className="font-medium mb-2">
             Filter
           </h4>
-          <Button className="absolute top-0 right-0" variant={"ghost"} size={"sm"} onClick={() => handleOpen(false)}>
-            <X />
-          </Button>
           <div className="flex flex-col gap-2 text-sm" role="group" aria-labelledby="filter-section-title">
             {searchableModels.map((model) => (
               <label key={model} className="flex items-center gap-2 cursor-pointer w-fit">
@@ -101,9 +98,14 @@ export function FilterSearch() {
             </Button>
           </div>
         </div>
-        <Button className="w-full mt-3" onClick={applyFilters} aria-label="Apply selected filters and sorting">
-          Apply
-        </Button>
+        <div className="w-full mt-3 flex gap-2">
+          <Button className="w-1/2" onClick={() => handleOpen(false)} aria-label="Apply selected filters and sorting" variant={"outline"}>
+            Cancel
+          </Button>
+          <Button className="w-1/2" onClick={applyFilters} aria-label="Apply selected filters and sorting">
+            Apply
+          </Button>
+        </div>
       </PopoverContent>
     </Popover>
   );

@@ -6,7 +6,7 @@ import { useEffect } from "react";
  *
  * @param ref - A single React ref object or an array of React ref objects. The hook will monitor clicks outside of these element(s).
  * @param callback - Function to run when a click is detected outside of the given element(s).
- * 
+ *
  * @example
  * // Single element
  * const ref = useRef<HTMLDivElement>(null);
@@ -18,9 +18,9 @@ import { useEffect } from "react";
  * const ref2 = useRef<HTMLHeaderElement>(null)
  * useClickOutside([ref1, ref2], () => setOpen(false));
  */
-export function useClickOutside<T extends Element>(ref: React.RefObject<T | null>, callback: (ref: React.RefObject<T>) => void): void;
-export function useClickOutside<T extends Element>(ref: React.RefObject<T | null>[], callback: (ref: React.RefObject<T>[]) => void): void;
-export function useClickOutside<T extends Element>(ref: React.RefObject<T | null> | React.RefObject<T | null>[], callback: (ref: any) => void) {
+export function useClickOutside<T extends Element>(ref: React.RefObject<T | null>, callback: (e: MouseEvent) => void): void;
+export function useClickOutside<T extends Element>(ref: React.RefObject<T | null>[], callback: (e: MouseEvent) => void): void;
+export function useClickOutside<T extends Element>(ref: React.RefObject<T | null> | React.RefObject<T | null>[], callback: (e: MouseEvent) => void) {
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as Element | null;
@@ -29,12 +29,12 @@ export function useClickOutside<T extends Element>(ref: React.RefObject<T | null
       if (Array.isArray(ref)) {
         if (ref.some((r) => !r.current)) return;
         if (ref.every((r) => r.current && !r.current.contains(target))) {
-          callback(ref);
+          callback(e);
         }
       } else {
         if (!ref.current) return;
         if (!ref.current.contains(target)) {
-          callback(ref);
+          callback(e);
         }
       }
     };

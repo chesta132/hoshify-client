@@ -47,7 +47,7 @@ export const omit = <T extends Record<string, any>, Z extends (keyof T)[] = []>(
  * // rec: { foo: boolean; bar: boolean } = { foo: false, bar: false }
  * ```
  */
-export const record = <T extends Record<string, any>, Z extends AllType>(data: T, recordType: Z) => {
+export const record = <T extends Record<string, any>, Z>(data: T, recordType: Z) => {
   const buildedData = { ...data } as Record<keyof T, Z>;
   Object.keys(buildedData).forEach((key: keyof T) => {
     buildedData[key] = recordType;

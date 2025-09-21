@@ -6,7 +6,7 @@ import { TextArea, type TextAreaProps } from "./TextArea";
 import React from "react";
 import { Checkbox, type CheckboxProps } from "./checkbox";
 import type { OneFieldOnly } from "@/types";
-import type { UseFormReturn } from "@/hooks/useForm";
+import type { FormGroup } from "@/hooks/useForm";
 import type { FormFields } from "@/types/form";
 import { useError } from "@/contexts";
 import { handleFormError } from "@/services/handleError";
@@ -52,7 +52,7 @@ export type FormItems<F extends FormFields, D extends Direction = "row"> = FormI
 
 export type FormLayoutProps<F extends FormFields, C extends boolean, D extends Direction> = {
   items: FormItems<F, D>[];
-  form: UseFormReturn<F>;
+  form: FormGroup<F>;
   asChild?: C;
   onFormSubmit?: (event: React.FormEvent<HTMLDivElement> | React.FormEvent<HTMLFormElement>, formValue: F) => any;
 } & (C extends true
@@ -70,6 +70,8 @@ export const FormLayout = <F extends FormFields, C extends boolean, D extends Di
   form,
   asChild,
   onFormSubmit,
+  className,
+  children,
   ...wrapperProps
 }: FormLayoutProps<F, C, D>) => {
   const {
@@ -97,7 +99,7 @@ export const FormLayout = <F extends FormFields, C extends boolean, D extends Di
   const Wrapper: React.ElementType = asChild ? "div" : "form";
 
   return (
-    <Wrapper className={cn("flex flex-col gap-1", asChild && "gap-2")} onSubmit={handleSubmit} {...(wrapperProps as any)}>
+    <Wrapper className={cn("flex flex-col gap-2", className)} onSubmit={handleSubmit} {...(wrapperProps as any)}>
       <RenderLayout items={items} form={form} afterSubmit={false} />
       {submitButton === undefined ? (
         <Button
@@ -109,13 +111,14 @@ export const FormLayout = <F extends FormFields, C extends boolean, D extends Di
         submitButton
       )}
       <RenderLayout items={items} form={form} afterSubmit={true} />
+      {children}
     </Wrapper>
   );
 };
 
 type RenderLayoutProps<F extends FormFields, D extends Direction> = {
   items: FormItems<F, D>[];
-  form: UseFormReturn<F>;
+  form: FormGroup<F>;
   afterSubmit: boolean;
 };
 

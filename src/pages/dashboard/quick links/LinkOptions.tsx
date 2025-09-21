@@ -6,7 +6,7 @@ import { EllipsisVertical } from "lucide-react";
 import { useRef, useState } from "react";
 import { Link } from "react-router";
 import type { Popup } from "./QuickLinks";
-import { serviceDeleteLink } from "@/services/linkService";
+import { useDeleteLink } from "@/services/linkService";
 
 export const LinkOptions = ({ setPopup }: { setPopup: React.Dispatch<React.SetStateAction<Popup>> }) => {
   const { user } = useUser();
@@ -20,7 +20,7 @@ export const LinkOptions = ({ setPopup }: { setPopup: React.Dispatch<React.SetSt
     setPopup(action);
   };
 
-  const handleDelete = serviceDeleteLink({ setOptionIndex });
+  const handleDelete = useDeleteLink({ setOptionIndex });
 
   return (
     <>

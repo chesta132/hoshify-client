@@ -5,12 +5,11 @@ import { handleFormError } from "./handleError";
 import type { FormGroup } from "@/hooks/useForm";
 import type { Popup } from "@/pages/dashboard/quick links/QuickLinks";
 
-export const serviceDeleteLink =
-  ({ setOptionIndex }: { setOptionIndex: React.Dispatch<React.SetStateAction<number | null>> }) =>
-  async (id: string) => {
-    const { setUser } = useUser();
-    const { setError } = useError();
+export const useDeleteLink = ({ setOptionIndex }: { setOptionIndex: React.Dispatch<React.SetStateAction<number | null>> }) => {
+  const { setUser } = useUser();
+  const { setError } = useError();
 
+  return async (id: string) => {
     return await new Request(({ signal }) => api.link.delete(`/${id}`, { signal }))
       .retry(3)
       .onSuccess(() => {
@@ -25,23 +24,24 @@ export const serviceDeleteLink =
       .setConfig({ handleError: { setError } })
       .exec();
   };
+};
 
-export const serviceUpdateLink =
-  ({
-    setLoading,
-    formGroup,
-    handlePopup,
-  }: {
-    setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-    formGroup: FormGroup<{
-      link: string;
-      title: string;
-    }>;
-    handlePopup: (action: Popup) => void;
-  }) =>
-  () => {
-    const { setError } = useError();
-    const { setUser } = useUser();
+export const useUpdateLink = ({
+  setLoading,
+  formGroup,
+  handlePopup,
+}: {
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  formGroup: FormGroup<{
+    link: string;
+    title: string;
+  }>;
+  handlePopup: (action: Popup) => void;
+}) => {
+  const { setError } = useError();
+  const { setUser } = useUser();
+
+  return () => {
     const {
       form: [form],
       error: [_, setFormError],
@@ -59,25 +59,26 @@ export const serviceUpdateLink =
       })
       .exec();
   };
+};
 
-export const serviceCreateLink =
-  ({
-    setLoading,
-    formGroup,
-    handlePopup,
-    editId,
-  }: {
-    setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-    formGroup: FormGroup<{
-      link: string;
-      title: string;
-    }>;
-    handlePopup: (action: Popup) => void;
-    editId: string | false;
-  }) =>
-  () => {
-    const { setError } = useError();
-    const { setUser, user } = useUser();
+export const useCreateLink = ({
+  setLoading,
+  formGroup,
+  handlePopup,
+  editId,
+}: {
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  formGroup: FormGroup<{
+    link: string;
+    title: string;
+  }>;
+  handlePopup: (action: Popup) => void;
+  editId: string | false;
+}) => {
+  const { setError } = useError();
+  const { setUser, user } = useUser();
+
+  return () => {
     const {
       form: [form],
       error: [_, setFormError],
@@ -107,3 +108,4 @@ export const serviceCreateLink =
       })
       .exec();
   };
+};

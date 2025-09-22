@@ -20,7 +20,7 @@ export const LinkOptions = ({ setPopup }: { setPopup: React.Dispatch<React.SetSt
     setPopup(action);
   };
 
-  const { deleteLink } = useLinkService({ handlePopup, setOptionIndex });
+  const { deleteLink } = useLinkService("delete", { setOptionIndex });
 
   const linkIcons = user.links.map(({ link }) => {
     const className = "w-10 p-2 bg-card-foreground/20 rounded-md";

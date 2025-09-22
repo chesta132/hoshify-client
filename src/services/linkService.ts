@@ -2,37 +2,44 @@ import api from "@/class/server/ApiClient";
 import { Request } from "@/class/server/Request";
 import { useError, useUser } from "@/contexts";
 import type { FormGroup } from "@/hooks/useForm";
-import type { Popup } from "@/pages/dashboard/quick links/QuickLinks";
 import type { ServerSuccess } from "@/class/server/ServerSuccess";
 import type { Link } from "@/types/models";
+import type { UnionToInter } from "@/types";
+
+type FormItems = {
+  link: string;
+  title: string;
+};
 
 type LinkServiceProps = {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  formGroup: FormGroup<{
-    link: string;
-    title: string;
-  }>;
-  handlePopup: (action: Popup) => void;
-  editId: string | false;
+  formGroup: FormGroup<FormItems>;
   setOptionIndex: React.Dispatch<React.SetStateAction<number | null>>;
 };
 
 type DeleteLink = { deleteLink: (id: string) => Promise<ServerSuccess<Link>> };
-type CreateLink = { createLink: () => Promise<ServerSuccess<Link>> };
-type UpdateLinkk = { updateLink: () => void | Promise<ServerSuccess<Link>> };
+type CreateLink = { createLink: (form: FormItems) => Promise<ServerSuccess<Link>> };
+type UpdateLink = { updateLink: (update: FormItems) => void | Promise<ServerSuccess<Link>> };
 
-export function useLinkService(depedences: Pick<LinkServiceProps, "handlePopup" | "setOptionIndex">): DeleteLink;
-export function useLinkService(depedences: Pick<LinkServiceProps, "formGroup" | "handlePopup" | "editId" | "setLoading">): CreateLink & UpdateLinkk;
-export function useLinkService(depedences: LinkServiceProps): CreateLink & UpdateLinkk & DeleteLink;
+type ServiceMap = {
+  create: { dep: Pick<LinkServiceProps, "formGroup" | "setLoading">; ret: CreateLink };
+  update: { dep: Pick<LinkServiceProps, "formGroup" | "setLoading">; ret: UpdateLink };
+  delete: { dep: Pick<LinkServiceProps, "setOptionIndex">; ret: DeleteLink };
+};
 
-export function useLinkService({ editId, formGroup, handlePopup, setOptionIndex, setLoading }: Partial<LinkServiceProps>) {
+type Services = keyof ServiceMap;
+
+type Depedencies<S extends Services> = [dep: ServiceMap[S]["dep"]];
+type AvailableService<S extends Services> = ServiceMap[S]["ret"];
+
+export function useLinkService<S extends Services>(service: S | S[], ...depedences: Depedencies<S>): UnionToInter<AvailableService<S>>;
+export function useLinkService(service: Services | Services[], { formGroup, setOptionIndex, setLoading }: Partial<LinkServiceProps> = {}) {
   const { setUser, user } = useUser();
   const { setError } = useError();
 
   const {
-    form: [form],
     validate: { compareOld },
-  } = formGroup || { form: [], validate: {} };
+  } = formGroup || { validate: {} };
 
   const getLinks = new Request(() => api.link.get("/")).retry(3);
   if (setLoading) getLinks.loading(setLoading);
@@ -48,28 +55,35 @@ export function useLinkService({ editId, formGroup, handlePopup, setOptionIndex,
       .exec();
   };
 
-  const createLink = () =>
+  const createLink = (formItem: FormItems) =>
     getLinks
-      .clone(({ signal }) => api.link.post("/", form, { signal }))
+      .clone(({ signal }) => api.link.post("/", formItem, { signal }))
       .onSuccess((res) => {
         setUser((prev) => ({ ...prev, links: [...prev.links, res.data] }));
-        handlePopup?.("closed");
       })
       .exec();
 
-  const updateLink = () => {
-    const link = user.links.find((link) => link.id === editId);
-    if (!link) return handlePopup?.("closed");
-    if (compareOld?.(link)) return;
+  const updateLink = (update: Partial<Link>) => {
+    const link = user.links.find((link) => link.id === update.id);
+    if (!link || compareOld?.(link)) return;
 
     return getLinks
-      .clone(({ signal }) => api.link.put(`/${editId}`, form, { signal }))
+      .clone(({ signal }) => api.link.put(`/${update.id}`, update, { signal }))
       .onSuccess((res) => {
         setUser((prev) => ({ ...prev, links: prev.links.map((link) => (link.id === res.data.id ? res.data : link)) }));
-        handlePopup?.("closed");
       })
       .exec();
   };
 
-  return { createLink, deleteLink, updateLink };
+  const services = {
+    create: { createLink },
+    update: { updateLink },
+    delete: { deleteLink },
+  };
+
+  if (Array.isArray(service)) {
+    return service.reduce((acc, key) => Object.assign(acc, services[key]), {});
+  }
+
+  return services[service];
 }

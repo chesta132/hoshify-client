@@ -18,7 +18,7 @@ export function LinkPopup({ popup, setPopup }: { popup: Popup; setPopup: React.D
   const [loading, setLoading] = useState(false);
 
   const {
-    form: [__, setForm],
+    form: [form, setForm],
     error: [_, setFormError],
   } = formGroup;
 
@@ -34,7 +34,7 @@ export function LinkPopup({ popup, setPopup }: { popup: Popup; setPopup: React.D
     setPopup(action);
   };
 
-  const { createLink, updateLink } = useLinkService({ formGroup, handlePopup, editId, setLoading });
+  const { createLink, updateLink } = useLinkService(["create", "update"], { formGroup, setLoading });
 
   return (
     <PopupWrapper blur>
@@ -60,7 +60,7 @@ export function LinkPopup({ popup, setPopup }: { popup: Popup; setPopup: React.D
           ]}
           form={formGroup}
           submitButton={null}
-          onFormSubmit={editId ? updateLink : createLink}
+          onFormSubmit={async () => (editId ? await updateLink(form) : await createLink(form)) && handlePopup("closed")}
         >
           <div className="flex gap-2 justify-end">
             <Button

@@ -2,8 +2,8 @@ import { useUser } from "@/contexts";
 import { useClickOutside } from "@/hooks/useEventListener";
 import { cn } from "@/lib/utils";
 import { capital, ellipsis, newLiner } from "@/utils/manipulate/string";
-import { EllipsisVertical } from "lucide-react";
-import { useRef, useState } from "react";
+import { Earth, EllipsisVertical, Mail, Phone } from "lucide-react";
+import React, { useRef, useState } from "react";
 import { Link } from "react-router";
 import type { Popup } from "./QuickLinks";
 import { useLinkService } from "@/services/linkService";
@@ -22,6 +22,19 @@ export const LinkOptions = ({ setPopup }: { setPopup: React.Dispatch<React.SetSt
 
   const { deleteLink } = useLinkService({ handlePopup, setOptionIndex });
 
+  const linkIcons = user.links.map(({ link }) => {
+    const className = "w-10 p-2 bg-card-foreground/20 rounded-md";
+    try {
+      const u = new URL(link);
+      if (u.protocol === "mailto:") return <Mail size={40} className={className} />;
+      if (u.protocol === "tel:") return <Phone size={40} className={className} />;
+      if (u.protocol === "localhost:" || u.hostname === "localhost" || /^\d{1,3}(\.\d{1,3}){3}$/.test(u.hostname))
+        return <Earth size={40} className={className} />;
+    } catch {
+      return <Earth size={40} className={className} />;
+    }
+  });
+
   return (
     <>
       {user.links.map(({ id, link, title }, idx) => (
@@ -37,12 +50,16 @@ export const LinkOptions = ({ setPopup }: { setPopup: React.Dispatch<React.SetSt
             linkRefs.current[idx] = { current: el };
           }}
         >
-          <img
-            src={`https://www.google.com/s2/favicons?domain_url=${link}&sz=24`}
-            alt={`${capital(title)} favicon`}
-            sizes="24"
-            className="w-10 p-2 bg-card-foreground/20 rounded-md"
-          />
+          {React.isValidElement(linkIcons[idx]) ? (
+            linkIcons[idx]
+          ) : (
+            <img
+              src={`https://www.google.com/s2/favicons?domain=${link}&sz=24`}
+              alt={`${capital(title)} favicon`}
+              sizes="24"
+              className="w-10 p-2 bg-card-foreground/20 rounded-md"
+            />
+          )}
           <span>{ellipsis(newLiner(title, { fontSize: 16, px: 80 }), { px: 145, fontSize: 16 })}</span>
           <button
             className={cn(

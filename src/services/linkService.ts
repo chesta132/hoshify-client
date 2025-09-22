@@ -14,7 +14,7 @@ type FormItems = {
 type LinkServiceProps = {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   formGroup: FormGroup<FormItems>;
-  setOptionIndex: React.Dispatch<React.SetStateAction<number | null>>;
+  setOptionOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 type DeleteLink = { deleteLink: (id: string) => Promise<ServerSuccess<Link>> };
@@ -24,16 +24,16 @@ type UpdateLink = { updateLink: (update: FormItems) => void | Promise<ServerSucc
 type ServiceMap = {
   create: { dep: Pick<LinkServiceProps, "formGroup" | "setLoading">; ret: CreateLink };
   update: { dep: Pick<LinkServiceProps, "formGroup" | "setLoading">; ret: UpdateLink };
-  delete: { dep: Pick<LinkServiceProps, "setOptionIndex">; ret: DeleteLink };
+  delete: { dep: Pick<LinkServiceProps, "setOptionOpen">; ret: DeleteLink };
 };
 
 type Services = keyof ServiceMap;
 
-type Depedencies<S extends Services> = [dep: ServiceMap[S]["dep"]];
+type Depedencies<S extends Services> = [dep: UnionToInter<ServiceMap[S]["dep"]>];
 type AvailableService<S extends Services> = ServiceMap[S]["ret"];
 
 export function useLinkService<S extends Services>(service: S | S[], ...depedences: Depedencies<S>): UnionToInter<AvailableService<S>>;
-export function useLinkService(service: Services | Services[], { formGroup, setOptionIndex, setLoading }: Partial<LinkServiceProps> = {}) {
+export function useLinkService(service: Services | Services[], { formGroup, setOptionOpen, setLoading }: Partial<LinkServiceProps> = {}) {
   const { setUser, user } = useUser();
   const { setError } = useError();
 
@@ -49,7 +49,7 @@ export function useLinkService(service: Services | Services[], { formGroup, setO
       .clone(({ signal }) => api.link.delete(`/${id}`, { signal }))
       .onSuccess(() => {
         setUser((prev) => ({ ...prev, links: prev.links.filter((link) => link.id !== id) }));
-        setOptionIndex?.(null);
+        setOptionOpen?.(false);
       })
       .setConfig({ handleError: { setError } })
       .exec();

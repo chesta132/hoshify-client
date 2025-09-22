@@ -4,8 +4,8 @@ import { Popup as PopupWrapper } from "@/components/ui/popup";
 import { useUser } from "@/contexts";
 import useForm from "@/hooks/useForm";
 import { motion } from "motion/react";
-import { useEffect, useState } from "react";
-import { formSchema, type Popup } from "./QuickLinks";
+import { useEffect, useMemo, useState } from "react";
+import { type Popup } from "./QuickLinks";
 import { useLinkService } from "@/services/linkService";
 
 export function LinkPopup({ popup, setPopup }: { popup: Popup; setPopup: React.Dispatch<React.SetStateAction<Popup>> }) {
@@ -13,7 +13,8 @@ export function LinkPopup({ popup, setPopup }: { popup: Popup; setPopup: React.D
   const isAdd = popup === "add";
   const editId = !isAdd && popup.slice(5);
 
-  const formGroup = useForm({ link: "", title: "" }, { link: true, title: { max: 100 } });
+  const formSchema = useMemo(() => ({ link: "", title: "" }), []);
+  const formGroup = useForm(formSchema, { link: true, title: { max: 100 } });
   const { user } = useUser();
   const [loading, setLoading] = useState(false);
 
@@ -26,7 +27,7 @@ export function LinkPopup({ popup, setPopup }: { popup: Popup; setPopup: React.D
     if (!isAdd) {
       setForm(user.links.find((link) => link.id === editId) || formSchema);
     }
-  }, [editId, isAdd, setForm, user.links]);
+  }, [editId, formSchema, isAdd, setForm, user.links]);
 
   const handlePopup = (action: Popup) => {
     setForm(formSchema);

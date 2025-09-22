@@ -6,7 +6,7 @@ import useForm from "@/hooks/useForm";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { formSchema, type Popup } from "./QuickLinks";
-import { useCreateLink, useUpdateLink } from "@/services/linkService";
+import { useLinkService } from "@/services/linkService";
 
 export function LinkPopup({ popup, setPopup }: { popup: Popup; setPopup: React.Dispatch<React.SetStateAction<Popup>> }) {
   const inputField = { elementType: "input", size: "sm", classLabel: "bg-popover" } as const;
@@ -34,8 +34,7 @@ export function LinkPopup({ popup, setPopup }: { popup: Popup; setPopup: React.D
     setPopup(action);
   };
 
-  const handleCreate = useCreateLink({ formGroup, handlePopup, setLoading });
-  const handleEdit = useUpdateLink({ editId, formGroup, handlePopup, setLoading });
+  const { createLink, updateLink } = useLinkService({ formGroup, handlePopup, editId, setLoading });
 
   return (
     <PopupWrapper blur>
@@ -61,7 +60,7 @@ export function LinkPopup({ popup, setPopup }: { popup: Popup; setPopup: React.D
           ]}
           form={formGroup}
           submitButton={null}
-          onFormSubmit={editId ? handleEdit : handleCreate}
+          onFormSubmit={editId ? updateLink : createLink}
         >
           <div className="flex gap-2 justify-end">
             <Button

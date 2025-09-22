@@ -6,7 +6,7 @@ import { EllipsisVertical } from "lucide-react";
 import { useRef, useState } from "react";
 import { Link } from "react-router";
 import type { Popup } from "./QuickLinks";
-import { useDeleteLink } from "@/services/linkService";
+import { useLinkService } from "@/services/linkService";
 
 export const LinkOptions = ({ setPopup }: { setPopup: React.Dispatch<React.SetStateAction<Popup>> }) => {
   const { user } = useUser();
@@ -20,7 +20,7 @@ export const LinkOptions = ({ setPopup }: { setPopup: React.Dispatch<React.SetSt
     setPopup(action);
   };
 
-  const handleDelete = useDeleteLink({ setOptionIndex });
+  const { deleteLink } = useLinkService({ handlePopup, setOptionIndex });
 
   return (
     <>
@@ -75,7 +75,7 @@ export const LinkOptions = ({ setPopup }: { setPopup: React.Dispatch<React.SetSt
                 </button>
               </li>
               <li>
-                <button className="w-full pl-4 py-2 text-start hover:bg-card-foreground/20 cursor-pointer" onClick={() => handleDelete(id)}>
+                <button className="w-full pl-4 py-2 text-start hover:bg-card-foreground/20 cursor-pointer" onClick={() => deleteLink(id)}>
                   Remove
                 </button>
               </li>

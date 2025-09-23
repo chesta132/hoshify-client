@@ -10,9 +10,12 @@ export type Config<N> = {
   handleError?: { setError: React.Dispatch<React.SetStateAction<StateErrorServer | null>> } & HandleErrorOptions;
   withLoad?: boolean;
 };
-export type Retry = { counted: number; count: number; interval: number };
+type OnRetryCallback = (err: unknown) => any;
+export type Retry = { counted: number; count: number; interval: number; onRetry?: OnRetryCallback };
 export type RequestFetcher<T, A extends any[]> = (controller: AbortController, ...args: A) => Promise<ServerSuccess<T>>;
 export type SafeExcResult<T> = { ok: true; data: T } | { ok: false; error: unknown };
+
+type RetryOptions = { interval?: number; onRetry?: OnRetryCallback };
 
 export class Request<T, A extends any[] = [], N extends NavigateFunction | undefined = undefined, L = boolean> {
   private _fetcher: RequestFetcher<T, A>;
@@ -81,7 +84,7 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
     return this as Request<T, A, N, L>;
   }
 
-  onSuccess(cb: (response: ServerSuccess<T>) => any) {
+  onSuccess(cb: (res: ServerSuccess<T>) => any) {
     this._onSuccess = cb;
     return this;
   }
@@ -96,8 +99,8 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
     return this;
   }
 
-  retry(count: number, intervalMs = 1000) {
-    this._retry = { count, counted: 0, interval: intervalMs };
+  retry(count: number, { interval = 1000, onRetry }: RetryOptions = {}) {
+    this._retry = { count, counted: 0, interval, onRetry };
     return this;
   }
 
@@ -135,6 +138,7 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
       if (_retry) {
         _retry.counted++;
         if (_retry.counted <= _retry.count) {
+          _retry.onRetry?.(err);
           await new Promise((res) => setTimeout(res, _retry.interval));
           return await this.exec(...args);
         }

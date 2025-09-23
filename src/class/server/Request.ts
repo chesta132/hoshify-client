@@ -100,7 +100,7 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
   }
 
   retry(count: number, { interval = 1000, onRetry }: RetryOptions = {}) {
-    this._retry = { count, counted: 0, interval, onRetry };
+    this._retry = { count, counted: 1, interval, onRetry };
     return this;
   }
 

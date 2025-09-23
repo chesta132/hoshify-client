@@ -14,6 +14,7 @@ export const QuickLinks = () => {
   const [popup, setPopup] = useState<Popup>("closed");
   const linkWrapper = useRef<HTMLDivElement>(null);
   const [isDrag, setIsDrag] = useState(false);
+  const [optionIndex, setOptionIndex] = useState<number | null>(null);
 
   const { links, setLinks } = useLink();
 
@@ -42,7 +43,7 @@ export const QuickLinks = () => {
       <h1 className="font-heading font-semibold">Quick Links</h1>
       <div className="flex gap-2 px-3 overflow-x-auto scroll-bar py-2" ref={linkWrapper}>
         <Reorder.Group axis="x" values={links} onReorder={handleReorder} className="flex gap-2" style={{ display: "flex", gap: "0.5rem" }}>
-          {links.map((link) => (
+          {links.map((link, idx) => (
             <Reorder.Item
               key={link.id}
               value={link}
@@ -65,7 +66,7 @@ export const QuickLinks = () => {
               onDragStart={() => setIsDrag(true)}
               onDragEnd={handleDrop}
             >
-              <LinkOptions setPopup={setPopup} link={link} isDrag={isDrag} />
+              <LinkOptions setPopup={setPopup} link={link} isDrag={isDrag} optionIndex={optionIndex} setOptionIndex={setOptionIndex} index={idx} />
             </Reorder.Item>
           ))}
         </Reorder.Group>

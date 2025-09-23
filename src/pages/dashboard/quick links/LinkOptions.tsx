@@ -2,25 +2,35 @@ import { useClickOutside } from "@/hooks/useEventListener";
 import { cn } from "@/lib/utils";
 import { capital, ellipsis, newLiner } from "@/utils/manipulate/string";
 import { Earth, EllipsisVertical, Mail, Phone } from "lucide-react";
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import type { Popup } from "./QuickLinks";
 import type { Link as ModelLink } from "@/types/models";
 import { useLink } from "@/contexts";
+import { createPortal } from "react-dom";
 
-type LinkOptionsProps = { setPopup: React.Dispatch<React.SetStateAction<Popup>>; link: ModelLink; isDrag: boolean };
+type LinkOptionsProps = {
+  setPopup: React.Dispatch<React.SetStateAction<Popup>>;
+  link: ModelLink;
+  isDrag: boolean;
+  optionIndex: number | null;
+  setOptionIndex: React.Dispatch<React.SetStateAction<number | null>>;
+  index: number;
+};
 
-export const LinkOptions = ({ setPopup, link: linkProp, isDrag }: LinkOptionsProps) => {
+export const LinkOptions = ({ setPopup, link: linkProp, isDrag, optionIndex, setOptionIndex, index }: LinkOptionsProps) => {
   const { id, link, title } = linkProp;
-  const [optionOpen, setOptionOpen] = useState<boolean>(false);
-  const linkRef = useRef<HTMLDivElement>(null);
+  const optionOpen = optionIndex === index;
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const infoButtonRef = useRef<HTMLButtonElement>(null);
+  const infoButtonRect = infoButtonRef.current?.getBoundingClientRect();
   const { deleteLink } = useLink();
 
-  useClickOutside(linkRef, () => optionOpen === true && setOptionOpen(false));
+  useClickOutside(wrapperRef, () => optionOpen === true && setOptionIndex(null));
 
   const handlePopup = (action: Popup) => () => {
     (document.activeElement as HTMLElement)?.blur();
     setPopup(action);
-    setOptionOpen(false);
+    setOptionIndex(null);
   };
 
   let linkIcons: undefined | React.ReactElement;
@@ -51,7 +61,7 @@ export const LinkOptions = ({ setPopup, link: linkProp, isDrag }: LinkOptionsPro
 
   return (
     <div
-      ref={linkRef}
+      ref={wrapperRef}
       onClick={handleLinkClick}
       onKeyDown={handleKeyDown}
       role="link"
@@ -82,43 +92,48 @@ export const LinkOptions = ({ setPopup, link: linkProp, isDrag }: LinkOptionsPro
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          setOptionOpen(true);
+          if (optionOpen) setOptionIndex(null);
+          else setOptionIndex(index);
         }}
         aria-label={`Options for ${title}`}
         aria-expanded={optionOpen}
         aria-haspopup="menu"
+        ref={infoButtonRef}
       >
         <EllipsisVertical size={15} />
       </button>
-      {optionOpen && (
-        <ul
-          role="menu"
-          className="absolute top-4 right-2.5 py-2 bg-card w-full text-start z-20 rounded-md border shadow-lg"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-        >
-          <li role="none">
-            <button
-              role="menuitem"
-              className="w-full pl-4 py-2 text-start hover:bg-card-foreground/20 cursor-pointer focus:outline-none focus:bg-card-foreground/20"
-              onClick={handlePopup(`edit/${id}`)}
-            >
-              Edit shortcut
-            </button>
-          </li>
-          <li role="none">
-            <button
-              role="menuitem"
-              className="w-full pl-4 py-2 text-start hover:bg-card-foreground/20 cursor-pointer focus:outline-none focus:bg-card-foreground/20"
-              onClick={() => deleteLink(id)}
-            >
-              Remove
-            </button>
-          </li>
-        </ul>
-      )}
+      {optionOpen &&
+        createPortal(
+          <ul
+            role="menu"
+            className="absolute py-2 bg-card text-start z-20 rounded-md border shadow-lg text-xs"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            style={infoButtonRect && { top: infoButtonRect.top + infoButtonRect.height / 2, left: infoButtonRect.left + infoButtonRect.width / 2 }}
+          >
+            <li role="none">
+              <button
+                role="menuitem"
+                className="w-full pl-4 pr-7 py-2 text-start hover:bg-card-foreground/20 cursor-pointer focus:outline-none focus:bg-card-foreground/20"
+                onClick={handlePopup(`edit/${id}`)}
+              >
+                Edit shortcut
+              </button>
+            </li>
+            <li role="none">
+              <button
+                role="menuitem"
+                className="w-full pl-4 py-2 text-start hover:bg-card-foreground/20 cursor-pointer focus:outline-none focus:bg-card-foreground/20"
+                onClick={() => deleteLink(id)}
+              >
+                Remove
+              </button>
+            </li>
+          </ul>,
+          document.body
+        )}
     </div>
   );
 };

@@ -2,10 +2,10 @@ import { Button } from "@/components/form/button";
 import { Popup } from "@/components/ui/popup";
 import { Plus } from "lucide-react";
 import { AnimatePresence, Reorder } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { LinkPopup } from "./LinkPopup";
 import { LinkOptions } from "./LinkOptions";
-import { useUser } from "@/contexts";
+import { useLink } from "@/contexts";
 import type { Link as ModelLink } from "@/types/models";
 
 export type Popup = "add" | `edit/${string}${string}` | "closed";
@@ -13,9 +13,9 @@ export type Popup = "add" | `edit/${string}${string}` | "closed";
 export const QuickLinks = () => {
   const [popup, setPopup] = useState<Popup>("closed");
   const linkWrapper = useRef<HTMLDivElement>(null);
-  const { user } = useUser();
-  const [links, setLinks] = useState<ModelLink[]>(user.links.sort((a, b) => a.position - b.position));
   const [isDrag, setIsDrag] = useState(false);
+
+  const { links, setLinks } = useLink();
 
   const handlePopup = (action: Popup) => () => {
     (document.activeElement as HTMLElement)?.blur();
@@ -29,13 +29,13 @@ export const QuickLinks = () => {
     }));
 
     setLinks(updatedLinks);
+  };
+
+  const handleDrop = () => {
+    setIsDrag(false);
 
     // [WIP] - UPDATE POSITION
   };
-
-  useEffect(() => {
-    setLinks(user.links.sort((a, b) => a.position - b.position));
-  }, [user.links]);
 
   return (
     <div className="border-[0.8px] border-border rounded-[18px] py-3 px-4 space-y-1">
@@ -63,7 +63,7 @@ export const QuickLinks = () => {
               dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
               dragElastic={0.7}
               onDragStart={() => setIsDrag(true)}
-              onDragEnd={() => setIsDrag(false)}
+              onDragEnd={handleDrop}
             >
               <LinkOptions setPopup={setPopup} link={link} isDrag={isDrag} />
             </Reorder.Item>

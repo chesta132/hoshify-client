@@ -1,33 +1,34 @@
 import { Button } from "@/components/form/button";
 import { FormLayout } from "@/components/form/FormLayout";
 import { Popup as PopupWrapper } from "@/components/ui/popup";
-import { useUser } from "@/contexts";
 import useForm from "@/hooks/useForm";
 import { motion } from "motion/react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { type Popup } from "./QuickLinks";
-import { useLinkService } from "@/services/linkService";
+import { pick } from "@/utils/manipulate/object";
+import { useLink, useUser } from "@/contexts";
 
 export function LinkPopup({ popup, setPopup }: { popup: Popup; setPopup: React.Dispatch<React.SetStateAction<Popup>> }) {
+  const { user } = useUser();
+  const { createLink, links, updateLink, loading } = useLink();
+  const formSchema = useMemo(() => ({ link: "", title: "" }), []);
+  const formGroup = useForm(formSchema, { link: true, title: { max: 100 } });
+
   const inputField = { elementType: "input", size: "sm", classLabel: "bg-popover" } as const;
   const isAdd = popup === "add";
   const editId = !isAdd && popup.slice(5);
-
-  const formSchema = useMemo(() => ({ link: "", title: "" }), []);
-  const formGroup = useForm(formSchema, { link: true, title: { max: 100 } });
-  const { user } = useUser();
-  const [loading, setLoading] = useState(false);
-
+  const currentLink = !isAdd && links.find((link) => link.id === popup.slice(5));
   const {
     form: [form, setForm],
     error: [_, setFormError],
+    validate: { compareOld },
   } = formGroup;
 
   useEffect(() => {
     if (!isAdd) {
-      setForm(user.links.find((link) => link.id === editId) || formSchema);
+      setForm(currentLink ? pick(currentLink, ["link", "title"]) : formSchema);
     }
-  }, [editId, formSchema, isAdd, setForm, user.links]);
+  }, [currentLink, formSchema, isAdd, setForm]);
 
   const handlePopup = (action: Popup) => {
     setForm(formSchema);
@@ -35,7 +36,12 @@ export function LinkPopup({ popup, setPopup }: { popup: Popup; setPopup: React.D
     setPopup(action);
   };
 
-  const { createLink, updateLink } = useLinkService(["create", "update"], { formGroup, setLoading });
+  const handleUpdate = () => {
+    if (!currentLink) return;
+    const oldLink = user.links.find((link) => link.id === currentLink.id);
+    if (!oldLink || compareOld?.(oldLink)) return;
+    return updateLink({ ...currentLink, ...form });
+  };
 
   return (
     <PopupWrapper blur>
@@ -61,7 +67,7 @@ export function LinkPopup({ popup, setPopup }: { popup: Popup; setPopup: React.D
           ]}
           form={formGroup}
           submitButton={null}
-          onFormSubmit={async () => (editId ? await updateLink(form) : await createLink(form)) && handlePopup("closed")}
+          onFormSubmit={async () => (editId ? await handleUpdate() : await createLink(form)) && handlePopup("closed")}
         >
           <div className="flex gap-2 justify-end">
             <Button

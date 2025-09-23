@@ -4,8 +4,8 @@ import { capital, ellipsis, newLiner } from "@/utils/manipulate/string";
 import { Earth, EllipsisVertical, Mail, Phone } from "lucide-react";
 import React, { useRef, useState } from "react";
 import type { Popup } from "./QuickLinks";
-import { useLinkService } from "@/services/linkService";
 import type { Link as ModelLink } from "@/types/models";
+import { useLink } from "@/contexts";
 
 type LinkOptionsProps = { setPopup: React.Dispatch<React.SetStateAction<Popup>>; link: ModelLink; isDrag: boolean };
 
@@ -13,6 +13,7 @@ export const LinkOptions = ({ setPopup, link: linkProp, isDrag }: LinkOptionsPro
   const { id, link, title } = linkProp;
   const [optionOpen, setOptionOpen] = useState<boolean>(false);
   const linkRef = useRef<HTMLDivElement>(null);
+  const { deleteLink } = useLink();
 
   useClickOutside(linkRef, () => optionOpen === true && setOptionOpen(false));
 
@@ -21,8 +22,6 @@ export const LinkOptions = ({ setPopup, link: linkProp, isDrag }: LinkOptionsPro
     setPopup(action);
     setOptionOpen(false);
   };
-
-  const { deleteLink } = useLinkService("delete", { setOptionOpen });
 
   let linkIcons: undefined | React.ReactElement;
 

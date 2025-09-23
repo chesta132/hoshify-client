@@ -5,6 +5,7 @@ import { HeaderContext } from "./HeaderContext";
 import { SearchContext } from "./search/SearchContext";
 import { UserContext } from "./UserContext";
 import { ErrorContext } from "./ErrorContext";
+import { LinkContext } from "./LinkContext";
 
 const useCreateContext = <T,>(context: React.Context<T>, name: string) => {
   const createdContext = useContext(context);
@@ -30,4 +31,8 @@ export const useUser = () => {
 
 export const useError = () => {
   return useCreateContext(ErrorContext, "error");
+};
+
+export const useLink = () => {
+  return useCreateContext(LinkContext, "link");
 };

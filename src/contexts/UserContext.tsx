@@ -19,6 +19,7 @@ type UserValues = {
   getUser: Request<User, ConfigProp>;
   signIn: SignAuth;
   signUp: SignAuth;
+  isInitiated: boolean;
 };
 
 const defaultUser: InitiateUser = {
@@ -47,9 +48,10 @@ const defaultValues: UserValues = {
   getUser: new Request(() => api.user.get("/")),
   signIn: new Request(() => api.user.get("/")),
   signUp: new Request(() => api.user.get("/")),
-  loading: false,
+  loading: true,
   setLoading() {},
   isSignIn: false,
+  isInitiated: false,
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -72,6 +74,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     signIn,
     signUp,
     isSignIn,
+    isInitiated,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

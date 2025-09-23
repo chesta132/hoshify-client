@@ -40,7 +40,6 @@ export const LinkProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     setUser((prev) => ({ ...prev, links }));
   }, [links, setUser]);
-  useEffect(() => console.log(loading), [loading]);
 
   const value: LinkValues = {
     links,

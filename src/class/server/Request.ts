@@ -80,7 +80,7 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
     if (!value) {
       value = { load: true, unLoad: false } as any;
     }
-    this._loading = { set: setLoading as any, load: value?.load as any, unLoad: value?.load as any };
+    this._loading = { set: setLoading as any, load: value?.load as any, unLoad: value?.unLoad as any };
     return this as Request<T, A, N, L>;
   }
 
@@ -154,6 +154,7 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
       }
       throw err;
     } finally {
+      console.debugTrace(_loading?.unLoad);
       _loading?.set(_loading.unLoad);
       await _onFinally?.();
     }

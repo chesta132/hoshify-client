@@ -1,4 +1,5 @@
-import type { ErrorResponse, Response, StateErrorServer } from "@/types/server";
+import type { ErrorResponse, Response } from "@/types/server";
+import type { StateErrorServer } from "@/types/server/codes";
 import { omit } from "@/utils/manipulate/object";
 import type { AxiosError } from "axios";
 

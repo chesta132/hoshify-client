@@ -15,17 +15,18 @@ type LinkOptionsProps = {
   optionIndex: number | null;
   setOptionIndex: React.Dispatch<React.SetStateAction<number | null>>;
   index: number;
+  wrapperRef: React.RefObject<HTMLDivElement | null>;
 };
 
-export const LinkOptions = ({ setPopup, link: linkProp, isDrag, optionIndex, setOptionIndex, index }: LinkOptionsProps) => {
+export const LinkOptions = ({ setPopup, link: linkProp, isDrag, optionIndex, setOptionIndex, index, wrapperRef }: LinkOptionsProps) => {
   const { id, link, title } = linkProp;
   const optionOpen = optionIndex === index;
-  const wrapperRef = useRef<HTMLDivElement>(null);
+  const linkRef = useRef<HTMLDivElement>(null);
   const infoButtonRef = useRef<HTMLButtonElement>(null);
   const infoButtonRect = infoButtonRef.current?.getBoundingClientRect();
   const { deleteLink } = useLink();
 
-  useClickOutside(wrapperRef, () => optionOpen === true && setOptionIndex(null));
+  useClickOutside(linkRef, () => optionOpen === true && setOptionIndex(null));
 
   const handlePopup = (action: Popup) => () => {
     (document.activeElement as HTMLElement)?.blur();
@@ -61,9 +62,7 @@ export const LinkOptions = ({ setPopup, link: linkProp, isDrag, optionIndex, set
 
   return (
     <div
-      ref={wrapperRef}
-      onClick={handleLinkClick}
-      onKeyDown={handleKeyDown}
+      ref={linkRef}
       role="link"
       tabIndex={0}
       aria-label={`Open ${title} in new tab`}
@@ -71,6 +70,12 @@ export const LinkOptions = ({ setPopup, link: linkProp, isDrag, optionIndex, set
         "group flex flex-col justify-between items-center gap-1 text-xs text-center px-2 py-3 min-w-25 hover:bg-muted rounded-md relative cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/30",
         optionOpen && "bg-muted"
       )}
+      onClick={(e) => {
+        if (e.target === linkRef.current) handleLinkClick(e);
+      }}
+      onKeyDown={(e) => {
+        if (e.target === linkRef.current) handleKeyDown(e);
+      }}
     >
       {React.isValidElement(linkIcons) ? (
         linkIcons
@@ -78,27 +83,31 @@ export const LinkOptions = ({ setPopup, link: linkProp, isDrag, optionIndex, set
         <img
           src={`https://www.google.com/s2/favicons?domain=${link}&sz=24`}
           alt={`${capital(title)} favicon`}
-          sizes="24"
           className="w-10 p-2 bg-card-foreground/20 rounded-md pointer-events-none"
           draggable={false}
         />
       )}
       <span className="pointer-events-none select-none">{ellipsis(newLiner(title, { fontSize: 16, px: 80 }), { px: 145, fontSize: 16 })}</span>
       <button
+        ref={infoButtonRef}
+        type="button"
         className={cn(
           "absolute top-0 right-0 cursor-pointer group-hover:opacity-100 group-focus:opacity-100 focus:opacity-100 opacity-0 transition mt-1 py-1 px-1 mx-1 hover:bg-muted-foreground/20 rounded-full z-10 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1",
           optionOpen && "bg-muted-foreground/20 opacity-100"
         )}
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          if (optionOpen) setOptionIndex(null);
-          else setOptionIndex(index);
-        }}
-        aria-label={`Options for ${title}`}
+        aria-label={`Option button for ${title}`}
         aria-expanded={optionOpen}
         aria-haspopup="menu"
-        ref={infoButtonRef}
+        onClick={(e) => {
+          e.stopPropagation();
+          setOptionIndex(optionOpen ? null : index);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setOptionIndex(optionOpen ? null : index);
+          }
+        }}
       >
         <EllipsisVertical size={15} />
       </button>
@@ -107,17 +116,15 @@ export const LinkOptions = ({ setPopup, link: linkProp, isDrag, optionIndex, set
           <ul
             role="menu"
             className="absolute py-2 bg-card text-start z-20 rounded-md border shadow-lg text-xs"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
             style={infoButtonRect && { top: infoButtonRect.top + infoButtonRect.height / 2, left: infoButtonRect.left + infoButtonRect.width / 2 }}
+            aria-label={`Options for ${title}`}
           >
             <li role="none">
               <button
                 role="menuitem"
-                className="w-full pl-4 pr-7 py-2 text-start hover:bg-card-foreground/20 cursor-pointer focus:outline-none focus:bg-card-foreground/20"
+                className="w-full pl-4 pr-7 py-2 text-start hover:bg-card-foreground/20 focus:outline-none focus:bg-card-foreground/20"
                 onClick={handlePopup(`edit/${id}`)}
+                aria-label={`Edit ${title} link`}
               >
                 Edit shortcut
               </button>
@@ -125,14 +132,15 @@ export const LinkOptions = ({ setPopup, link: linkProp, isDrag, optionIndex, set
             <li role="none">
               <button
                 role="menuitem"
-                className="w-full pl-4 py-2 text-start hover:bg-card-foreground/20 cursor-pointer focus:outline-none focus:bg-card-foreground/20"
+                className="w-full pl-4 py-2 text-start hover:bg-card-foreground/20 focus:outline-none focus:bg-card-foreground/20"
                 onClick={() => deleteLink(id)}
+                aria-label={`Delete ${title} link`}
               >
                 Remove
               </button>
             </li>
           </ul>,
-          document.body
+          wrapperRef.current!
         )}
     </div>
   );

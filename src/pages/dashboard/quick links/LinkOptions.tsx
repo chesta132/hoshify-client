@@ -2,7 +2,7 @@ import { useClickOutside } from "@/hooks/useEventListener";
 import { cn } from "@/lib/utils";
 import { capital, ellipsis, newLiner } from "@/utils/manipulate/string";
 import { Earth, EllipsisVertical, Mail, Phone } from "lucide-react";
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { Popup } from "./QuickLinks";
 import type { Link as ModelLink } from "@/types/models";
 import { useLink } from "@/contexts";
@@ -24,6 +24,7 @@ export const LinkOptions = ({ setPopup, link: linkProp, isDrag, optionIndex, set
   const linkRef = useRef<HTMLDivElement>(null);
   const infoButtonRef = useRef<HTMLButtonElement>(null);
   const infoButtonRect = infoButtonRef.current?.getBoundingClientRect();
+  const [linkIcon, setLinkIcon] = useState<null | React.ReactNode>(null);
   const { deleteLink } = useLink();
 
   useClickOutside(linkRef, () => optionOpen === true && setOptionIndex(null));
@@ -34,18 +35,19 @@ export const LinkOptions = ({ setPopup, link: linkProp, isDrag, optionIndex, set
     setOptionIndex(null);
   };
 
-  let linkIcons: undefined | React.ReactElement;
-
   const iconClassName = "w-10 p-2 bg-card-foreground/20 rounded-md";
-  try {
-    const u = new URL(link);
-    if (u.protocol === "mailto:") linkIcons = <Mail size={40} className={iconClassName} />;
-    if (u.protocol === "tel:") linkIcons = <Phone size={40} className={iconClassName} />;
-    if (u.protocol === "localhost:" || u.hostname === "localhost" || /^\d{1,3}(\.\d{1,3}){3}$/.test(u.hostname))
-      linkIcons = <Earth size={40} className={iconClassName} />;
-  } catch {
-    linkIcons = <Earth size={40} className={iconClassName} />;
-  }
+
+  useEffect(() => {
+    try {
+      const u = new URL(link);
+      if (u.protocol === "mailto:") setLinkIcon(<Mail size={40} className={iconClassName} />);
+      if (u.protocol === "tel:") setLinkIcon(<Phone size={40} className={iconClassName} />);
+      if (u.protocol === "localhost:" || u.hostname === "localhost" || /^\d{1,3}(\.\d{1,3}){3}$/.test(u.hostname))
+        setLinkIcon(<Earth size={40} className={iconClassName} />);
+    } catch {
+      setLinkIcon(<Earth size={40} className={iconClassName} />);
+    }
+  }, [link]);
 
   const handleLinkClick = (e?: React.MouseEvent<HTMLDivElement>) => {
     e?.preventDefault();
@@ -77,8 +79,8 @@ export const LinkOptions = ({ setPopup, link: linkProp, isDrag, optionIndex, set
         if (e.target === linkRef.current) handleKeyDown(e);
       }}
     >
-      {React.isValidElement(linkIcons) ? (
-        linkIcons
+      {React.isValidElement(linkIcon) ? (
+        linkIcon
       ) : (
         <img
           src={`https://www.google.com/s2/favicons?domain=${link}&sz=24`}

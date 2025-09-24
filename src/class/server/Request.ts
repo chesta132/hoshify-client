@@ -154,7 +154,6 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
       }
       throw err;
     } finally {
-      console.debugTrace(_loading?.unLoad);
       _loading?.set(_loading.unLoad);
       await _onFinally?.();
     }

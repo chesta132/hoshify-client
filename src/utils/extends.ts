@@ -36,43 +36,37 @@ Object.compare = function <T extends object>(...objectsProp: T[]) {
   });
 };
 
-console.debug = function (message?: ("NO_TRACE" | "SUPER_TRACE") & {}, ...data: any[]) {
+console.debug = function (message?: "NO_TRACE" | (string & {}), ...data: any[]) {
   if (VITE_ENV === "production") return;
-  const createdError = new Error();
-  const callerLine = createdError.stack?.split("\n")[2].trim().slice(2);
   const noTrace = message === "NO_TRACE";
-  const superTrace = message === "SUPER_TRACE";
-
-  if (!"[vite]".includes(message || "") && !noTrace) {
-    if (superTrace) this.trace();
-    else this.log("Called by: " + callerLine);
+  if (message === "[vite]") {
+    return this.log(message, ...data);
   }
 
-  if (noTrace || superTrace) {
-    this.log(...data);
+  if (noTrace) {
+    this.groupCollapsed(...data);
   } else {
-    this.log(message, ...data);
+    this.groupCollapsed(message, ...data);
   }
+
+  if (!noTrace) {
+    this.trace();
+  }
+
+  console.groupEnd();
 };
 
 console.debugTable = function (tabularData, properties, trace) {
   if (VITE_ENV === "production") return;
   const createdError = new Error();
   const callerLine = createdError.stack?.split("\n")[2].trim().slice(2);
-  const noTrace = trace !== "NO_TRACE";
+  const noTrace = trace === "NO_TRACE";
   const superTrace = trace === "SUPER_TRACE";
 
-  if (noTrace) this.log("Called by: " + callerLine);
+  if (!noTrace) this.log("Called by: " + callerLine);
   else if (superTrace) this.trace();
 
   this.table(tabularData, properties);
-};
-
-console.debugTrace = function (...message: any[]) {
-  if (VITE_ENV === "production") return;
-  console.groupCollapsed(...message);
-  console.trace();
-  console.groupEnd();
 };
 
 Object.isObject = function <T>(object: T) {

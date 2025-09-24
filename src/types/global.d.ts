@@ -2,17 +2,12 @@ interface Console {
   /**
    * Console log when its not in production env
    */
-  debug(message?: ("NO_TRACE" | "SUPER_TRACE") & {}, ...data: any[]): void;
+  debug(message?: "NO_TRACE" | (string & {}), ...data: any[]): void;
 
   /**
    * Console table when its not in production env
    */
   debugTable(tabularData: any, properties?: readonly string[], trace?: "NO_TRACE" | "SUPER_TRACE"): void;
-
-  /**
-   * Console trace when its not in production env
-   */
-  debugTrace(...messages: any[]): void;
 }
 
 interface JSON {

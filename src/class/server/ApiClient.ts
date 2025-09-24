@@ -17,7 +17,7 @@ import type {
   UserEndpoints,
 } from "@/types/server/endpoints";
 
-type LogType = "default" | "none" | "no trace";
+type LogType = "default" | "none" | "no trace" | "table";
 type SetEndpoints<T extends Models, E extends Endpoints, O extends string = ""> = Omit<
   ApiClient<T, E["get"], E["put"], E["post"], E["delete"], E["patch"]>,
   ModelNames | "auth" | O
@@ -90,8 +90,11 @@ export class ApiClient<
         case "no trace":
           console.debug("NO_TRACE", endpoint, response);
           break;
+        case "table":
+          console.debugTable(response, [endpoint]);
+          break;
         default:
-          console.debugTrace(endpoint, response);
+          console.debug(endpoint, response);
           break;
       }
     }

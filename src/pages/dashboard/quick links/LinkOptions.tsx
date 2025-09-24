@@ -2,7 +2,7 @@ import { useClickOutside } from "@/hooks/useEventListener";
 import { cn } from "@/lib/utils";
 import { capital, ellipsis, newLiner } from "@/utils/manipulate/string";
 import { Earth, EllipsisVertical, Mail, Phone } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import type { Popup } from "./QuickLinks";
 import type { Link as ModelLink } from "@/types/models";
 import { useLink } from "@/contexts";
@@ -37,7 +37,7 @@ export const LinkOptions = ({ setPopup, link: linkProp, isDrag, optionIndex, set
 
   const iconClassName = "w-10 p-2 bg-card-foreground/20 rounded-md";
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     try {
       const u = new URL(link);
       if (u.protocol === "mailto:") setLinkIcon(<Mail size={40} className={iconClassName} />);

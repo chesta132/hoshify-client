@@ -4,12 +4,14 @@ import { useLinkService, type LinkServices } from "@/services/linkService";
 import type { Link } from "@/types/models";
 import { createContext, useEffect, useState } from "react";
 import { useUser } from ".";
+import type { PaginationResult } from "@/class/server/ServerSuccess";
 
 type LinkValues = {
   links: Link[];
   setLinks: React.Dispatch<React.SetStateAction<Link[]>>;
   loading: boolean;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  pagination: PaginationResult;
 } & LinkServices;
 
 const defaultValues: LinkValues = {
@@ -17,9 +19,11 @@ const defaultValues: LinkValues = {
   setLinks() {},
   loading: true,
   setLoading() {},
-  createLink: new Request(() => api.link.get("/")).exec,
-  deleteLink: new Request(() => api.link.get("/")).exec,
-  updateLink: new Request(() => api.link.get("/")).exec,
+  createLink: new Request(() => api.link.get("/")),
+  deleteLink: new Request(() => api.link.get("/")),
+  updateLink: new Request(() => api.link.get("/")),
+  getLinks: new Request(() => api.link.get("/")),
+  pagination: {},
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -28,14 +32,34 @@ export const LinkContext = createContext<LinkValues>(defaultValues);
 export const LinkProvider = ({ children }: { children: React.ReactNode }) => {
   const { user, setUser, isInitiated } = useUser();
   const [links, setLinks] = useState<Link[]>(user.links.sort((a, b) => a.position - b.position));
+  const [pagination, setPagination] = useState<PaginationResult>({});
   const [loading, setLoading] = useState(false);
 
-  const { createLink, deleteLink, updateLink } = useLinkService({ setLoading, setLinks });
+  const { createLink, deleteLink, updateLink, getLinks } = useLinkService({ setLoading, setLinks, pagination });
 
   useEffect(() => {
-    setLinks(user.links.sort((a, b) => a.position - b.position));
+    getLinks.onSuccess((res) => {
+      setLinks((prev) => [...prev, ...res.data].sort((a, b) => a.position - b.position));
+      setPagination(res.getPagination());
+    });
+  }, [getLinks]);
+
+  useEffect(() => {
+    if (isInitiated) {
+      let updates = user.links.sort((a, b) => a.position - b.position);
+      getLinks
+        .clone()
+        .onSuccess((res) => {
+          updates = [...updates, ...res.data].sort((a, b) => a.position - b.position);
+          setPagination(res.getPagination());
+        })
+        .onFinally(() => {
+          setLinks(updates);
+        })
+        .safeExec(updates.length);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setLinks, isInitiated]);
+  }, [isInitiated]);
 
   useEffect(() => {
     setUser((prev) => ({ ...prev, links }));
@@ -49,6 +73,8 @@ export const LinkProvider = ({ children }: { children: React.ReactNode }) => {
     createLink,
     deleteLink,
     updateLink,
+    getLinks,
+    pagination,
   };
 
   return <LinkContext.Provider value={value}>{children}</LinkContext.Provider>;

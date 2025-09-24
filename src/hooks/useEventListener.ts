@@ -67,7 +67,7 @@ export function useClickOutside<T extends Element>(ref: React.RefObject<T | null
  *   console.log("Data loaded when element became visible");
  * });
  */
-export const useInView = (ref: React.RefObject<Element | null>, callback: () => void | Promise<void>, options?: IntersectionObserverInit) => {
+export const useInView = (ref: React.RefObject<Element | null>, callback: () => any, options?: IntersectionObserverInit) => {
   useEffect(() => {
     const element = ref.current;
     const observer = new IntersectionObserver(

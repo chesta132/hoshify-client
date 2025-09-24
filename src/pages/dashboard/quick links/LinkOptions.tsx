@@ -135,7 +135,7 @@ export const LinkOptions = ({ setPopup, link: linkProp, isDrag, optionIndex, set
               <button
                 role="menuitem"
                 className="w-full pl-4 py-2 text-start hover:bg-card-foreground/20 focus:outline-none focus:bg-card-foreground/20"
-                onClick={() => deleteLink(id)}
+                onClick={() => deleteLink.exec(id)}
                 aria-label={`Delete ${title} link`}
               >
                 Remove

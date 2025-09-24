@@ -7,6 +7,7 @@ import { LinkPopup } from "./LinkPopup";
 import { LinkOptions } from "./LinkOptions";
 import { useLink } from "@/contexts";
 import type { Link as ModelLink } from "@/types/models";
+import { useInView } from "@/hooks/useEventListener";
 
 export type Popup = "add" | `edit/${string}${string}` | "closed";
 
@@ -16,8 +17,11 @@ export const QuickLinks = () => {
   const [isDrag, setIsDrag] = useState(false);
   const [optionIndex, setOptionIndex] = useState<number | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const addRef = useRef<HTMLDivElement>(null);
 
-  const { links, setLinks } = useLink();
+  const { links, setLinks, getLinks, pagination } = useLink();
+
+  useInView(addRef, () => pagination.hasNext && getLinks.exec("sequel"));
 
   const handlePopup = (action: Popup) => () => {
     (document.activeElement as HTMLElement)?.blur();
@@ -81,6 +85,7 @@ export const QuickLinks = () => {
         </Reorder.Group>
 
         <div
+          ref={addRef}
           onClick={handlePopup("add")}
           className="cursor-pointer flex flex-col justify-between items-center gap-1 text-center px-2 py-3 min-w-20 hover:bg-muted rounded-md shrink-0"
         >

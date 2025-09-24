@@ -39,8 +39,8 @@ export function LinkPopup({ popup, setPopup }: { popup: Popup; setPopup: React.D
   const handleUpdate = () => {
     if (!currentLink) return;
     const oldLink = user.links.find((link) => link.id === currentLink.id);
-    if (!oldLink || compareOld?.(oldLink)) return;
-    return updateLink({ ...currentLink, ...form });
+    if (!oldLink || compareOld(oldLink)) return;
+    return updateLink.exec({ ...currentLink, ...form });
   };
 
   return (
@@ -67,7 +67,7 @@ export function LinkPopup({ popup, setPopup }: { popup: Popup; setPopup: React.D
           ]}
           form={formGroup}
           submitButton={null}
-          onFormSubmit={async () => (editId ? await handleUpdate() : await createLink(form)) && handlePopup("closed")}
+          onFormSubmit={async () => (editId ? await handleUpdate() : await createLink.exec(form)) && handlePopup("closed")}
         >
           <div className="flex gap-2 justify-end">
             <Button

@@ -3,6 +3,7 @@ type Dynamic = `/${string}${string}`;
 type Branch = `/${string}`;
 type DynamicRestore = `/restores/${string}${string}`;
 type Restores = "/restores";
+type OffsetQuery = `offset=${number}`;
 
 export type AuthEndpoints = {
   get: "/google" | "/google/callback" | "/send-email-verif" | "/google-bind" | "/google-bind/callback";
@@ -45,7 +46,7 @@ export type ScheduleEndpoints = {
 };
 
 export type LinkEndpoints = {
-  get: Root;
+  get: Root | (`${Root}?${OffsetQuery}` | (string & {}));
   post: Root;
   put: Dynamic;
   delete: Branch;

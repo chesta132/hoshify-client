@@ -45,3 +45,42 @@ export function useClickOutside<T extends Element>(ref: React.RefObject<T | null
     };
   }, [callback, ref]);
 }
+
+/**
+ * Hook that runs a callback when a given element enters the viewport.
+ *
+ * @param ref - A React ref object pointing to the target element to be observed.
+ * @param callback - Function to run when the element is visible in the viewport. Can be synchronous or asynchronous.
+ * @param options - Optional IntersectionObserver configuration (e.g., root, rootMargin, threshold).
+ *
+ * @example
+ * const ref = useRef<HTMLDivElement>(null);
+ * useInView(ref, () => {
+ *   console.log("Element is visible!");
+ * });
+ *
+ * @example
+ * // With async callback
+ * const ref = useRef<HTMLDivElement>(null);
+ * useInView(ref, async () => {
+ *   await fetchData();
+ *   console.log("Data loaded when element became visible");
+ * });
+ */
+export const useInView = (ref: React.RefObject<Element | null>, callback: () => void | Promise<void>, options?: IntersectionObserverInit) => {
+  useEffect(() => {
+    const element = ref.current;
+    const observer = new IntersectionObserver(
+      async ([entry]) => {
+        if (entry.isIntersecting) {
+          await callback();
+        }
+      },
+      { root: null, rootMargin: "20px", threshold: 0.1, ...options }
+    );
+    if (element) {
+      observer.observe(element);
+    }
+    return () => observer.disconnect();
+  }, [callback, options, ref]);
+};

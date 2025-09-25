@@ -4,7 +4,8 @@ import { useAuthService } from "@/services/authService";
 import { useUserService } from "@/services/userService";
 import type { InitiateUser, User } from "@/types/models";
 import dayjs from "dayjs";
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router";
 
 type ConfigProp = [config?: ApiConfig];
 type SignAuth = Request<InitiateUser, [body: Partial<User>, ...ConfigProp]>;
@@ -60,9 +61,36 @@ export const UserContext = createContext<UserValues>(defaultValues);
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<InitiateUser>(defaultUser);
   const [loading, setLoading] = useState(false);
+  const [isInitiated, setIsInitiated] = useState(false);
+  const [isSignIn, setIsSignIn] = useState<boolean>(JSON.safeParse(localStorage.getItem("is-sign-in")!, false));
 
-  const { getUser, initiate, isInitiated } = useUserService({ setLoading, setUser });
-  const { isSignIn, signIn, signUp } = useAuthService({ isInitiated, setLoading, setUser, user });
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isSignPage = location.pathname === "/signin" || location.pathname === "/signup";
+
+  const { getUser, initiate } = useUserService({ setLoading, setUser });
+  const { signIn, signUp } = useAuthService({ setLoading, setUser });
+
+  useEffect(() => {
+    initiate.safeExec().finally(() => setIsInitiated(true));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("is-sign-in", JSON.stringify(isSignIn));
+  }, [isSignIn]);
+
+  useEffect(() => {
+    if (user.id === "" && isInitiated) {
+      setIsSignIn(false);
+    }
+  }, [isInitiated, user.id]);
+
+  useEffect(() => {
+    if (!isSignIn && isInitiated && !isSignPage) {
+      navigate("/signin");
+    }
+  }, [isInitiated, isSignIn, isSignPage, navigate]);
 
   const value: UserValues = {
     initiate,

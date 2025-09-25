@@ -48,7 +48,7 @@ export type ScheduleEndpoints = {
 export type LinkEndpoints = {
   get: Root | (`${Root}?${OffsetQuery}` | (string & {}));
   post: Root;
-  put: Dynamic;
+  put: Dynamic | Root
   delete: Branch;
   patch: never;
 };

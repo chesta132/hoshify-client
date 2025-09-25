@@ -19,7 +19,7 @@ export const QuickLinks = () => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const addRef = useRef<HTMLDivElement>(null);
 
-  const { links, setLinks, getLinks, pagination } = useLink();
+  const { links, setLinks, getLinks, pagination, updateLinks } = useLink();
 
   useInView(addRef, () => pagination.hasNext && getLinks.exec("sequel"));
 
@@ -37,17 +37,16 @@ export const QuickLinks = () => {
     setLinks(updatedLinks);
   };
 
-  const handleDrop = () => {
+  const handleDrop = async () => {
     setIsDrag(false);
-
-    // [WIP] - UPDATE POSITION
+    await updateLinks.safeExec(links);
   };
 
   return (
     <div className="border-[0.8px] border-border rounded-[18px] py-3 px-4 space-y-1" ref={wrapperRef}>
       <h1 className="font-heading font-semibold">Quick Links</h1>
       <div className="flex gap-2 px-3 overflow-x-auto scroll-bar py-2" ref={linkWrapper}>
-        <Reorder.Group axis="x" values={links} onReorder={handleReorder} className="flex gap-2" style={{ display: "flex", gap: "0.5rem" }}>
+        <Reorder.Group axis="x" values={links} onReorder={handleReorder} className="flex gap-2">
           {links.map((link, idx) => (
             <Reorder.Item
               key={link.id}

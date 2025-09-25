@@ -17,6 +17,7 @@ export type LinkServices = {
   createLink: Request<Link, [body: Partial<Link>]>;
   deleteLink: Request<Link, [id: string]>;
   getLinks: Request<Link[], [offset: number | "sequel"]>;
+  updateLinks: Request<Link[], [updates: Partial<Link>[]], undefined, boolean>;
 };
 
 export function useLinkService({ setLoading, setLinks, pagination }: LinkServiceProps): LinkServices {
@@ -67,5 +68,20 @@ export function useLinkService({ setLoading, setLinks, pagination }: LinkService
     [getLinks, setLinks]
   );
 
-  return { createLink, updateLink, deleteLink, getLinks };
+  const updateLinks = useMemo(
+    () =>
+      getLinks
+        .clone(({ signal }, updates: Partial<Link>[]) =>
+          api.link.put<Link[]>(
+            "/",
+            updates.map((update) => omit(update, ["createdAt", "updatedAt", "userId"])),
+            { signal }
+          )
+        )
+        .onSuccess(() => {})
+        .setConfig({ handleError: undefined }),
+    [getLinks]
+  );
+
+  return { createLink, updateLink, deleteLink, getLinks, updateLinks };
 }

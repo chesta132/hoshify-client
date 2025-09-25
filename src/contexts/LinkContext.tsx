@@ -23,6 +23,7 @@ const defaultValues: LinkValues = {
   deleteLink: new Request(() => api.link.get("/")),
   updateLink: new Request(() => api.link.get("/")),
   getLinks: new Request(() => api.link.get("/")),
+  updateLinks: new Request(() => api.link.get("/")),
   pagination: {},
 };
 
@@ -35,7 +36,7 @@ export const LinkProvider = ({ children }: { children: React.ReactNode }) => {
   const [pagination, setPagination] = useState<PaginationResult>({});
   const [loading, setLoading] = useState(false);
 
-  const { createLink, deleteLink, updateLink, getLinks } = useLinkService({ setLoading, setLinks, pagination });
+  const { createLink, deleteLink, updateLink, getLinks, updateLinks } = useLinkService({ setLoading, setLinks, pagination });
 
   useEffect(() => {
     getLinks.onSuccess((res) => {
@@ -75,6 +76,7 @@ export const LinkProvider = ({ children }: { children: React.ReactNode }) => {
     updateLink,
     getLinks,
     pagination,
+    updateLinks,
   };
 
   return <LinkContext.Provider value={value}>{children}</LinkContext.Provider>;

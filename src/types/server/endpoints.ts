@@ -55,12 +55,12 @@ export type AuthEndpoints = {
     { path: "/google-bind"; body: never; response: DirectToServer }
   ];
   post: [
-    | { path: "/signup"; body: SignUpBody; response: InitiateUser }
-    | { path: "/signin"; body: SignInBody; response: InitiateUser }
-    | { path: "/signout"; body: never; response: Redirect }
-    | { path: "/verify-email"; body: never; response: User }
-    | { path: `/send-otp?type=${SendOtpType}`; body: never; response: User }
-    | { path: `/request-role?role=${UserRole}`; body: never; response: User }
+    { path: "/signup"; body: SignUpBody; response: InitiateUser },
+    { path: "/signin"; body: SignInBody; response: InitiateUser },
+    { path: "/signout"; body: never; response: Redirect },
+    { path: "/verify-email"; body: never; response: User },
+    { path: `/send-otp?type=${SendOtpType}`; body: never; response: User },
+    { path: `/request-role?role=${UserRole}`; body: never; response: User }
   ];
   put: [
     { path: "/bind-local"; body: UserCredentialBody; response: User },

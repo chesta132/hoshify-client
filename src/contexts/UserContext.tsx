@@ -3,12 +3,12 @@ import { Request } from "@/class/server/Request";
 import { useAuthService } from "@/services/authService";
 import { useUserService } from "@/services/userService";
 import type { InitiateUser, User } from "@/types/models";
+import type { SignInBody, SignUpBody } from "@/types/server/endpoints";
 import dayjs from "dayjs";
 import { createContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 
 type ConfigProp = [config?: ApiConfig];
-type SignAuth = Request<InitiateUser, [body: Partial<User>, ...ConfigProp]>;
 
 type UserValues = {
   user: InitiateUser;
@@ -18,8 +18,8 @@ type UserValues = {
   isSignIn: boolean;
   initiate: Request<InitiateUser, ConfigProp>;
   getUser: Request<User, ConfigProp>;
-  signIn: SignAuth;
-  signUp: SignAuth;
+  signIn: Request<InitiateUser, [body: SignInBody, config?: ApiConfig | undefined]>;
+  signUp: Request<InitiateUser, [body: SignUpBody, config?: ApiConfig | undefined]>;
   isInitiated: boolean;
 };
 

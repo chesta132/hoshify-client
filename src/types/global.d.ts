@@ -140,3 +140,6 @@ type ExtractArray<T> = T extends (infer U)[] ? U : T;
 
 /** Conditionally adds a new field to a type `T`. */
 type ConditionalField<T, Key extends string, ExtraKey extends string, ExtraType> = IsFalsy<T[Key], T, T & { [K in ExtraKey]: ExtraType }>;
+
+/** Replaces all occurrences of substring `W` in string `S` with `R`. */
+type Replace<S extends string, F extends string, R extends string> = S extends `${infer First}${F}${infer Last}` ? `${First}${R}${Last}` : S;

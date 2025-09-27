@@ -17,6 +17,20 @@ export type SafeExcResult<T> = { ok: true; data: T } | { ok: false; error: unkno
 
 type RetryOptions = { interval?: number; onRetry?: OnRetryCallback };
 
+type ResponsePrivates =
+  | "_fetcher"
+  | "_setState"
+  | "_navigate"
+  | "_config"
+  | "_onSuccess"
+  | "_onError"
+  | "_onFinally"
+  | "_retry"
+  | "_transform"
+  | "_loading"
+  | "_controller";
+type PrettyResponsePrivates = Replace<ResponsePrivates, "_", "">;
+
 export class Request<T, A extends any[] = [], N extends NavigateFunction | undefined = undefined, L = boolean> {
   private _fetcher: RequestFetcher<T, A>;
   private _setState?: React.Dispatch<React.SetStateAction<T>>;
@@ -36,6 +50,26 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
 
   static from<T, A extends any[] = [], N extends NavigateFunction | undefined = undefined, L = boolean>(instance: Request<T, A, N, L>) {
     return instance.clone();
+  }
+
+  reset<K extends Exclude<PrettyResponsePrivates, "fetcher">>(...keys: K[]) {
+    keys.forEach((k) => {
+      const key = `_${k}` as ResponsePrivates;
+      switch (key) {
+        case "_config":
+          this[key] = {};
+          break;
+        case "_controller":
+          this[key] = new AbortController();
+          break;
+        default:
+          delete this[key];
+      }
+    });
+
+    type NN = "navigate" extends K ? undefined : N;
+    type NL = "loading" extends K ? boolean : L;
+    return this as Request<T, A, NN, NL>;
   }
 
   clone<NT = T, NA extends any[] = A>(fetcher?: RequestFetcher<NT, NA>) {

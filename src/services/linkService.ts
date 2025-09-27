@@ -54,7 +54,7 @@ export function useLinkService({ setLoading, setLinks, pagination }: LinkService
             return [...prev, res.data];
           });
         })
-        .setConfig({ handleError: undefined }),
+        .reset("config"),
     [getLinks, setLinks]
   );
 
@@ -65,7 +65,7 @@ export function useLinkService({ setLoading, setLinks, pagination }: LinkService
         .onSuccess((res) => {
           setLinks((prev) => prev.map((link) => (link.id === res.data.id ? res.data : link)));
         })
-        .setConfig({ handleError: undefined }),
+        .reset("config"),
     [getLinks, setLinks]
   );
 
@@ -73,8 +73,7 @@ export function useLinkService({ setLoading, setLinks, pagination }: LinkService
     () =>
       getLinks
         .clone(({ signal }, updates: BodyOf<LinkEndpoints["put"], "/">) => api.link.put<Link[]>("/", updates, { signal }))
-        .onSuccess(() => {})
-        .setConfig({ handleError: undefined }),
+        .reset("onSuccess", "config"),
     [getLinks]
   );
 

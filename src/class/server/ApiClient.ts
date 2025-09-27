@@ -118,11 +118,11 @@ export class ApiClient<
     }
   }
 
-  get<T extends Get[number]["response"] | undefined = undefined, U extends Get[number]["path"] = Get[number]["path"]>(url: U, config?: ApiConfig) {
+  get<T extends Get["response"] | undefined = undefined, U extends Get["path"] = Get["path"]>(url: U, config?: ApiConfig) {
     return this.request<T extends undefined ? ResponseOf<Get, U> : T>({ ...config, url, method: "GET" });
   }
 
-  post<T extends Post[number]["response"] | undefined = undefined, U extends Post[number]["path"] = Post[number]["path"]>(
+  post<T extends Post["response"] | undefined = undefined, U extends Post["path"] = Post["path"]>(
     url: U,
     data?: BodyOf<Post, U>,
     config?: ApiConfig
@@ -130,7 +130,7 @@ export class ApiClient<
     return this.request<T extends undefined ? ResponseOf<Get, U> : T>({ ...config, url, method: "POST", data });
   }
 
-  patch<T extends Patch[number]["response"] | undefined = undefined, U extends Patch[number]["path"] = Patch[number]["path"]>(
+  patch<T extends Patch["response"] | undefined = undefined, U extends Patch["path"] = Patch["path"]>(
     url: U,
     data?: BodyOf<Patch, U>,
     config?: ApiConfig
@@ -138,7 +138,7 @@ export class ApiClient<
     return this.request<T extends undefined ? ResponseOf<Get, U> : T>({ ...config, url, method: "PATCH", data });
   }
 
-  put<T extends Put[number]["response"] | undefined = undefined, U extends Put[number]["path"] = Put[number]["path"]>(
+  put<T extends Put["response"] | undefined = undefined, U extends Put["path"] = Put["path"]>(
     url: U,
     data?: BodyOf<Put, U>,
     config?: ApiConfig
@@ -146,7 +146,7 @@ export class ApiClient<
     return this.request<T extends undefined ? ResponseOf<Get, U> : T>({ ...config, url, method: "PUT", data });
   }
 
-  delete<T extends Delete[number]["response"] | undefined = undefined, U extends Delete[number]["path"] = Delete[number]["path"]>(
+  delete<T extends Delete["response"] | undefined = undefined, U extends Delete["path"] = Delete["path"]>(
     url: U,
     config?: ApiConfig
   ) {

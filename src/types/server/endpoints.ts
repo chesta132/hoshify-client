@@ -1,12 +1,12 @@
 import type { InitiateUser, Link, Money, Schedule, Todo, Transaction, User, UserRole } from "../models";
 
-type Root = "/";
-type Param = `/${string}${string}`;
-type ParamRestores = `/restores/${string}${string}`;
-type Restores = "/restores";
-type WithQuery = `/${string}?${string}`;
-type DirectToServer = "DIRECT_TO_SERVER";
-type Redirect = "REDIRECT";
+export type Root = "/";
+export type Param = `/${string}${string}`;
+export type ParamRestores = `/restores/${string}${string}`;
+export type Restores = "/restores";
+export type WithQuery = `/${string}?${string}`;
+export type DirectToServer = never;
+export type Redirect = never;
 
 export type SignInBody = UserCredentialBody & { rememberMe: boolean };
 export type SignUpBody = SignInBody & UserFullName;
@@ -49,81 +49,78 @@ export type ParamTemplate<B, T> = {
 };
 
 export type AuthEndpoints = {
-  get: [
-    { path: "/google"; body: never; response: DirectToServer },
-    { path: "/send-email-verif"; body: never; response: User },
-    { path: "/google-bind"; body: never; response: DirectToServer }
-  ];
-  post: [
-    { path: "/signup"; body: SignUpBody; response: InitiateUser },
-    { path: "/signin"; body: SignInBody; response: InitiateUser },
-    { path: "/signout"; body: never; response: Redirect },
-    { path: "/verify-email"; body: never; response: User },
-    { path: `/send-otp?type=${SendOtpType}`; body: never; response: User },
-    { path: `/request-role?role=${UserRole}`; body: never; response: User }
-  ];
-  put: [
-    { path: "/bind-local"; body: UserCredentialBody; response: User },
-    { path: "/update-email"; body: { newEmail: string }; response: User },
-    { path: `/reset-password?token=${string}${string}`; body: { newPassword: string }; response: User },
-    { path: "/update-password"; body: { newPassword: string; oldPassword: string }; response: User },
-    { path: `/accept-request-role?token=${string}${string}`; body: never; response: User }
-  ];
-  delete: [];
-  patch: [];
+  get:
+    | { path: "/google"; body: never; response: DirectToServer }
+    | { path: "/send-email-verif"; body: never; response: User }
+    | { path: "/google-bind"; body: never; response: DirectToServer };
+  post:
+    | { path: "/signup"; body: SignUpBody; response: InitiateUser }
+    | { path: "/signin"; body: SignInBody; response: InitiateUser }
+    | { path: "/signout"; body: never; response: Redirect }
+    | { path: "/verify-email"; body: never; response: User }
+    | { path: `/send-otp?type=${SendOtpType}`; body: never; response: User }
+    | { path: `/request-role?role=${UserRole}`; body: never; response: User };
+  put:
+    | { path: "/bind-local"; body: UserCredentialBody; response: User }
+    | { path: "/update-email"; body: { newEmail: string }; response: User }
+    | { path: `/reset-password?token=${string}${string}`; body: { newPassword: string }; response: User }
+    | { path: "/update-password"; body: { newPassword: string; oldPassword: string }; response: User }
+    | { path: `/accept-request-role?token=${string}${string}`; body: never; response: User };
+  delete: never;
+  patch: never;
 };
 
 export type UserEndpoints = {
-  get: [{ path: "/initiate"; body: never; response: InitiateUser } | { path: Root; body: never; response: User }];
-  delete: [{ path: `${Root}?token=${string}${string}`; body: never; response: User }];
-  put: [{ path: Root; body: UserFullName; response: User }];
-  patch: [];
-  post: [];
+  get: { path: "/initiate"; body: never; response: InitiateUser } | { path: Root; body: never; response: User };
+  delete: { path: `${Root}?token=${string}${string}`; body: never; response: User };
+  put: { path: Root; body: UserFullName; response: User };
+  patch: never;
+  post: never;
 };
 
 export type TodoEndpoints = {
-  get: [GetTemplate<"root", Todo>, GetTemplate<"param", Todo>];
-  post: [RootTemplate<CreateTodoBody, Todo>, RootTemplate<CreateTodoBody[], Todo[]>];
-  put: [RootTemplate<CreateTodoBody[], Todo[]>, RootTemplate<CreateTodoBody, Todo>];
-  delete: [DeleteTemplate<"root", Todo>, DeleteTemplate<"param", Todo>];
-  patch: [RestoresTemplate<"root", Todo>, RestoresTemplate<"param", Todo>];
+  get: GetTemplate<"root", Todo> | GetTemplate<"param", Todo>;
+  post: RootTemplate<CreateTodoBody, Todo> | RootTemplate<CreateTodoBody[], Todo[]>;
+  put: RootTemplate<CreateTodoBody[], Todo[]> | RootTemplate<CreateTodoBody, Todo>;
+  delete: DeleteTemplate<"root", Todo> | DeleteTemplate<"param", Todo>;
+  patch: RestoresTemplate<"root", Todo> | RestoresTemplate<"param", Todo>;
 };
 
 export type TransactionEndpoints = {
-  get: [GetTemplate<"root", Transaction>, GetTemplate<"param", Transaction>];
-  post: [RootTemplate<CreateTransactionBody, Transaction>, RootTemplate<CreateTransactionBody[], Transaction[]>];
-  put: [RootTemplate<CreateTransactionBody, Transaction>];
-  delete: [DeleteTemplate<"root", Transaction>, DeleteTemplate<"param", Transaction>];
-  patch: [RestoresTemplate<"root", Transaction>, RestoresTemplate<"param", Transaction>];
+  get: GetTemplate<"root", Transaction> | GetTemplate<"param", Transaction>;
+  post: RootTemplate<CreateTransactionBody, Transaction> | RootTemplate<CreateTransactionBody[], Transaction[]>;
+  put: RootTemplate<CreateTransactionBody, Transaction>;
+  delete: DeleteTemplate<"root", Transaction> | DeleteTemplate<"param", Transaction>;
+  patch: RestoresTemplate<"root", Transaction> | RestoresTemplate<"param", Transaction>;
 };
 
 export type ScheduleEndpoints = {
-  get: [GetTemplate<"root", Schedule>, GetTemplate<"param", Schedule>];
-  post: [RootTemplate<CreateScheduleBody, Schedule>, RootTemplate<CreateScheduleBody[], Schedule[]>];
-  put: [RootTemplate<CreateScheduleBody, Schedule>, RootTemplate<CreateScheduleBody[], Schedule[]>];
-  delete: [DeleteTemplate<"root", Schedule>, DeleteTemplate<"param", Schedule>];
-  patch: [RestoresTemplate<"root", Schedule>, RestoresTemplate<"param", Schedule>];
+  get: GetTemplate<"root", Schedule> | GetTemplate<"param", Schedule>;
+  post: RootTemplate<CreateScheduleBody, Schedule> | RootTemplate<CreateScheduleBody[], Schedule[]>;
+  put: RootTemplate<CreateScheduleBody, Schedule> | RootTemplate<CreateScheduleBody[], Schedule[]>;
+  delete: DeleteTemplate<"root", Schedule> | DeleteTemplate<"param", Schedule>;
+  patch: RestoresTemplate<"root", Schedule> | RestoresTemplate<"param", Schedule>;
 };
 
 export type LinkEndpoints = {
-  get: [GetTemplate<"root", Link>, GetTemplate<"param", Link>];
-  post: [RootTemplate<CreateLinkBody, Link>, RootTemplate<CreateLinkBody[], Link[]>];
-  put: [ParamTemplate<CreateLinkBody, Link>, RootTemplate<CreateLinkBody[], Link[]>];
-  delete: [DeleteTemplate<"root", Link>, DeleteTemplate<"param", Link>];
-  patch: [];
+  get: GetTemplate<"root", Link> | GetTemplate<"param", Link>;
+  post: RootTemplate<CreateLinkBody, Link> | RootTemplate<CreateLinkBody[], Link[]>;
+  put: ParamTemplate<CreateLinkBody, Link> | RootTemplate<CreateLinkBody[], Link[]>;
+  delete: DeleteTemplate<"root", Link> | DeleteTemplate<"param", Link>;
+  patch: never;
 };
 
 export type MoneyEndpoints = {
-  get: [RootTemplate<never, Money>];
-  put: [ParamTemplate<never, Money>];
-  patch: [{ path: `/refresh${Param}?refresh=${RefreshConfig}`; body: never; response: Money }];
-  post: [];
-  delete: [];
+  get: RootTemplate<never, Money>;
+  put: ParamTemplate<never, Money>;
+  patch: { path: `/refresh${Param}?refresh=${RefreshConfig}`; body: never; response: Money };
+  post: never;
+  delete: never;
 };
 
 export type Endpoints = AuthEndpoints | UserEndpoints | TodoEndpoints | TransactionEndpoints | ScheduleEndpoints | LinkEndpoints | MoneyEndpoints;
 
-export type EndpointOf<P extends Endpoints[keyof Endpoints], M extends P[number]["path"] = P[number]["path"]> = P extends readonly (infer E)[]
+export type EndpointOf<P extends Endpoints[keyof Endpoints], M extends P["path"] = P["path"]> = P extends infer E
   ? E extends { path: infer Path }
     ? M extends Path
       ? E
@@ -131,5 +128,5 @@ export type EndpointOf<P extends Endpoints[keyof Endpoints], M extends P[number]
     : never
   : never;
 
-export type BodyOf<P extends Endpoints[keyof Endpoints], M extends P[number]["path"]> = EndpointOf<P, M>["body"];
-export type ResponseOf<P extends Endpoints[keyof Endpoints], M extends P[number]["path"]> = EndpointOf<P, M>["response"];
+export type BodyOf<P extends Endpoints[keyof Endpoints], M extends P["path"]> = EndpointOf<P, M>["body"];
+export type ResponseOf<P extends Endpoints[keyof Endpoints], M extends P["path"]> = EndpointOf<P, M>["response"];

@@ -3,7 +3,7 @@ import { Request } from "@/class/server/Request";
 import type { PaginationResult } from "@/class/server/ServerSuccess";
 import { useError } from "@/contexts";
 import type { Link } from "@/types/models";
-import { omit } from "@/utils/manipulate/object";
+import type { BodyOf, CreateLinkBody, LinkEndpoints } from "@/types/server/endpoints";
 import { useMemo } from "react";
 
 type LinkServiceProps = {
@@ -13,11 +13,11 @@ type LinkServiceProps = {
 };
 
 export type LinkServices = {
-  updateLink: Request<Link, [updates: Partial<Link>]>;
-  createLink: Request<Link, [body: Partial<Link>]>;
+  updateLink: Request<Link, [updates: CreateLinkBody & { id: string }]>;
+  createLink: Request<Link[], [body: CreateLinkBody | CreateLinkBody[]]>;
   deleteLink: Request<Link, [id: string]>;
   getLinks: Request<Link[], [offset: number | "sequel"]>;
-  updateLinks: Request<Link[], [updates: Partial<Link>[]], undefined, boolean>;
+  updateLinks: Request<Link[], [updates: CreateLinkBody[]]>;
 };
 
 export function useLinkService({ setLoading, setLinks, pagination }: LinkServiceProps): LinkServices {
@@ -37,7 +37,7 @@ export function useLinkService({ setLoading, setLinks, pagination }: LinkService
   const deleteLink = useMemo(
     () =>
       getLinks
-        .clone(({ signal }, id: string) => api.link.delete(`/${id}`, { signal }))
+        .clone(({ signal }, id: string) => api.link.delete<Link>(`/${id}`, { signal }))
         .onSuccess((res) => {
           setLinks((prev) => prev.filter((link) => link.id !== res.data.id));
         }),
@@ -47,9 +47,12 @@ export function useLinkService({ setLoading, setLinks, pagination }: LinkService
   const createLink = useMemo(
     () =>
       getLinks
-        .clone(({ signal }, body: Partial<Link>) => api.link.post("/", body, { signal }))
+        .clone(({ signal }, body: BodyOf<LinkEndpoints["post"], "/">) => api.link.post("/", body, { signal }))
         .onSuccess((res) => {
-          setLinks((prev) => [...prev, res.data]);
+          setLinks((prev) => {
+            if (Array.isArray(res.data)) return [...prev, ...res.data];
+            return [...prev, res.data];
+          });
         })
         .setConfig({ handleError: undefined }),
     [getLinks, setLinks]
@@ -58,9 +61,7 @@ export function useLinkService({ setLoading, setLinks, pagination }: LinkService
   const updateLink = useMemo(
     () =>
       getLinks
-        .clone(({ signal }, updates: Partial<Link>) =>
-          api.link.put(`/${updates.id}`, omit(updates, ["createdAt", "id", "updatedAt", "userId"]), { signal })
-        )
+        .clone(({ signal }, updates: BodyOf<LinkEndpoints["put"], "/:id"> & { id: string }) => api.link.put(`/${updates.id}`, updates, { signal }))
         .onSuccess((res) => {
           setLinks((prev) => prev.map((link) => (link.id === res.data.id ? res.data : link)));
         })
@@ -71,13 +72,7 @@ export function useLinkService({ setLoading, setLinks, pagination }: LinkService
   const updateLinks = useMemo(
     () =>
       getLinks
-        .clone(({ signal }, updates: Partial<Link>[]) =>
-          api.link.put<Link[]>(
-            "/",
-            updates.map((update) => omit(update, ["createdAt", "updatedAt", "userId"])),
-            { signal }
-          )
-        )
+        .clone(({ signal }, updates: BodyOf<LinkEndpoints["put"], "/">) => api.link.put<Link[]>("/", updates, { signal }))
         .onSuccess(() => {})
         .setConfig({ handleError: undefined }),
     [getLinks]

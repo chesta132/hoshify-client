@@ -1,6 +1,7 @@
 import api, { type ApiConfig } from "@/class/server/ApiClient";
 import { Request } from "@/class/server/Request";
-import type { InitiateUser, User } from "@/types/models";
+import type { InitiateUser } from "@/types/models";
+import type { ResponseOf, AuthEndpoints, BodyOf } from "@/types/server/endpoints";
 import { useMemo, useState } from "react";
 
 type AuthServiceProps = {
@@ -12,9 +13,9 @@ export const useAuthService = ({ setLoading, setUser }: AuthServiceProps) => {
   const [isSignIn, setIsSignIn] = useState<boolean>(JSON.safeParse(localStorage.getItem("is-sign-in")!, false));
 
   const signAuthFetcher =
-    (path: "/signin" | "/signup") =>
-    ({ signal }: { signal: AbortSignal }, body: Partial<User>, config?: ApiConfig) =>
-      api.auth.post<InitiateUser>(path, body, { signal, ...config });
+    <P extends "/signin" | "/signup">(path: P) =>
+    ({ signal }: { signal: AbortSignal }, body: BodyOf<AuthEndpoints["post"], P>, config?: ApiConfig) =>
+      api.auth.post<ResponseOf<AuthEndpoints["post"], P>>(path, body, { signal, ...config });
 
   const signIn = useMemo(
     () =>

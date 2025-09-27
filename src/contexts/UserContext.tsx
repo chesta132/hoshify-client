@@ -81,10 +81,17 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   }, [isSignIn]);
 
   useEffect(() => {
-    if (user.id === "" && isInitiated) {
-      setIsSignIn(false);
+    if (isInitiated) {
+      if (user.id === "") {
+        setIsSignIn(false);
+      } else {
+        setIsSignIn(true);
+        if (isSignPage) {
+          navigate("/");
+        }
+      }
     }
-  }, [isInitiated, user.id]);
+  }, [isInitiated, isSignPage, navigate, user.id]);
 
   useEffect(() => {
     if (!isSignIn && isInitiated && !isSignPage) {

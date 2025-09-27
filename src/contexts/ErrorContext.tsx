@@ -1,11 +1,12 @@
 import type { StateErrorServer } from "@/types/server/codes";
 import { createContext, useCallback, useState } from "react";
 
-export type SetGlobalError = React.Dispatch<React.SetStateAction<StateErrorServer | null>>;
+export type GlobalError = StateErrorServer | null;
+export type SetGlobalError = React.Dispatch<React.SetStateAction<GlobalError>>;
 
 type ErrorValues = {
-  error: StateErrorServer | null;
-  setError: React.Dispatch<React.SetStateAction<StateErrorServer | null>>;
+  error: GlobalError;
+  setError: SetGlobalError;
   clearError: () => void;
 };
 
@@ -19,7 +20,7 @@ const defaultValues: ErrorValues = {
 export const ErrorContext = createContext<ErrorValues>(defaultValues);
 
 export const ErrorProvider = ({ children }: { children: React.ReactNode }) => {
-  const [error, setError] = useState<StateErrorServer | null>(null);
+  const [error, setError] = useState<GlobalError>(null);
 
   const clearError = useCallback(() => {
     setError(null);

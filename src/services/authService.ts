@@ -1,7 +1,8 @@
 import api, { type ApiConfig } from "@/class/server/ApiClient";
 import { Request } from "@/class/server/Request";
+import { useError } from "@/contexts";
 import type { InitiateUser } from "@/types/models";
-import type { ResponseOf, AuthEndpoints, BodyOf } from "@/types/server/endpoints";
+import type { ResponseOf, AuthEndpoints, BodyOf, SignInBody, SignUpBody } from "@/types/server/endpoints";
 import { useMemo, useState } from "react";
 
 type AuthServiceProps = {
@@ -9,8 +10,15 @@ type AuthServiceProps = {
   setUser: React.Dispatch<React.SetStateAction<InitiateUser>>;
 };
 
-export const useAuthService = ({ setLoading, setUser }: AuthServiceProps) => {
+export type AuthServices = {
+  signUp: Request<InitiateUser, [body: SignUpBody, config?: ApiConfig | undefined]>;
+  signIn: Request<InitiateUser, [body: SignInBody, config?: ApiConfig | undefined]>;
+  isSignIn: boolean;
+};
+
+export const useAuthService = ({ setLoading, setUser }: AuthServiceProps): AuthServices => {
   const [isSignIn, setIsSignIn] = useState<boolean>(JSON.safeParse(localStorage.getItem("is-sign-in")!, false));
+  const { setError } = useError();
 
   const signAuthFetcher =
     <P extends "/signin" | "/signup">(path: P) =>
@@ -23,8 +31,9 @@ export const useAuthService = ({ setLoading, setUser }: AuthServiceProps) => {
         .loading(setLoading)
         .onSuccess(() => setIsSignIn(true))
         .mergeState(setUser)
-        .retry(3),
-    [setLoading, setUser]
+        .retry(3)
+        .config({ handleError: { setError } }),
+    [setLoading, setUser, setError]
   );
 
   const signUp = useMemo(() => signIn.clone(signAuthFetcher("/signup")), [signIn]);

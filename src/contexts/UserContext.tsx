@@ -1,27 +1,20 @@
-import api, { type ApiConfig } from "@/class/server/ApiClient";
+import api from "@/class/server/ApiClient";
 import { Request } from "@/class/server/Request";
-import { useAuthService } from "@/services/authService";
-import { useUserService } from "@/services/userService";
-import type { InitiateUser, User } from "@/types/models";
-import type { SignInBody, SignUpBody } from "@/types/server/endpoints";
+import { useAuthService, type AuthServices } from "@/services/authService";
+import { useUserService, type UserServices } from "@/services/userService";
+import type { InitiateUser } from "@/types/models";
 import dayjs from "dayjs";
 import { createContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
-
-type ConfigProp = [config?: ApiConfig];
 
 type UserValues = {
   user: InitiateUser;
   setUser: React.Dispatch<React.SetStateAction<InitiateUser>>;
   loading: boolean;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  isSignIn: boolean;
-  initiate: Request<InitiateUser, ConfigProp>;
-  getUser: Request<User, ConfigProp>;
-  signIn: Request<InitiateUser, [body: SignInBody, config?: ApiConfig | undefined]>;
-  signUp: Request<InitiateUser, [body: SignUpBody, config?: ApiConfig | undefined]>;
   isInitiated: boolean;
-};
+} & UserServices &
+  AuthServices;
 
 const defaultUser: InitiateUser = {
   id: "",

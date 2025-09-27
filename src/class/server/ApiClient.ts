@@ -4,7 +4,7 @@ import { ServerError } from "@/class/server/ServerError";
 import type { Response } from "@/types/server";
 import { VITE_ENV, VITE_SERVER_URL } from "@/config";
 import { normalizeDates } from "@/utils/manipulate/date";
-import type { Models, InitiateUser, User, ModelNames, Todo, Schedule, Money, Transaction, Link } from "@/types/models";
+import type { ModelNames } from "@/types/models";
 import { pick } from "@/utils/manipulate/object";
 import type {
   AuthEndpoints,
@@ -20,15 +20,14 @@ import type {
 } from "@/types/server/endpoints";
 
 type LogType = "default" | "none" | "no trace" | "table";
-type SetEndpoints<T extends Models, E extends Endpoints, O extends string = ""> = Omit<
-  ApiClient<T, E["get"], E["put"], E["post"], E["delete"], E["patch"]>,
+type SetEndpoints<E extends Endpoints, O extends string = ""> = Omit<
+  ApiClient<E["get"], E["put"], E["post"], E["delete"], E["patch"]>,
   ModelNames | "auth" | O
 >;
 
 export type ApiConfig<D = any> = AxiosRequestConfig<D> & { logType?: LogType };
 
 export class ApiClient<
-  M extends Models = any,
   Get extends Endpoints["get"] = any,
   Put extends Endpoints["put"] = any,
   Post extends Endpoints["post"] = any,
@@ -38,13 +37,13 @@ export class ApiClient<
   private api: AxiosInstance;
   private endpoint: string;
 
-  readonly auth!: SetEndpoints<InitiateUser | User, AuthEndpoints>;
-  readonly user!: SetEndpoints<User, UserEndpoints, "patch">;
-  readonly todo!: SetEndpoints<Todo, TodoEndpoints>;
-  readonly schedule!: SetEndpoints<Schedule, ScheduleEndpoints>;
-  readonly money!: SetEndpoints<Money, MoneyEndpoints, "delete">;
-  readonly transaction!: SetEndpoints<Transaction, TransactionEndpoints>;
-  readonly link!: SetEndpoints<Link, LinkEndpoints, "patch">;
+  readonly auth!: SetEndpoints<AuthEndpoints>;
+  readonly user!: SetEndpoints<UserEndpoints, "patch">;
+  readonly todo!: SetEndpoints<TodoEndpoints>;
+  readonly schedule!: SetEndpoints<ScheduleEndpoints>;
+  readonly money!: SetEndpoints<MoneyEndpoints, "delete">;
+  readonly transaction!: SetEndpoints<TransactionEndpoints>;
+  readonly link!: SetEndpoints<LinkEndpoints, "patch">;
 
   constructor(baseURL: string, endpoint = "", initiate = false) {
     this.endpoint = endpoint;
@@ -102,7 +101,7 @@ export class ApiClient<
     }
   }
 
-  private async request<T = M>(config: ApiConfig): Promise<ServerSuccess<T>> {
+  private async request<T>(config: ApiConfig): Promise<ServerSuccess<T>> {
     try {
       const response = (await this.api.request<T>({
         ...config,
@@ -138,18 +137,11 @@ export class ApiClient<
     return this.request<T extends undefined ? ResponseOf<Get, U> : T>({ ...config, url, method: "PATCH", data });
   }
 
-  put<T extends Put["response"] | undefined = undefined, U extends Put["path"] = Put["path"]>(
-    url: U,
-    data?: BodyOf<Put, U>,
-    config?: ApiConfig
-  ) {
+  put<T extends Put["response"] | undefined = undefined, U extends Put["path"] = Put["path"]>(url: U, data?: BodyOf<Put, U>, config?: ApiConfig) {
     return this.request<T extends undefined ? ResponseOf<Get, U> : T>({ ...config, url, method: "PUT", data });
   }
 
-  delete<T extends Delete["response"] | undefined = undefined, U extends Delete["path"] = Delete["path"]>(
-    url: U,
-    config?: ApiConfig
-  ) {
+  delete<T extends Delete["response"] | undefined = undefined, U extends Delete["path"] = Delete["path"]>(url: U, config?: ApiConfig) {
     return this.request<T extends undefined ? ResponseOf<Get, U> : T>({ ...config, url, method: "DELETE" });
   }
 }

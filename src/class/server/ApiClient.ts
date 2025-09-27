@@ -8,9 +8,11 @@ import type { Models, InitiateUser, User, ModelNames, Todo, Schedule, Money, Tra
 import { pick } from "@/utils/manipulate/object";
 import type {
   AuthEndpoints,
+  BodyOf,
   Endpoints,
   LinkEndpoints,
   MoneyEndpoints,
+  ResponseOf,
   ScheduleEndpoints,
   TodoEndpoints,
   TransactionEndpoints,
@@ -27,11 +29,11 @@ export type ApiConfig<D = any> = AxiosRequestConfig<D> & { logType?: LogType };
 
 export class ApiClient<
   M extends Models = any,
-  Get extends string = string,
-  Put extends string = string,
-  Post extends string = string,
-  Delete extends string = string,
-  Patch extends string = string
+  Get extends Endpoints["get"] = any,
+  Put extends Endpoints["put"] = any,
+  Post extends Endpoints["post"] = any,
+  Delete extends Endpoints["delete"] = any,
+  Patch extends Endpoints["patch"] = any
 > {
   private api: AxiosInstance;
   private endpoint: string;
@@ -44,7 +46,7 @@ export class ApiClient<
   readonly transaction!: SetEndpoints<Transaction, TransactionEndpoints>;
   readonly link!: SetEndpoints<Link, LinkEndpoints, "patch">;
 
-  constructor(baseURL: string, endpoint = "", initiate = true) {
+  constructor(baseURL: string, endpoint = "", initiate = false) {
     this.endpoint = endpoint;
     this.api = axios.create({
       baseURL,
@@ -55,13 +57,13 @@ export class ApiClient<
     });
 
     if (initiate) {
-      this.auth = new ApiClient(baseURL, "/auth", false);
-      this.user = new ApiClient(baseURL, "/user", false);
-      this.todo = new ApiClient(baseURL, "/todos", false);
-      this.schedule = new ApiClient(baseURL, "/schedules", false);
-      this.money = new ApiClient(baseURL, "/money", false);
-      this.transaction = new ApiClient(baseURL, "/transactions", false);
-      this.link = new ApiClient(baseURL, "/links", false);
+      this.auth = new ApiClient(baseURL, "/auth");
+      this.user = new ApiClient(baseURL, "/user");
+      this.todo = new ApiClient(baseURL, "/todos");
+      this.schedule = new ApiClient(baseURL, "/schedules");
+      this.money = new ApiClient(baseURL, "/money");
+      this.transaction = new ApiClient(baseURL, "/transactions");
+      this.link = new ApiClient(baseURL, "/links");
     }
 
     this.api.interceptors.response.use(
@@ -116,26 +118,41 @@ export class ApiClient<
     }
   }
 
-  get<T = M>(url: Get, config?: ApiConfig) {
-    return this.request<T>({ ...config, url, method: "GET" });
+  get<T extends Get[number]["response"] | undefined = undefined, U extends Get[number]["path"] = Get[number]["path"]>(url: U, config?: ApiConfig) {
+    return this.request<T extends undefined ? ResponseOf<Get, U> : T>({ ...config, url, method: "GET" });
   }
 
-  post<T = M>(url: Post, data?: any, config?: ApiConfig) {
-    return this.request<T>({ ...config, url, method: "POST", data });
+  post<T extends Post[number]["response"] | undefined = undefined, U extends Post[number]["path"] = Post[number]["path"]>(
+    url: U,
+    data?: BodyOf<Post, U>,
+    config?: ApiConfig
+  ) {
+    return this.request<T extends undefined ? ResponseOf<Get, U> : T>({ ...config, url, method: "POST", data });
   }
 
-  patch<T = M>(url: Patch, data?: any, config?: ApiConfig) {
-    return this.request<T>({ ...config, url, method: "PATCH", data });
+  patch<T extends Patch[number]["response"] | undefined = undefined, U extends Patch[number]["path"] = Patch[number]["path"]>(
+    url: U,
+    data?: BodyOf<Patch, U>,
+    config?: ApiConfig
+  ) {
+    return this.request<T extends undefined ? ResponseOf<Get, U> : T>({ ...config, url, method: "PATCH", data });
   }
 
-  put<T = M>(url: Put, data?: any, config?: ApiConfig) {
-    return this.request<T>({ ...config, url, method: "PUT", data });
+  put<T extends Put[number]["response"] | undefined = undefined, U extends Put[number]["path"] = Put[number]["path"]>(
+    url: U,
+    data?: BodyOf<Put, U>,
+    config?: ApiConfig
+  ) {
+    return this.request<T extends undefined ? ResponseOf<Get, U> : T>({ ...config, url, method: "PUT", data });
   }
 
-  delete<T = M>(url: Delete, config?: ApiConfig) {
-    return this.request<T>({ ...config, url, method: "DELETE" });
+  delete<T extends Delete[number]["response"] | undefined = undefined, U extends Delete[number]["path"] = Delete[number]["path"]>(
+    url: U,
+    config?: ApiConfig
+  ) {
+    return this.request<T extends undefined ? ResponseOf<Get, U> : T>({ ...config, url, method: "DELETE" });
   }
 }
 
-const api = new ApiClient(VITE_SERVER_URL);
+const api = new ApiClient(VITE_SERVER_URL, "", true);
 export default api;

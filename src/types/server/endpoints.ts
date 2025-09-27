@@ -1,64 +1,135 @@
+import type { InitiateUser, Link, Money, Schedule, Todo, Transaction, User, UserRole } from "../models";
+
 type Root = "/";
-type Dynamic = `/${string}${string}`;
-type Branch = `/${string}`;
-type DynamicRestore = `/restores/${string}${string}`;
+type Param = `/${string}${string}`;
+type ParamRestores = `/restores/${string}${string}`;
 type Restores = "/restores";
-type OffsetQuery = `offset=${number}`;
+type WithQuery = `/${string}?${string}`;
+type DirectToServer = "DIRECT_TO_SERVER";
+type Redirect = "REDIRECT";
+
+export type SignInBody = UserCredentialBody & { rememberMe: boolean };
+export type SignUpBody = SignInBody & UserFullName;
+export type CreateTodoBody = Pick<Todo, "title" | "details" | "dueDate"> & Partial<Pick<Todo, "status">>;
+export type UserCredentialBody = Pick<User, "email"> & { password: string };
+export type CreateTransactionBody = Pick<Transaction, "type" | "title" | "amount"> & Partial<Pick<Transaction, "details">>;
+export type CreateScheduleBody = Pick<Schedule, "title" | "details"> & Partial<Pick<Schedule, "start" | "end">>;
+export type CreateLinkBody = Pick<Link, "link" | "title"> & Partial<Pick<Link, "position">>;
+
+export type RefreshConfig = "income" | "outcome" | "total";
+export type UserFullName = Pick<User, "fullName">;
+export type Ids = { ids: string[] };
+
+export type SendOtpType = "CHANGE_EMAIL" | "CHANGE_PASSWORD" | "DELETE_ACCOUNT";
+
+export type GetTemplate<E extends "root" | "param", T> = {
+  path: E extends "root" ? Root | WithQuery : Param;
+  body: never;
+  response: E extends "root" ? T[] : T;
+};
+export type DeleteTemplate<E extends "root" | "param", T> = {
+  path: E extends "root" ? Root | WithQuery : Param;
+  body: E extends "root" ? Ids : never;
+  response: E extends "root" ? T[] : T;
+};
+export type RestoresTemplate<E extends "root" | "param", T> = {
+  path: E extends "root" ? Restores : ParamRestores;
+  body: E extends "root" ? Ids : never;
+  response: E extends "root" ? T[] : T;
+};
+export type RootTemplate<B, T> = {
+  path: Root;
+  body: B;
+  response: T;
+};
+export type ParamTemplate<B, T> = {
+  path: Param;
+  body: B;
+  response: T;
+};
 
 export type AuthEndpoints = {
-  get: "/google" | "/google/callback" | "/send-email-verif" | "/google-bind" | "/google-bind/callback";
-  post: "/signup" | "/signin" | "/signout" | "/verify-email" | "/send-otp" | "/request-role";
-  put: "/bind-local" | "/update-email" | "/reset-password" | "/update-password" | "/accept-request-role";
-  delete: never;
-  patch: never;
+  get: [
+    { path: "/google"; body: never; response: DirectToServer },
+    { path: "/send-email-verif"; body: never; response: User },
+    { path: "/google-bind"; body: never; response: DirectToServer }
+  ];
+  post: [
+    | { path: "/signup"; body: SignUpBody; response: InitiateUser }
+    | { path: "/signin"; body: SignInBody; response: InitiateUser }
+    | { path: "/signout"; body: never; response: Redirect }
+    | { path: "/verify-email"; body: never; response: User }
+    | { path: `/send-otp?type=${SendOtpType}`; body: never; response: User }
+    | { path: `/request-role?role=${UserRole}`; body: never; response: User }
+  ];
+  put: [
+    { path: "/bind-local"; body: UserCredentialBody; response: User },
+    { path: "/update-email"; body: { newEmail: string }; response: User },
+    { path: `/reset-password?token=${string}${string}`; body: { newPassword: string }; response: User },
+    { path: "/update-password"; body: { newPassword: string; oldPassword: string }; response: User },
+    { path: `/accept-request-role?token=${string}${string}`; body: never; response: User }
+  ];
+  delete: [];
+  patch: [];
 };
 
 export type UserEndpoints = {
-  get: "/initiate" | Root;
-  delete: Root;
-  put: Root;
-  patch: never;
-  post: never;
+  get: [{ path: "/initiate"; body: never; response: InitiateUser } | { path: Root; body: never; response: User }];
+  delete: [{ path: `${Root}?token=${string}${string}`; body: never; response: User }];
+  put: [{ path: Root; body: UserFullName; response: User }];
+  patch: [];
+  post: [];
 };
 
 export type TodoEndpoints = {
-  get: Branch;
-  post: Root;
-  put: Branch;
-  delete: Branch;
-  patch: Restores | DynamicRestore;
+  get: [GetTemplate<"root", Todo>, GetTemplate<"param", Todo>];
+  post: [RootTemplate<CreateTodoBody, Todo>, RootTemplate<CreateTodoBody[], Todo[]>];
+  put: [RootTemplate<CreateTodoBody[], Todo[]>, RootTemplate<CreateTodoBody, Todo>];
+  delete: [DeleteTemplate<"root", Todo>, DeleteTemplate<"param", Todo>];
+  patch: [RestoresTemplate<"root", Todo>, RestoresTemplate<"param", Todo>];
 };
 
 export type TransactionEndpoints = {
-  get: Branch;
-  post: Root;
-  put: Dynamic;
-  delete: Branch;
-  patch: Restores | DynamicRestore;
+  get: [GetTemplate<"root", Transaction>, GetTemplate<"param", Transaction>];
+  post: [RootTemplate<CreateTransactionBody, Transaction>, RootTemplate<CreateTransactionBody[], Transaction[]>];
+  put: [RootTemplate<CreateTransactionBody, Transaction>];
+  delete: [DeleteTemplate<"root", Transaction>, DeleteTemplate<"param", Transaction>];
+  patch: [RestoresTemplate<"root", Transaction>, RestoresTemplate<"param", Transaction>];
 };
 
 export type ScheduleEndpoints = {
-  get: Branch;
-  post: Root;
-  put: Branch;
-  delete: Branch;
-  patch: Restores | DynamicRestore;
+  get: [GetTemplate<"root", Schedule>, GetTemplate<"param", Schedule>];
+  post: [RootTemplate<CreateScheduleBody, Schedule>, RootTemplate<CreateScheduleBody[], Schedule[]>];
+  put: [RootTemplate<CreateScheduleBody, Schedule>, RootTemplate<CreateScheduleBody[], Schedule[]>];
+  delete: [DeleteTemplate<"root", Schedule>, DeleteTemplate<"param", Schedule>];
+  patch: [RestoresTemplate<"root", Schedule>, RestoresTemplate<"param", Schedule>];
 };
 
 export type LinkEndpoints = {
-  get: Root | (`${Root}?${OffsetQuery}` | (string & {}));
-  post: Root;
-  put: Dynamic | Root
-  delete: Branch;
-  patch: never;
+  get: [GetTemplate<"root", Link>, GetTemplate<"param", Link>];
+  post: [RootTemplate<CreateLinkBody, Link>, RootTemplate<CreateLinkBody[], Link[]>];
+  put: [ParamTemplate<CreateLinkBody, Link>, RootTemplate<CreateLinkBody[], Link[]>];
+  delete: [DeleteTemplate<"root", Link>, DeleteTemplate<"param", Link>];
+  patch: [];
 };
 
 export type MoneyEndpoints = {
-  get: Root;
-  put: Dynamic;
-  patch: DynamicRestore;
-  post: never;
-  delete: never;
+  get: [RootTemplate<never, Money>];
+  put: [ParamTemplate<never, Money>];
+  patch: [{ path: `/refresh${Param}?refresh=${RefreshConfig}`; body: never; response: Money }];
+  post: [];
+  delete: [];
 };
 
 export type Endpoints = AuthEndpoints | UserEndpoints | TodoEndpoints | TransactionEndpoints | ScheduleEndpoints | LinkEndpoints | MoneyEndpoints;
+
+export type EndpointOf<P extends Endpoints[keyof Endpoints], M extends P[number]["path"] = P[number]["path"]> = P extends readonly (infer E)[]
+  ? E extends { path: infer Path }
+    ? M extends Path
+      ? E
+      : never
+    : never
+  : never;
+
+export type BodyOf<P extends Endpoints[keyof Endpoints], M extends P[number]["path"]> = EndpointOf<P, M>["body"];
+export type ResponseOf<P extends Endpoints[keyof Endpoints], M extends P[number]["path"]> = EndpointOf<P, M>["response"];

@@ -35,12 +35,12 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
   private _fetcher: RequestFetcher<T, A>;
   private _setState?: React.Dispatch<React.SetStateAction<T>>;
   private _navigate?: N;
-  private _config: Config<N> = {};
+  private _config: Config<N> = { withLoad: true };
   private _onSuccess?: (response: ServerSuccess<T>) => any;
   private _onError?: (error: unknown) => any;
   private _onFinally?: () => any;
   private _retry?: Retry;
-  private _transform?: (res: ServerSuccess<T>) => ServerSuccess<T>;
+  private _transform: ((res: ServerSuccess<T>) => ServerSuccess<T>)[] = [];
   private _loading?: { set: React.Dispatch<React.SetStateAction<L>>; load: L; unLoad: L };
   private _controller = new AbortController();
 
@@ -57,7 +57,7 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
       const key = `_${k}` as ResponsePrivates;
       switch (key) {
         case "_config":
-          this[key] = {};
+          this[key] = { withLoad: true };
           break;
         case "_controller":
           this[key] = new AbortController();
@@ -103,7 +103,7 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
     return this as Request<T, A, NavigateFunction, L>;
   }
 
-  setConfig(config: Config<N>) {
+  config(config: Config<N>) {
     this._config = { ...this._config, ...config };
     return this;
   }
@@ -139,7 +139,7 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
   }
 
   transform(cb: (res: ServerSuccess<T>) => ServerSuccess<T>) {
-    this._transform = cb;
+    this._transform.push(cb);
     return this;
   }
 
@@ -161,14 +161,18 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
     }
     try {
       let res = await _fetcher(controller, ...args);
-      if (_transform) {
-        res = _transform(res);
-      }
+
+      _transform.forEach((t) => {
+        res = t(res);
+      });
+
       _setState?.(res.data);
       await _onSuccess?.(res);
+
       return res;
     } catch (err) {
       if ((err as Error).name === "AbortError") throw err;
+
       if (_retry) {
         _retry.counted++;
         if (_retry.counted <= _retry.count) {
@@ -177,7 +181,9 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
           return await this.exec(...args);
         }
       }
+
       await _onError?.(err);
+
       if (err instanceof ServerError) {
         if (_config.directOnAuthError) {
           directOnAuthError(err, _navigate);
@@ -186,6 +192,7 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
       if (_config.handleError) {
         handleError(err, _config.handleError.setError, _config.handleError);
       }
+
       throw err;
     } finally {
       _loading?.set(_loading.unLoad);

@@ -30,7 +30,7 @@ export function useLinkService({ setLoading, setLinks, pagination }: LinkService
       )
         .retry(3)
         .loading(setLoading)
-        .setConfig({ handleError: { setError } }),
+        .config({ handleError: { setError } }),
     [pagination.nextOffset, setError, setLoading]
   );
 

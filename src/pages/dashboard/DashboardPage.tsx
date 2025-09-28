@@ -1,5 +1,6 @@
 import { useUser } from "@/contexts";
-import { QuickLinks } from "./quick links/QuickLinks";
+import { QuickLinks } from "../../components/quick-links/QuickLinks";
+import { MoneyOverview } from "@/components/money-overview/MoneyOverview";
 
 export const DashboardPage = () => {
   const { user } = useUser();
@@ -12,6 +13,9 @@ export const DashboardPage = () => {
       </section>
       <section>
         <QuickLinks />
+      </section>
+      <section>
+        <MoneyOverview />
       </section>
     </div>
   );

@@ -1,5 +1,5 @@
 import type { Config, FormFields } from "@/types/form";
-import { VALIDATION_RULES } from "@/class/form validator/rule";
+import { VALIDATION_RULES } from "@/class/form-validator/rule";
 
 export class FormValidator<T extends Partial<FormFields>> {
   form: T;

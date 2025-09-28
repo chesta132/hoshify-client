@@ -70,10 +70,7 @@ export function useLinkService({ setLoading, setLinks, pagination }: LinkService
   );
 
   const updateLinks = useMemo(
-    () =>
-      getLinks
-        .clone(({ signal }, updates: BodyOf<LinkEndpoints["put"], "/">) => api.link.put<Link[]>("/", updates, { signal }))
-        .reset("onSuccess", "config"),
+    () => getLinks.clone(({ signal }, updates: BodyOf<LinkEndpoints["put"], "/">) => api.link.put<Link[]>("/", updates, { signal })).reset("config"),
     [getLinks]
   );
 

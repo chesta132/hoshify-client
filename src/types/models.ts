@@ -44,6 +44,7 @@ export interface Schedule {
   createdAt: Dayjs;
 }
 
+export const todoStatus: TodoStatus[] = ["PENDING", "ACTIVE", "COMPLETED", "CANCELED"];
 export type TodoStatus = "PENDING" | "ACTIVE" | "COMPLETED" | "CANCELED";
 export interface Todo {
   id: string;

@@ -1,3 +1,5 @@
+import type dayjs from "dayjs";
+import type { TodoStatus } from "./models";
 import type { ErrorResponse } from "./server";
 
 type FieldPlaces = "server" | "local";
@@ -17,6 +19,9 @@ export type StringFields = {
     | "fullName"
     | "link";
   local: "verifyPassword";
+  literal: {
+    status: TodoStatus;
+  };
 };
 
 export type BooleanFields = {
@@ -24,9 +29,18 @@ export type BooleanFields = {
   local: never;
 };
 
+export type DateFields = {
+  server: "dueDate";
+};
+
 export type ServerFields = StringFields["server"] | BooleanFields["server"];
 
-export type FormFields = Partial<Record<StringFields[FieldPlaces], string> & Record<BooleanFields[FieldPlaces], boolean>>;
+export type FormFields = Partial<
+  Record<StringFields[FieldPlaces], string> &
+    Record<BooleanFields[FieldPlaces], boolean> &
+    StringFields["literal"] &
+    Record<DateFields["server"], dayjs.Dayjs>
+>;
 
 export type BooleanUnion<T> = {
   [K in keyof T]: T[K] | boolean;

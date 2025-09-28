@@ -1,6 +1,7 @@
 import type { FieldValidations, FormFields } from "@/types/form";
 import { isValidEmail } from "./validator";
 import { isValidUrl } from "@/utils/manipulate/string";
+import { todoStatus } from "@/types/models";
 
 export const VALIDATION_RULES: FieldValidations<FormFields> = {
   title: [
@@ -74,4 +75,5 @@ export const VALIDATION_RULES: FieldValidations<FormFields> = {
     },
   ],
   link: [{ condition: (value, config) => !!(config.link && !isValidUrl(value!)), message: "Invalid URL" }],
+  status: [{ condition: (value, config) => !!(config.status && value && !todoStatus.includes(value)), message: "Please select a valid status" }],
 };

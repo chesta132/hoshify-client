@@ -11,6 +11,7 @@ type TodosValues = {
   setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
   loading: boolean;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setComplete: (id: string, complete: boolean) => Promise<void>;
 } & TodoServices;
 
 const defaultValues: TodosValues = {
@@ -23,6 +24,7 @@ const defaultValues: TodosValues = {
   getTodos: new Request(() => api.todo.get("/")),
   updateTodo: new Request(() => api.todo.get("/")),
   updateTodos: new Request(() => api.todo.get("/")),
+  async setComplete() {},
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -38,11 +40,28 @@ export const TodosProvider = ({ children }: { children: React.ReactNode }) => {
 
   const sort = (a: Todo, b: Todo) => a.dueDate.valueOf() - b.dueDate.valueOf();
 
+  const setComplete = async (id: string, val: boolean) => {
+    const original = todos.find((todo) => todo.id === id);
+    if (!original) return console.error("Todo not found");
+    const update: Todo = { ...original, status: val ? "COMPLETED" : "ACTIVE" };
+    setTodos((prev) => prev.map((todo) => (todo.id === id ? update : todo)));
+
+    await updateTodo
+      .clone()
+      .reset("onSuccess")
+      .onError((_, retry) => {
+        const { counted } = retry || {};
+        if (counted === 3) {
+          setTodos((prev) => prev.map((todo) => (todo.id === id ? original : todo)));
+        }
+      })
+      .safeExec(update);
+  };
+
   useEffect(() => {
     getTodos.onSuccess((res) => {
       setTodos((prev) => [...prev, ...res.data].sort(sort));
       setPagination(res.getPagination());
-      return res;
     });
   }, [getTodos]);
 
@@ -77,6 +96,7 @@ export const TodosProvider = ({ children }: { children: React.ReactNode }) => {
     getTodos,
     updateTodo,
     updateTodos,
+    setComplete,
   };
 
   return <TodoContext.Provider value={value}>{children}</TodoContext.Provider>;

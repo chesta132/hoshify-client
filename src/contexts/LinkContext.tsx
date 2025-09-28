@@ -41,10 +41,9 @@ export const LinkProvider = ({ children }: { children: React.ReactNode }) => {
   const sort = (a: Link, b: Link) => a.position - b.position;
 
   useEffect(() => {
-    getLinks.transform((res) => {
+    getLinks.onSuccess((res) => {
       setLinks((prev) => [...prev, ...res.data].sort(sort));
       setPagination(res.getPagination());
-      return res;
     });
   }, [getLinks]);
 

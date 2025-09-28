@@ -39,7 +39,7 @@ export const TodosProvider = ({ children }: { children: React.ReactNode }) => {
   const sort = (a: Todo, b: Todo) => a.dueDate.valueOf() - b.dueDate.valueOf();
 
   useEffect(() => {
-    getTodos.transform((res) => {
+    getTodos.onSuccess((res) => {
       setTodos((prev) => [...prev, ...res.data].sort(sort));
       setPagination(res.getPagination());
       return res;

@@ -12,11 +12,14 @@ import { useError } from "@/contexts";
 import { handleFormError } from "@/services/handleError";
 import { omit } from "@/utils/manipulate/object";
 import { cn } from "@/lib/utils";
+import * as SelectPrimitive from "@radix-ui/react-select";
+import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue } from "../ui/Select";
+import { capital } from "@/utils/manipulate/string";
 
 type ButtonElement = React.ReactElement<React.ButtonHTMLAttributes<HTMLButtonElement>>;
 type Direction = "row" | "column";
 
-export type ElementTypes = "input" | "checkbox" | "link" | "button" | "textarea" | "separator" | "custom";
+export type ElementTypes = "input" | "checkbox" | "link" | "button" | "textarea" | "separator" | "select" | "custom";
 type ElementProps<T extends ElementTypes> = T extends "input"
   ? InputProps
   : T extends "checkbox"
@@ -29,7 +32,9 @@ type ElementProps<T extends ElementTypes> = T extends "input"
         asChild?: boolean;
       }
   : T extends "separator"
-  ? React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>
+  ? React.ComponentProps<"div">
+  : T extends "select"
+  ? React.ComponentProps<"div"> & { options?: React.ComponentProps<typeof SelectPrimitive.Root> }
   : TextAreaProps;
 
 export type FormItemBase<F extends FormFields> = (
@@ -40,13 +45,18 @@ export type FormItemBase<F extends FormFields> = (
   | ({ elementType: "textarea" } & ElementProps<"textarea">)
   | ({ elementType: "separator"; label?: string } & ElementProps<"separator">)
   | { elementType: "custom"; render: React.ReactNode; fieldId?: undefined }
+  | ({
+      elementType: "select";
+      values: ({ label: string } & React.ComponentProps<typeof SelectPrimitive.Item>)[] | string[];
+      placeholder?: string;
+    } & ElementProps<"select">)
 ) & { fieldId?: keyof F; afterSubmitButton?: boolean };
 
 type FormColumn<F extends FormFields, D extends Direction> = {
   layoutDirection: "column" | "row";
   afterSubmitButton?: boolean;
   items: FormItems<F, D>[];
-} & React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
+} & React.ComponentProps<"div">;
 
 export type FormItems<F extends FormFields, D extends Direction = "row"> = FormItemBase<F> | FormColumn<F, D>;
 
@@ -235,6 +245,57 @@ function RenderLayout<F extends FormFields, D extends Direction>({ items, form, 
                 <div className={cn("h-px bg-border", formItem.label ? "flex-1" : "w-full")} />
                 {formItem.label && <span className="text-xs text-muted-foreground">{formItem.label}</span>}
                 {formItem.label && <div className="h-px bg-border flex-1" />}
+              </div>
+            );
+
+          case "select":
+            if (fieldId) {
+              return (
+                <div className="relative" key={`form-select-${idx}`} {...omit(elementProps as any, ["options"])}>
+                  <Select
+                    value={String(formVal[fieldId])}
+                    onValueChange={(val) => validateField({ [fieldId]: val } as Partial<F>)}
+                    {...formItem.options}
+                  >
+                    <SelectTrigger className="cursor-pointer w-full">
+                      <SelectValue placeholder={formItem.placeholder} />
+                    </SelectTrigger>
+                    <SelectSeparator />
+                    <SelectContent className="z-[99999]">
+                      {formItem.values.map((val) => {
+                        const { label, value, className, ...rest } =
+                          typeof val === "string" ? { label: capital(val.toLowerCase()), value: val } : val;
+                        return (
+                          <SelectItem value={value} key={value} className={cn("cursor-pointer", className)} {...rest}>
+                            {label}
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                  {formErr[fieldId] && <p className="absolute text-red-500 text-[12px] text-start">{formErr[fieldId]}</p>}
+                </div>
+              );
+            }
+
+            return (
+              <div key={`form-select-${idx}`} {...omit(elementProps as any, ["options"])}>
+                <Select {...formItem.options}>
+                  <SelectTrigger className="cursor-pointer w-full">
+                    <SelectValue placeholder={formItem.placeholder} />
+                  </SelectTrigger>
+                  <SelectSeparator />
+                  <SelectContent className="z-[99999]">
+                    {formItem.values.map((val) => {
+                      const { label, value, className, ...rest } = typeof val === "string" ? { label: capital(val.toLowerCase()), value: val } : val;
+                      return (
+                        <SelectItem value={value} key={value} className={cn("cursor-pointer", className)} {...rest}>
+                          {label}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
               </div>
             );
 

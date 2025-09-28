@@ -1,6 +1,7 @@
 import { useUser } from "@/contexts";
-import { QuickLinks } from "../../components/quick-links/QuickLinks";
-import { MoneyOverview } from "@/components/money-overview/MoneyOverview";
+import { QuickLinks } from "../../components/overviews/quick-links/QuickLinks";
+import { MoneyOverview } from "@/components/overviews/money-overview/MoneyOverview";
+import { TodoOverview } from "@/components/overviews/todo-overview/TodoOverview";
 
 export const DashboardPage = () => {
   const { user } = useUser();

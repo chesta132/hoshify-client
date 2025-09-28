@@ -1,6 +1,6 @@
 import { Button } from "@/components/form/button";
 import { FormLayout } from "@/components/form/FormLayout";
-import { Popup as PopupWrapper } from "@/components/ui/popup";
+import { Popup as PopupWrapper } from "@/components/ui/Popup";
 import useForm from "@/hooks/useForm";
 import { motion } from "motion/react";
 import { useEffect, useMemo } from "react";

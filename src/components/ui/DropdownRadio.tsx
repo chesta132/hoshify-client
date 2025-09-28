@@ -14,8 +14,8 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import { DropdownMenu } from "./dropdown-menu";
+} from "./DropdownMenu";
+import { DropdownMenu } from "./DropdownMenu";
 import { cn } from "@/lib/utils";
 
 type StringOrNode = string | React.ReactNode;

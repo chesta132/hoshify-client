@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Button } from "@/components/form/button";
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/Popover";
 import { Checkbox } from "@/components/form/checkbox";
 import { ArrowUpNarrowWide, Filter } from "lucide-react";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/RadioGroup";
 import { capital } from "@/utils/manipulate/string";
 import { useSearch } from "@/contexts";
 import { searchableModels } from "@/contexts/search/FIlterHooks";

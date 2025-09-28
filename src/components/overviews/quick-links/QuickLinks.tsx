@@ -1,5 +1,5 @@
 import { Button } from "@/components/form/button";
-import { Popup } from "@/components/ui/popup";
+import { Popup } from "@/components/ui/Popup";
 import { Plus } from "lucide-react";
 import { AnimatePresence, Reorder } from "motion/react";
 import { useRef, useState } from "react";
@@ -43,9 +43,9 @@ export const QuickLinks = () => {
   };
 
   return (
-    <div className="border-[0.8px] border-border rounded-[18px] py-3 px-4 space-y-1" ref={wrapperRef}>
-      <h1 className="font-heading font-semibold">Quick Links</h1>
-      <div className="flex gap-2 px-3 overflow-x-auto scroll-bar py-2" ref={linkWrapper}>
+    <div className="border-[0.8px] border-border rounded-[18px] p-4 space-y-1 bg-card" ref={wrapperRef}>
+      <h1 className="font-heading font-medium tracking-wide">Quick Links</h1>
+      <div className="flex gap-2 overflow-x-auto scroll-bar py-2" ref={linkWrapper}>
         <Reorder.Group axis="x" values={links} onReorder={handleReorder} className="flex gap-2">
           {links.map((link, idx) => (
             <Reorder.Item

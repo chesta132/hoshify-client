@@ -9,7 +9,9 @@ type OverviewCardProps = {
 export const OverviewCard = ({ label, value }: OverviewCardProps) => {
   return (
     <div className="bg-card rounded-2xl border-border border-[0.8px] p-4 flex flex-col">
-      <span className="text-xs leading-4 text-card-foreground/60">{label}</span>
+      <span className="text-xs leading-4 text-card-foreground/60" id={label.toLowerCase()}>
+        {label}
+      </span>
       <span
         className={cn(
           "text-lg lg:text-xl font-semibold leading-8",
@@ -17,6 +19,7 @@ export const OverviewCard = ({ label, value }: OverviewCardProps) => {
           label === "Outcome" && "text-red-600",
           label === "Total" && currencyToNumber(value) >= 0 ? "text-green-600" : "text-red-600"
         )}
+        aria-labelledby={label.toLowerCase()}
       >
         {value}
       </span>

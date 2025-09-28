@@ -32,26 +32,29 @@ export const LinkContext = createContext<LinkValues>(defaultValues);
 
 export const LinkProvider = ({ children }: { children: React.ReactNode }) => {
   const { user, setUser, isInitiated } = useUser();
-  const [links, setLinks] = useState<Link[]>(user.links.sort((a, b) => a.position - b.position));
+  const [links, setLinks] = useState(user.links);
   const [pagination, setPagination] = useState<PaginationResult>({});
   const [loading, setLoading] = useState(false);
 
   const { createLink, deleteLink, updateLink, getLinks, updateLinks } = useLinkService({ setLoading, setLinks, pagination });
 
+  const sort = (a: Link, b: Link) => a.position - b.position;
+
   useEffect(() => {
-    getLinks.onSuccess((res) => {
-      setLinks((prev) => [...prev, ...res.data].sort((a, b) => a.position - b.position));
+    getLinks.transform((res) => {
+      setLinks((prev) => [...prev, ...res.data].sort(sort));
       setPagination(res.getPagination());
+      return res;
     });
   }, [getLinks]);
 
   useEffect(() => {
     if (isInitiated) {
-      let updates = user.links.sort((a, b) => a.position - b.position);
+      let updates = user.links.sort(sort);
       getLinks
         .clone()
         .onSuccess((res) => {
-          updates = [...updates, ...res.data].sort((a, b) => a.position - b.position);
+          updates = [...updates, ...res.data].sort(sort);
           setPagination(res.getPagination());
         })
         .onFinally(() => {

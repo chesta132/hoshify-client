@@ -81,7 +81,7 @@ export type UserEndpoints = {
 export type TodoEndpoints = {
   get: GetTemplate<"root", Todo> | GetTemplate<"param", Todo>;
   post: RootTemplate<CreateTodoBody, Todo> | RootTemplate<CreateTodoBody[], Todo[]>;
-  put: RootTemplate<CreateTodoBody[], Todo[]> | RootTemplate<CreateTodoBody, Todo>;
+  put: RootTemplate<CreateTodoBody[], Todo[]> | ParamTemplate<CreateTodoBody, Todo>;
   delete: DeleteTemplate<"root", Todo> | DeleteTemplate<"param", Todo>;
   patch: RestoresTemplate<"root", Todo> | RestoresTemplate<"param", Todo>;
 };
@@ -97,7 +97,7 @@ export type TransactionEndpoints = {
 export type ScheduleEndpoints = {
   get: GetTemplate<"root", Schedule> | GetTemplate<"param", Schedule>;
   post: RootTemplate<CreateScheduleBody, Schedule> | RootTemplate<CreateScheduleBody[], Schedule[]>;
-  put: RootTemplate<CreateScheduleBody, Schedule> | RootTemplate<CreateScheduleBody[], Schedule[]>;
+  put: ParamTemplate<CreateScheduleBody, Schedule> | RootTemplate<CreateScheduleBody[], Schedule[]>;
   delete: DeleteTemplate<"root", Schedule> | DeleteTemplate<"param", Schedule>;
   patch: RestoresTemplate<"root", Schedule> | RestoresTemplate<"param", Schedule>;
 };

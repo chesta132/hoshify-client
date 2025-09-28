@@ -6,6 +6,7 @@ import { SearchContext } from "./search/SearchContext";
 import { UserContext } from "./UserContext";
 import { ErrorContext } from "./ErrorContext";
 import { LinkContext } from "./LinkContext";
+import { TodoContext } from "./TodoContext";
 
 const useCreateContext = <T,>(context: React.Context<T>, name: string) => {
   const createdContext = useContext(context);
@@ -35,4 +36,8 @@ export const useError = () => {
 
 export const useLink = () => {
   return useCreateContext(LinkContext, "link");
+};
+
+export const useTodo = () => {
+  return useCreateContext(TodoContext, "todo");
 };

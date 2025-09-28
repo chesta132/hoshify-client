@@ -18,6 +18,9 @@ export const DashboardPage = () => {
       <section>
         <MoneyOverview />
       </section>
+      <section>
+        <TodoOverview />
+      </section>
     </div>
   );
 };

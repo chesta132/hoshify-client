@@ -10,8 +10,9 @@ export type Config<N> = {
   handleError?: { setError: React.Dispatch<React.SetStateAction<StateErrorServer | null>> } & HandleErrorOptions;
   withLoad?: boolean;
 };
-type OnRetryCallback = (err: unknown) => any;
-export type Retry = { counted: number; count: number; interval: number; onRetry?: OnRetryCallback };
+type OnRetryCallback = (err: unknown, options: Omit<Retry, "onRetry">) => any;
+type OnErrorCallback = (error: unknown, retry?: Omit<Retry, "onRetry">) => any;
+export type Retry = { counted: number; count: number } & RetryOptions;
 export type RequestFetcher<T, A extends any[]> = (controller: AbortController, ...args: A) => Promise<ServerSuccess<T>>;
 export type SafeExcResult<T> = { ok: true; data: T } | { ok: false; error: unknown };
 
@@ -37,7 +38,7 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
   private _navigate?: N;
   private _config: Config<N> = { withLoad: true };
   private _onSuccess?: (response: ServerSuccess<T>) => any;
-  private _onError?: (error: unknown) => any;
+  private _onError?: OnErrorCallback;
   private _onFinally?: () => any;
   private _retry?: Retry;
   private _transform: ((res: ServerSuccess<T>) => ServerSuccess<T>)[] = [];
@@ -61,6 +62,9 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
           break;
         case "_controller":
           this[key] = new AbortController();
+          break;
+        case "_transform":
+          this[key] = [];
           break;
         default:
           delete this[key];
@@ -123,7 +127,7 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
     return this;
   }
 
-  onError(cb: (error: unknown) => any) {
+  onError(cb: OnErrorCallback) {
     this._onError = cb;
     return this;
   }
@@ -176,13 +180,13 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
       if (_retry) {
         _retry.counted++;
         if (_retry.counted <= _retry.count) {
-          _retry.onRetry?.(err);
+          _retry.onRetry?.(err, _retry);
           await new Promise((res) => setTimeout(res, _retry.interval));
           return await this.exec(...args);
         }
       }
 
-      await _onError?.(err);
+      await _onError?.(err, _retry);
 
       if (err instanceof ServerError) {
         if (_config.directOnAuthError) {

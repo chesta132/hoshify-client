@@ -11,7 +11,7 @@ export const Layout = () => {
   return (
     <>
       <Header />
-      <motion.main className="md:px-7 md:pt-10 px-5 pt-8" style={isDesktop ? { marginLeft: sidebarWidth } : undefined}>
+      <motion.main className="md:px-7 md:pt-10 px-5 pt-8" style={{ marginLeft: isDesktop ? sidebarWidth : 0 }}>
         <Outlet />
       </motion.main>
     </>

@@ -17,7 +17,7 @@ export const Header = () => {
       <motion.header
         ref={headerRef}
         className="px-5 py-4 flex items-center gap-5 justify-between fixed w-full bg-background z-50 border-b-2 border-b-border right-0 transition-[top] duration-400"
-        style={isDesktop ? { paddingLeft: sidebarWidth } : undefined}
+        style={{ paddingLeft: isDesktop ? sidebarWidth : 20 }}
       >
         <Nav />
         <Search />

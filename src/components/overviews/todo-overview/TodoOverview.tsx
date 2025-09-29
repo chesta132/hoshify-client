@@ -1,6 +1,6 @@
 import { Button } from "@/components/form/button";
 import { Checkbox } from "@/components/form/checkbox";
-import { FormLayout } from "@/components/form/FormLayout";
+import { FormLayout } from "@/components/form-layout/FormLayout";
 import { Popup } from "@/components/ui/Popup";
 import { useTodo } from "@/contexts";
 import useForm from "@/hooks/useForm";
@@ -20,8 +20,6 @@ export const TodoOverview = () => {
   const {
     form: [form],
   } = formGroup;
-
-  const inputField = { elementType: "input", size: "sm", classLabel: "bg-popover" } as const;
 
   return (
     <div className="bg-card rounded-2xl border-[0.8px] border-border flex flex-col">
@@ -69,42 +67,20 @@ export const TodoOverview = () => {
             <div className="border-b border-muted-foreground pb-1 font-heading font-medium">
               <h1>Add task</h1>
             </div>
-            <FormLayout
-              items={[
-                {
-                  ...inputField,
-                  label: "Title",
-                  placeholder: "Task title",
-                  fieldId: "title",
-                },
-                { ...inputField, label: "Details", placeholder: "Task details", fieldId: "details" },
-                // DUE DATE WIP
-                {
-                  elementType: "select",
-                  values: todoStatus,
-                  placeholder: "Task status",
-                  defaultValue: "ACTIVE",
-                  fieldId: "status",
-                },
-              ]}
-              form={formGroup}
-              submitButton={null}
-              onFormSubmit={async () => createTodo.exec(form)}
-            >
-              <div className="flex gap-2 justify-end">
-                <Button
-                  variant={"outline"}
-                  className="hover:bg-red-500 dark:hover:bg-red-500 hover:text-white"
+            <FormLayout form={formGroup} onFormSubmit={async () => createTodo.exec(form)}>
+              <FormLayout.input size="sm" classLabel="bg-popover" label="Title" placeholder="Task title" fieldId="title" />
+              <FormLayout.input size="sm" classLabel="bg-popover" label="Details" placeholder="Task details" fieldId="details" />
+              <FormLayout.select values={todoStatus} placeholder="Task status" defaultValue={"ACTIVE"} fieldId="status" />
+              {/* DUE DATE WIP */}
+              <FormLayout.direction position={"right"}>
+                <FormLayout.cancel
                   // onClick={() => handlePopup("closed")}
-                  type="button"
                   disabled={loading}
                 >
                   Cancel
-                </Button>
-                <Button variant={"outline"} disabled={loading}>
-                  Add task
-                </Button>
-              </div>
+                </FormLayout.cancel>
+                <FormLayout.submit disabled={loading}>Add task</FormLayout.submit>
+              </FormLayout.direction>
             </FormLayout>
           </motion.div>
         </Popup>

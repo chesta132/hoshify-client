@@ -1,5 +1,4 @@
-import { Button } from "@/components/form/button";
-import { FormLayout } from "@/components/form/FormLayout";
+import { FormLayout } from "@/components/form-layout/FormLayout";
 import { Popup as PopupWrapper } from "@/components/ui/Popup";
 import useForm from "@/hooks/useForm";
 import { motion } from "motion/react";
@@ -14,7 +13,6 @@ export function LinkPopup({ popup, setPopup }: { popup: Popup; setPopup: React.D
   const formSchema = useMemo(() => ({ link: "", title: "" }), []);
   const formGroup = useForm(formSchema, { link: true, title: { max: 100 } });
 
-  const inputField = { elementType: "input", size: "sm", classLabel: "bg-popover" } as const;
   const isAdd = popup === "add";
   const editId = !isAdd && popup.slice(5);
   const currentLink = !isAdd && links.find((link) => link.id === popup.slice(5));
@@ -56,33 +54,17 @@ export function LinkPopup({ popup, setPopup }: { popup: Popup; setPopup: React.D
           <h1>{isAdd ? "Add" : "Edit"} shortcut</h1>
         </div>
         <FormLayout
-          items={[
-            {
-              ...inputField,
-              label: "Title",
-              placeholder: "Shortcut title",
-              fieldId: "title",
-            },
-            { ...inputField, label: "URL", placeholder: "Link URL", fieldId: "link" },
-          ]}
           form={formGroup}
-          submitButton={null}
           onFormSubmit={async () => (editId ? await handleUpdate() : await createLink.exec(form)) && handlePopup("closed")}
         >
-          <div className="flex gap-2 justify-end">
-            <Button
-              variant={"outline"}
-              className="hover:bg-red-500 dark:hover:bg-red-500 hover:text-white"
-              onClick={() => handlePopup("closed")}
-              type="button"
-              disabled={loading}
-            >
+          <FormLayout.input size="sm" classLabel="bg-popover" label="Title" placeholder="Shortcut title" fieldId="title" />
+          <FormLayout.input size="sm" classLabel="bg-popover" label="URL" placeholder="Link URL" fieldId="link" />
+          <FormLayout.direction position={"right"}>
+            <FormLayout.cancel onClick={() => handlePopup("closed")} disabled={loading}>
               Cancel
-            </Button>
-            <Button variant={"outline"} disabled={loading}>
-              {isAdd ? "Add" : "Save"}
-            </Button>
-          </div>
+            </FormLayout.cancel>
+            <FormLayout.submit disabled={loading}>{isAdd ? "Add" : "Save"}</FormLayout.submit>
+          </FormLayout.direction>
         </FormLayout>
       </motion.div>
     </PopupWrapper>

@@ -20,7 +20,7 @@ export const FormDirection = ({ className, position, direction, ...props }: Form
         position?.includes("center" as any) && "justify-center items-center",
         direction?.includes("row") && "flex-row",
         direction?.includes("column") && "flex-col",
-        direction?.includes("reverse") && direction?.includes("row") ? "flex-row-reverse" : direction?.includes("column") && "flex-col-reverse",
+        direction?.includes("reverse") && (direction?.includes("row") ? "flex-row-reverse" : direction?.includes("column") && "flex-col-reverse"),
         className
       )}
       {...props}

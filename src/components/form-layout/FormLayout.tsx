@@ -11,6 +11,7 @@ import { FormSelect } from "./FormSelect";
 import { FormTextArea } from "./FormTextArea";
 import { FormSeparator } from "./FormSeparator";
 import { FormDirection } from "./FormDirection";
+import { SecAuthMethod } from "../form-layout-template/secAuthMethod";
 
 type FormValues<F extends FormFields = FormFields> = { form: FormGroup<F> };
 
@@ -75,6 +76,7 @@ FormLayout.separator = FormSeparator;
 FormLayout.submit = FormSubmit;
 FormLayout.cancel = FormCancel;
 FormLayout.direction = FormDirection;
+FormLayout.templates = { SecAuthMethod };
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const useFormLayout = () => {

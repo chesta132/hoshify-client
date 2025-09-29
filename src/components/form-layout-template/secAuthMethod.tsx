@@ -3,6 +3,7 @@ import { Button } from "../form/button";
 import { Link } from "react-router";
 import type { FormItems } from "../form/FormLayout";
 import type { FormFields } from "@/types/form";
+import { FormLayout } from "../form-layout/FormLayout";
 
 // eslint-disable-next-line react-refresh/only-export-components
 const GoogleIcon = () => (
@@ -102,4 +103,60 @@ export const secAuthMethod = <F extends FormFields>(
       },
     ],
   };
+};
+
+type SecAuthMethodProps = { loading: boolean; handleGoogle: () => Promise<void>; type: "signin" | "signup" };
+
+export const SecAuthMethod = ({ handleGoogle, loading, type }: SecAuthMethodProps) => {
+  return (
+    <FormLayout.direction direction={"column"} className="gap-4">
+      <FormLayout.button
+        className="w-full text-foreground inline-flex items-center justify-center gap-2 h-10 px-3 rounded-lg border-2 border-foreground/80 text-sm font-medium shadow bg-card hover:bg-muted/40 hover:text-foreground/80"
+        aria-label="Sign in with Google"
+        type="button"
+        onClick={handleGoogle}
+        disabled={loading}
+      >
+        <GoogleIcon /> Sign in with Google
+      </FormLayout.button>
+      {/* WIP - GUEST */}
+      <FormLayout.button disabled={loading} aria-describedby="guest-info" className="text-foreground" variant={"outline"}>
+        Continue as Guest
+      </FormLayout.button>
+      <div className="flex justify-center items-center gap-2 text-muted-foreground">
+        <InfoIcon size={14} aria-hidden />
+        <p className="text-xs text-center" id="guest-info">
+          Data will be stored locally on this device
+        </p>
+      </div>
+      {type === "signin" ? (
+        <div className="text-[13px] text-center">
+          New here?{" "}
+          <Link to="/signup" className="text-link">
+            Create Account
+          </Link>
+        </div>
+      ) : (
+        <div className="text-center flex flex-col gap-2">
+          {/* [WIP] - TERMS & POLICY */}
+          <div className="text-xs">
+            By signing up you agree to our{" "}
+            <Link to={"/terms"} className="text-muted-foreground text-link">
+              Terms
+            </Link>{" "}
+            and{" "}
+            <Link className="text-muted-foreground text-link" to={"/privacy-policy"}>
+              Privacy Policy.
+            </Link>
+          </div>
+          <div className="text-[13px]">
+            Already have an account?{" "}
+            <Link to="/signin" className="text-link">
+              Sign In
+            </Link>
+          </div>
+        </div>
+      )}
+    </FormLayout.direction>
+  );
 };

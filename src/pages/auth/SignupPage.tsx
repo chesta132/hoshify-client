@@ -1,5 +1,4 @@
-import { FormLayout } from "@/components/form/FormLayout";
-import { secAuthMethod } from "@/components/form-layout-template/secAuthMethod";
+import { FormLayout } from "@/components/form-layout/FormLayout";
 import { VITE_SERVER_URL } from "@/config";
 import { useUser } from "@/contexts";
 import useForm from "@/hooks/useForm";
@@ -34,13 +33,6 @@ export const SignupPage = () => {
     setLoading(false);
   };
 
-  const inputField = {
-    elementType: "input",
-    size: "sm",
-    focusRing: true,
-    classLabel: "bg-card",
-  } as const;
-
   return (
     <div className="w-full min-h-dvh justify-center items-center flex">
       <div className="min-h-[70vh] grid place-items-center">
@@ -52,43 +44,32 @@ export const SignupPage = () => {
             <h1 className="mt-3 text-xl font-semibold tracking-tight">Sign Up</h1>
             <p className="text-sm text-muted-foreground">Sign up to sync your data across devices</p>
           </div>
-
-          <FormLayout
-            items={[
-              {
-                ...inputField,
-                placeholder: "Your full name",
-                label: "Full Name",
-                fieldId: "fullName",
-              },
-              {
-                ...inputField,
-                placeholder: "Your email",
-                label: "email",
-                fieldId: "email",
-              },
-              {
-                ...inputField,
-                placeholder: "Your password",
-                label: "password",
-                fieldId: "password",
-                type: "password",
-              },
-              {
-                ...inputField,
-                placeholder: "Confirm your password",
-                label: "Confirm Password",
-                fieldId: "verifyPassword",
-                type: "password",
-              },
-              { elementType: "checkbox", label: "Remember Me", className: "text-sm", fieldId: "rememberMe" },
-              { elementType: "separator", label: "OR", afterSubmitButton: true },
-              secAuthMethod<typeof formVal>(loading, handleGoogle, "signup"),
-            ]}
-            submitProps={{ children: "Sign In", disabled: loading }}
-            form={form}
-            onFormSubmit={handleSubmit}
-          />
+          <FormLayout form={form} onFormSubmit={handleSubmit}>
+            <FormLayout.input size="sm" focusRing={true} classLabel="bg-card" placeholder="Your full name" label="Full Name" fieldId="fullName" />
+            <FormLayout.input size="sm" focusRing={true} classLabel="bg-card" placeholder="Your email" label="email" fieldId="email" />
+            <FormLayout.input
+              size="sm"
+              focusRing={true}
+              classLabel="bg-card"
+              placeholder="Your password"
+              label="password"
+              fieldId="password"
+              type="password"
+            />
+            <FormLayout.input
+              size="sm"
+              focusRing={true}
+              classLabel="bg-card"
+              placeholder="Confirm your password"
+              label="Confirm Password"
+              fieldId="verifyPassword"
+              type="password"
+            />
+            <FormLayout.submit variant={"default"}>Sign Up</FormLayout.submit>
+            <FormLayout.checkbox label="Remember me" className="text-sm" fieldId="rememberMe" />
+            <FormLayout.separator>OR</FormLayout.separator>
+            <FormLayout.templates.SecAuthMethod handleGoogle={handleGoogle} loading={loading} type="signup" />
+          </FormLayout>
         </div>
       </div>
     </div>

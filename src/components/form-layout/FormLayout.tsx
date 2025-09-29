@@ -18,6 +18,7 @@ type FormValues<F extends FormFields = FormFields> = { form: FormGroup<F> };
 
 const FormContext = createContext<FormValues>({
   form: {
+    resetForm() {},
     error: [{} as any, () => {}],
     form: [{}, () => {}],
     validate: { validateForm: () => false, compareOld: () => false, validateField: () => false },

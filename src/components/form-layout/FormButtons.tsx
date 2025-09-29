@@ -8,7 +8,7 @@ export const FormButton = ({ className, ...props }: ButtonProps) => {
         "w-full inline-flex items-center justify-center h-10 px-3 rounded-lg bg-primary text-primary-foreground text-sm font-medium shadow disabled:opacity-70",
         className
       )}
-      type="submit"
+      type="button"
       {...props}
     />
   );

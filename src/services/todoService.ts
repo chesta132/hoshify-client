@@ -73,8 +73,11 @@ export function useTodoService({ setLoading, setTodos, pagination }: TodoService
     () =>
       getTodos
         .clone(({ signal }, updates: BodyOf<TodoEndpoints["put"], "/">) => api.todo.put("/", updates, { signal }))
-        .reset("onSuccess", "config"),
-    [getTodos]
+        .onSuccess((res) => {
+          setTodos((prev) => prev.flatMap((todo) => res.data.map((t) => (t.id === todo.id ? t : todo))));
+        })
+        .reset("config"),
+    [getTodos, setTodos]
   );
 
   return { createTodo, updateTodo, deleteTodo, getTodos, updateTodos };

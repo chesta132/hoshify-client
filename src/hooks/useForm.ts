@@ -11,6 +11,7 @@ export type FormGroup<T extends FormFields> = {
     validateField: (field: Partial<T>) => boolean;
     compareOld: (old: T, message?: string) => boolean;
   };
+  readonly resetForm: () => void;
 };
 
 const useForm = <T extends FormFields>(schema: T, config: Config<T>): FormGroup<T> => {
@@ -54,10 +55,16 @@ const useForm = <T extends FormFields>(schema: T, config: Config<T>): FormGroup<
     return true;
   };
 
+  const resetForm = () => {
+    setForm(schema);
+    setFormError(record(schema, ""));
+  };
+
   return {
     form: [form, setForm],
     error: [formError, setFormError],
     validate: { validateForm, validateField, compareOld },
+    resetForm,
   };
 };
 

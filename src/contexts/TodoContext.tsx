@@ -67,15 +67,15 @@ export const TodosProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (isInitiated) {
-      let updates = user.todos.sort(sort);
+      let updates = user.todos;
       getTodos
         .clone()
         .onSuccess((res) => {
-          updates = [...updates, ...res.data].sort(sort);
+          updates = [...updates, ...res.data];
           setPagination(res.getPagination());
         })
         .onFinally(() => {
-          setTodos(updates);
+          setTodos(updates.sort(sort));
         })
         .safeExec(updates.length);
     }

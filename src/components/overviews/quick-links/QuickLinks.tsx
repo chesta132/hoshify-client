@@ -1,4 +1,4 @@
-import { Button } from "@/components/form/button";
+import { Button } from "@/components/form/Button";
 import { Popup } from "@/components/ui/Popup";
 import { Plus } from "lucide-react";
 import { AnimatePresence, Reorder } from "motion/react";

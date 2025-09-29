@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Button, type ButtonProps } from "../form/button";
+import { Button, type ButtonProps } from "../form/Button";
 
 export const FormButton = ({ className, ...props }: ButtonProps) => {
   return (

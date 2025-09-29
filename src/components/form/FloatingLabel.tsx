@@ -14,7 +14,7 @@ export const FloatingLabel = ({ isFloat, size, label, placeholder, optional, cla
   return (
     <label
       className={cn(
-        "absolute transition-all duration-200 ease-in-out select-none z-10 pointer-events-none whitespace-nowrap mx-3",
+        "absolute transition-all duration-200 ease-in-out select-none pointer-events-none whitespace-nowrap mx-3",
         isFloat
           ? `-left-1 text-xs font-medium px-1 bg-background ${size === "sm" ? "-top-1" : "-top-2.5"}`
           : `${size === "lg" ? "top-4.5" : "top-4"} left-0 text-sm text-foreground/80`,

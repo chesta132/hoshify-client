@@ -1,4 +1,4 @@
-import { Checkbox, type CheckboxProps } from "../form/checkbox";
+import { Checkbox, type CheckboxProps } from "../form/Checkbox";
 import type { FormFields } from "@/types/form";
 import { useFormLayout } from "./FormLayout";
 
@@ -12,11 +12,5 @@ export const FormCheckbox = ({ fieldId, ...props }: FormCheckboxProps) => {
     },
   } = useFormLayout();
 
-  return (
-    <Checkbox
-      checked={fieldId && !!(val[fieldId])}
-      onCheckedChange={fieldId && ((val) => validateField({ [fieldId]: val }))}
-      {...props}
-    />
-  );
+  return <Checkbox checked={fieldId && !!val[fieldId]} onCheckedChange={fieldId && ((val) => validateField({ [fieldId]: val }))} {...props} />;
 };

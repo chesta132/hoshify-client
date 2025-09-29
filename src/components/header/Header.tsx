@@ -1,5 +1,5 @@
 import { Settings } from "lucide-react";
-import { Button } from "../form/button";
+import { Button } from "../form/Button";
 import { Link } from "react-router";
 import { ThemeDropdown } from "./ThemeDropdown";
 import { Search } from "./search/Search";

@@ -1,5 +1,5 @@
 import { SidebarIcon } from "lucide-react";
-import { Button } from "../form/button";
+import { Button } from "../form/Button";
 import { useHeader } from "@/contexts";
 
 export const SidebarToggle = ({ className }: { className?: string }) => {

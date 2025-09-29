@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Button } from "./button";
+import { Button } from "./Button";
 import { ArrowUpLeft, Trash2 } from "lucide-react";
 import { ellipsis } from "@/utils/manipulate/string";
 import { AnimatePresence, motion, type HTMLMotionProps } from "motion/react";

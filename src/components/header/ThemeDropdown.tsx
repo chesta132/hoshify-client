@@ -1,5 +1,5 @@
 import { Laptop2, Moon, Sun } from "lucide-react";
-import { Button } from "../form/button";
+import { Button } from "../form/Button";
 import { useTheme } from "@/contexts";
 import type { Theme } from "@/contexts/appearance/theme";
 import { DropdownRadio } from "../ui/DropdownRadio";

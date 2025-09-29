@@ -3,7 +3,7 @@ import type { Config, FormFields } from "@/types/form";
 import { record } from "@/utils/manipulate/object";
 import { useState } from "react";
 
-export type FormGroup<T extends Partial<FormFields>> = {
+export type FormGroup<T extends FormFields> = {
   readonly form: [T, React.Dispatch<React.SetStateAction<T>>];
   readonly error: [Record<keyof T, string>, React.Dispatch<React.SetStateAction<Record<keyof T, string>>>];
   readonly validate: {
@@ -13,7 +13,7 @@ export type FormGroup<T extends Partial<FormFields>> = {
   };
 };
 
-const useForm = <T extends Partial<FormFields>>(schema: T, config: Config<T>): FormGroup<T> => {
+const useForm = <T extends FormFields>(schema: T, config: Config<T>): FormGroup<T> => {
   const [form, setForm] = useState(schema);
   const [formError, setFormError] = useState(record(schema, ""));
   const [isOld, setIsOld] = useState(false);
@@ -49,9 +49,9 @@ const useForm = <T extends Partial<FormFields>>(schema: T, config: Config<T>): F
     if (isSame) {
       setFormError(record(formError, message ?? "Nothing has changed"));
       setIsOld(true);
-      return true;
+      return false;
     }
-    return false;
+    return true;
   };
 
   return {

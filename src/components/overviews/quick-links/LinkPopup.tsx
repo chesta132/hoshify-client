@@ -39,7 +39,7 @@ export function LinkPopup({ popup, setPopup }: { popup: Popup; setPopup: React.D
   const handleUpdate = () => {
     if (!currentLink) return;
     const oldLink = user.links.find((link) => link.id === currentLink.id);
-    if (!oldLink || compareOld(oldLink)) return;
+    if (!oldLink || !compareOld(pick(oldLink, ["link", "title"]))) return;
     return updateLink.exec({ ...currentLink, ...form });
   };
 

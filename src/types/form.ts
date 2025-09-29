@@ -64,7 +64,7 @@ export type ConfigRuleS<T> = Partial<Record<keyof Omit<T, keyof CustomRuleS>, bo
 export type Config<T extends FormFields = FormFields> = ConfigRuleS<T> & Pick<CustomRuleS, Extract<keyof T, keyof CustomRuleS>>;
 
 export type ValidationRule<T> = {
-  condition: (value: T, config: Config, allValue?: Partial<FormFields>) => boolean;
+  condition: (value: T, config: Config, allValue?: FormFields) => boolean;
   message: string | ((config: Config) => string);
 };
 

@@ -70,7 +70,13 @@ export const TodoOverview = () => {
             <FormLayout form={formGroup} onFormSubmit={async () => createTodo.exec(form)}>
               <FormLayout.input size="sm" classLabel="bg-popover" label="Title" placeholder="Task title" fieldId="title" />
               <FormLayout.input size="sm" classLabel="bg-popover" label="Details" placeholder="Task details" fieldId="details" />
-              <FormLayout.select values={todoStatus} placeholder="Task status" defaultValue={"ACTIVE"} fieldId="status" />
+              <FormLayout.select
+                values={todoStatus}
+                placeholder="Task status"
+                defaultValue={"ACTIVE"}
+                fieldId="status"
+                contentProps={{ className: "z-[9999]" }}
+              />
               {/* DUE DATE WIP */}
               <FormLayout.direction position={"right"}>
                 <FormLayout.cancel

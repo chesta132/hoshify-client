@@ -1,17 +1,32 @@
-import { cn } from "@/lib/utils";
-import { Select, SelectTrigger, SelectValue, SelectSeparator, SelectContent, SelectItem } from "../ui/Select";
 import { useFormLayout } from "./FormLayout";
 import type { FormFields } from "@/types/form";
-import * as SelectPrimitive from "@radix-ui/react-select";
-import { capital } from "@/utils/manipulate/string";
+
+import type {
+  SelectProps,
+  SelectTriggerProps,
+  SelectValueProps,
+  SelectSeparatorProps,
+  SelectContentProps,
+  SelectItemProps,
+} from "@radix-ui/react-select";
+import { DropdownSelect } from "../ui/DropdownSelect";
+
+type StringOrNode = string | React.ReactNode;
 
 type FormSelectProps = {
   fieldId?: keyof FormFields;
-  placeholder?: string;
-  values: ({ label: string } & React.ComponentProps<typeof SelectPrimitive.Item>)[] | string[];
-} & Omit<React.ComponentProps<"div"> & React.ComponentProps<typeof SelectPrimitive.Root>, "children">;
+  placeholder?: StringOrNode;
+  values: ({ label: StringOrNode } & SelectItemProps & React.RefAttributes<HTMLDivElement>)[] | string[];
+  onValueChange?: (value: string) => void;
+  selectProps?: SelectProps & React.RefAttributes<HTMLSelectElement>;
+  triggerProps?: SelectTriggerProps & React.RefAttributes<HTMLButtonElement>;
+  valueProps?: SelectValueProps & React.RefAttributes<HTMLSpanElement>;
+  separatorProps?: SelectSeparatorProps & React.RefAttributes<HTMLDivElement>;
+  contentProps?: SelectContentProps & React.RefAttributes<HTMLDivElement>;
+  itemProps?: SelectItemProps & React.RefAttributes<HTMLDivElement>;
+} & Omit<React.ComponentProps<"div">, "children">;
 
-export const FormSelect = ({ className, fieldId, placeholder, values, ...props }: FormSelectProps) => {
+export const FormSelect = ({ fieldId, selectProps, ...props }: FormSelectProps) => {
   const {
     form: {
       form: [val],
@@ -20,25 +35,13 @@ export const FormSelect = ({ className, fieldId, placeholder, values, ...props }
     },
   } = useFormLayout();
 
+  const handleValueChange = fieldId && ((val: string) => validateField({ [fieldId]: val }));
+
   return (
-    <div className={cn("relative", className)} {...props}>
-      <Select value={fieldId && String(val[fieldId])} onValueChange={fieldId && ((val) => validateField({ [fieldId]: val }))} {...props}>
-        <SelectTrigger className="cursor-pointer w-full">
-          <SelectValue placeholder={placeholder} />
-        </SelectTrigger>
-        <SelectSeparator />
-        <SelectContent>
-          {values.map((val) => {
-            const { label, value, className, ...rest } = typeof val === "string" ? { label: capital(val.toLowerCase()), value: val } : val;
-            return (
-              <SelectItem value={value} key={value} className={cn("cursor-pointer", className)} {...rest}>
-                {label}
-              </SelectItem>
-            );
-          })}
-        </SelectContent>
-      </Select>
-      {fieldId && err[fieldId] && <p className="absolute text-red-500 text-[12px] text-start">{err[fieldId]}</p>}
-    </div>
+    <DropdownSelect
+      selectProps={{ value: fieldId && String(val[fieldId]), onValueChange: handleValueChange, ...selectProps }}
+      error={fieldId && err[fieldId]}
+      {...props}
+    />
   );
 };

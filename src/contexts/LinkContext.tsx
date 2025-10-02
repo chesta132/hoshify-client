@@ -31,8 +31,8 @@ const defaultValues: LinkValues = {
 export const LinkContext = createContext<LinkValues>(defaultValues);
 
 export const LinkProvider = ({ children }: { children: React.ReactNode }) => {
-  const { user, setUser, isInitiated } = useUser();
-  const [links, setLinks] = useState(user.links);
+  const { setUser, isInitiated, isSignIn } = useUser();
+  const [links, setLinks] = useState<Link[]>([]);
   const [pagination, setPagination] = useState<PaginationResult>({});
   const [loading, setLoading] = useState(false);
 
@@ -48,21 +48,17 @@ export const LinkProvider = ({ children }: { children: React.ReactNode }) => {
   }, [getLinks]);
 
   useEffect(() => {
-    if (isInitiated) {
-      let updates = user.links.sort(sort);
+    if (isInitiated && isSignIn) {
       getLinks
         .clone()
         .onSuccess((res) => {
-          updates = [...updates, ...res.data].sort(sort);
+          setLinks(res.data.sort(sort));
           setPagination(res.getPagination());
         })
-        .onFinally(() => {
-          setLinks(updates);
-        })
-        .safeExec(updates.length);
+        .safeExec(0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isInitiated]);
+  }, [isInitiated, isSignIn]);
 
   useEffect(() => {
     setUser((prev) => ({ ...prev, links }));

@@ -40,7 +40,7 @@ export const TodoOverview = () => {
       </div>
       <div className="border-b-[0.8px] border-b-border p-4 flex flex-col gap-3.5">
         {todos.slice(0, 5).map((todo) => (
-          <TodoOption todo={todo} />
+          <TodoOption todo={todo} key={todo.id} />
         ))}
       </div>
       <AnimatePresence>{isOpen && <TodoPopup formGroup={formGroup} setIsOpen={setIsOpen} />}</AnimatePresence>

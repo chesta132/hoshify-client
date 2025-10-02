@@ -1,0 +1,75 @@
+import api from "@/class/server/ApiClient";
+import { Request } from "@/class/server/Request";
+import { useMoneyService, type MoneyServices } from "@/services/moneyService";
+import type { Money } from "@/types/models";
+import { createContext, useEffect, useState } from "react";
+import { useUser } from ".";
+import dayjs from "dayjs";
+
+type MoneyValues = {
+  money: Money;
+  setMoney: React.Dispatch<React.SetStateAction<Money>>;
+  loading: boolean;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+} & MoneyServices;
+
+const defaultMonet: Money = {
+  id: "",
+  userId: "",
+  income: "$0.00",
+  outcome: "$0.00",
+  total: "$0.00",
+  updatedAt: dayjs(0),
+  createdAt: dayjs(),
+};
+
+const defaultValues: MoneyValues = {
+  money: defaultMonet,
+  setMoney() {},
+  loading: true,
+  setLoading() {},
+  getMoney: new Request(() => api.money.get("/")),
+};
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const MoneyContext = createContext<MoneyValues>(defaultValues);
+
+export const MoneyProvider = ({ children }: { children: React.ReactNode }) => {
+  const { setUser, isInitiated, isSignIn } = useUser();
+  const [money, setMoney] = useState(defaultMonet);
+  const [loading, setLoading] = useState(false);
+
+  const { getMoney } = useMoneyService({ setLoading });
+
+  useEffect(() => {
+    getMoney.onSuccess((res) => {
+      setMoney(res.data);
+    });
+  }, [getMoney]);
+
+  useEffect(() => {
+    if (isInitiated && isSignIn) {
+      getMoney
+        .clone()
+        .onSuccess((res) => {
+          setMoney(res.data);
+        })
+        .safeExec();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInitiated, isSignIn]);
+
+  useEffect(() => {
+    setUser((prev) => ({ ...prev, money }));
+  }, [money, setUser]);
+
+  const value: MoneyValues = {
+    money,
+    setMoney,
+    loading,
+    setLoading,
+    getMoney,
+  };
+
+  return <MoneyContext.Provider value={value}>{children}</MoneyContext.Provider>;
+};

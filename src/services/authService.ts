@@ -1,18 +1,18 @@
 import api, { type ApiConfig } from "@/class/server/ApiClient";
 import { Request } from "@/class/server/Request";
 import { useError } from "@/contexts";
-import type { InitiateUser } from "@/types/models";
+import type { User } from "@/types/models";
 import type { ResponseOf, AuthEndpoints, BodyOf, SignInBody, SignUpBody } from "@/types/server/endpoints";
 import { useMemo, useState } from "react";
 
 type AuthServiceProps = {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  setUser: React.Dispatch<React.SetStateAction<InitiateUser>>;
+  setUser: React.Dispatch<React.SetStateAction<User>>;
 };
 
 export type AuthServices = {
-  signUp: Request<InitiateUser, [body: SignUpBody, config?: ApiConfig | undefined]>;
-  signIn: Request<InitiateUser, [body: SignInBody, config?: ApiConfig | undefined]>;
+  signUp: Request<User, [body: SignUpBody, config?: ApiConfig | undefined]>;
+  signIn: Request<User, [body: SignInBody, config?: ApiConfig | undefined]>;
   isSignIn: boolean;
 };
 

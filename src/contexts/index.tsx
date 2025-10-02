@@ -7,6 +7,7 @@ import { UserContext } from "./UserContext";
 import { ErrorContext } from "./ErrorContext";
 import { LinkContext } from "./LinkContext";
 import { TodoContext } from "./TodoContext";
+import { MoneyContext } from "./MoneyContext";
 
 const useCreateContext = <T,>(context: React.Context<T>, name: string) => {
   const createdContext = useContext(context);
@@ -40,4 +41,8 @@ export const useLink = () => {
 
 export const useTodo = () => {
   return useCreateContext(TodoContext, "todo");
+};
+
+export const useMoney = () => {
+  return useCreateContext(MoneyContext, "money");
 };

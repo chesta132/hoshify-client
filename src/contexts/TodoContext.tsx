@@ -31,8 +31,8 @@ const defaultValues: TodosValues = {
 export const TodoContext = createContext(defaultValues);
 
 export const TodosProvider = ({ children }: { children: React.ReactNode }) => {
-  const { user, isInitiated, setUser } = useUser();
-  const [todos, setTodos] = useState(user.todos);
+  const { isSignIn, isInitiated, setUser } = useUser();
+  const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState<PaginationResult>({});
 
@@ -66,21 +66,17 @@ export const TodosProvider = ({ children }: { children: React.ReactNode }) => {
   }, [getTodos]);
 
   useEffect(() => {
-    if (isInitiated) {
-      let updates = user.todos;
+    if (isInitiated && isSignIn) {
       getTodos
         .clone()
         .onSuccess((res) => {
-          updates = [...updates, ...res.data];
+          setTodos(res.data.sort(sort));
           setPagination(res.getPagination());
         })
-        .onFinally(() => {
-          setTodos(updates.sort(sort));
-        })
-        .safeExec(updates.length);
+        .safeExec(0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isInitiated]);
+  }, [isInitiated, isSignIn]);
 
   useEffect(() => {
     setUser((prev) => ({ ...prev, todos }));

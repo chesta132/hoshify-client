@@ -1,10 +1,9 @@
-import { useUser } from "@/contexts";
+import { useMoney } from "@/contexts";
 import React from "react";
 import { OverviewCard } from "./OverviewCard";
 
 export const MoneyOverview = () => {
-  const { user } = useUser();
-  const { money } = user;
+  const { money } = useMoney();
 
   const values = [
     { label: "Income", value: money.income },

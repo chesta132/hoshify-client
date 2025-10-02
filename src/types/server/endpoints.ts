@@ -1,4 +1,4 @@
-import type { InitiateUser, Link, Money, Schedule, Todo, Transaction, User, UserRole } from "../models";
+import type { Link, Money, Schedule, Todo, Transaction, User, UserRole } from "../models";
 
 export type Root = "/";
 export type Param = `/${string}${string}`;
@@ -54,8 +54,8 @@ export type AuthEndpoints = {
     | { path: "/send-email-verif"; body: never; response: User }
     | { path: "/google-bind"; body: never; response: DirectToServer };
   post:
-    | { path: "/signup"; body: SignUpBody; response: InitiateUser }
-    | { path: "/signin"; body: SignInBody; response: InitiateUser }
+    | { path: "/signup"; body: SignUpBody; response: User }
+    | { path: "/signin"; body: SignInBody; response: User }
     | { path: "/signout"; body: never; response: Redirect }
     | { path: "/verify-email"; body: never; response: User }
     | { path: `/send-otp?type=${SendOtpType}`; body: never; response: User }
@@ -71,7 +71,7 @@ export type AuthEndpoints = {
 };
 
 export type UserEndpoints = {
-  get: { path: "/initiate"; body: never; response: InitiateUser } | { path: Root; body: never; response: User };
+  get: { path: Root; body: never; response: User };
   delete: { path: `${Root}?token=${string}${string}`; body: never; response: User };
   put: { path: Root; body: UserFullName; response: User };
   patch: never;

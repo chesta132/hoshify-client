@@ -16,6 +16,7 @@ import { UserProvider } from "./contexts/UserContext";
 import { ErrorProvider } from "./contexts/ErrorContext";
 import { LinkProvider } from "./contexts/LinkContext";
 import { TodosProvider } from "./contexts/TodoContext";
+import { MoneyProvider } from "./contexts/MoneyContext";
 
 function App() {
   return (
@@ -25,24 +26,26 @@ function App() {
           <UserProvider>
             <TodosProvider>
               <LinkProvider>
-                <SearchProvider>
-                  <HeaderProvider>
-                    <AppearanceProvider>
-                      <Routes>
-                        <Route path="/signup" element={<SignupPage />} />
-                        <Route path="/signin" element={<SigninPage />} />
-                        <Route path="/" element={<Layout />}>
-                          <Route path="/" index element={<DashboardPage />} />
-                          <Route path="/todos" element={<TodoPage />} />
-                          <Route path="/notes" element={<NotePage />} />
-                          <Route path="/money" element={<MoneyPage />} />
-                          <Route path="/calendar" element={<CalendarPage />} />
-                          <Route path="/settings" element={<SettingsPage />} />
-                        </Route>
-                      </Routes>
-                    </AppearanceProvider>
-                  </HeaderProvider>
-                </SearchProvider>
+                <MoneyProvider>
+                  <SearchProvider>
+                    <HeaderProvider>
+                      <AppearanceProvider>
+                        <Routes>
+                          <Route path="/signup" element={<SignupPage />} />
+                          <Route path="/signin" element={<SigninPage />} />
+                          <Route path="/" element={<Layout />}>
+                            <Route path="/" index element={<DashboardPage />} />
+                            <Route path="/todos" element={<TodoPage />} />
+                            <Route path="/notes" element={<NotePage />} />
+                            <Route path="/money" element={<MoneyPage />} />
+                            <Route path="/calendar" element={<CalendarPage />} />
+                            <Route path="/settings" element={<SettingsPage />} />
+                          </Route>
+                        </Routes>
+                      </AppearanceProvider>
+                    </HeaderProvider>
+                  </SearchProvider>
+                </MoneyProvider>
               </LinkProvider>
             </TodosProvider>
           </UserProvider>

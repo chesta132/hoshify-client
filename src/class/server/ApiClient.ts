@@ -12,6 +12,7 @@ import type {
   Endpoints,
   LinkEndpoints,
   MoneyEndpoints,
+  NoteEndpoints,
   ResponseOf,
   ScheduleEndpoints,
   TodoEndpoints,
@@ -44,6 +45,7 @@ export class ApiClient<
   readonly money!: SetEndpoints<MoneyEndpoints, "delete">;
   readonly transaction!: SetEndpoints<TransactionEndpoints>;
   readonly link!: SetEndpoints<LinkEndpoints, "patch">;
+  readonly note!: SetEndpoints<NoteEndpoints>;
 
   constructor(baseURL: string, endpoint = "", initiate = false) {
     this.endpoint = endpoint;

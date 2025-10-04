@@ -1,4 +1,4 @@
-import type { Link, Money, Schedule, Todo, Transaction, User, UserRole } from "../models";
+import type { Link, Money, Note, Schedule, Todo, Transaction, User, UserRole } from "../models";
 
 export type Root = "/";
 export type Param = `/${string}${string}`;
@@ -11,6 +11,7 @@ export type Redirect = never;
 export type SignInBody = UserCredentialBody & { rememberMe: boolean };
 export type SignUpBody = SignInBody & UserFullName;
 export type CreateTodoBody = Pick<Todo, "title" | "details" | "dueDate"> & Partial<Pick<Todo, "status">>;
+export type CreateNoteBody = Pick<Note, "title" | "details">;
 export type UserCredentialBody = Pick<User, "email"> & { password: string };
 export type CreateTransactionBody = Pick<Transaction, "type" | "title" | "amount"> & Partial<Pick<Transaction, "details">>;
 export type CreateScheduleBody = Pick<Schedule, "title" | "details"> & Partial<Pick<Schedule, "start" | "end">>;
@@ -86,6 +87,14 @@ export type TodoEndpoints = {
   patch: RestoresTemplate<"root", Todo> | RestoresTemplate<"param", Todo>;
 };
 
+export type NoteEndpoints = {
+  get: GetTemplate<"root", Note> | GetTemplate<"param", Note>;
+  post: RootTemplate<CreateNoteBody, Note> | RootTemplate<CreateNoteBody[], Note[]>;
+  put: RootTemplate<CreateNoteBody[], Note[]> | ParamTemplate<CreateNoteBody, Note>;
+  delete: DeleteTemplate<"root", Note> | DeleteTemplate<"param", Note>;
+  patch: RestoresTemplate<"root", Note> | RestoresTemplate<"param", Note>;
+};
+
 export type TransactionEndpoints = {
   get: GetTemplate<"root", Transaction> | GetTemplate<"param", Transaction>;
   post: RootTemplate<CreateTransactionBody, Transaction> | RootTemplate<CreateTransactionBody[], Transaction[]>;
@@ -118,7 +127,15 @@ export type MoneyEndpoints = {
   delete: never;
 };
 
-export type Endpoints = AuthEndpoints | UserEndpoints | TodoEndpoints | TransactionEndpoints | ScheduleEndpoints | LinkEndpoints | MoneyEndpoints;
+export type Endpoints =
+  | AuthEndpoints
+  | UserEndpoints
+  | TodoEndpoints
+  | TransactionEndpoints
+  | ScheduleEndpoints
+  | LinkEndpoints
+  | MoneyEndpoints
+  | NoteEndpoints;
 
 export type EndpointOf<P extends Endpoints[keyof Endpoints], M extends P["path"] = P["path"]> = P extends infer E
   ? E extends { path: infer Path }

@@ -29,10 +29,13 @@ export const useAuthService = ({ setLoading, setUser }: AuthServiceProps): AuthS
     () =>
       new Request(signAuthFetcher("/signin"))
         .loading(setLoading)
-        .onSuccess(() => setIsSignIn(true))
+        .transform((res) => {
+          if (!isSignIn) setIsSignIn(true);
+          return res;
+        })
         .mergeState(setUser)
         .config({ handleError: { setError } }),
-    [setLoading, setUser, setError]
+    [setLoading, setUser, setError, isSignIn]
   );
 
   const signUp = useMemo(() => signIn.clone(signAuthFetcher("/signup")), [signIn]);

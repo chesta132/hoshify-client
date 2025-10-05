@@ -10,6 +10,7 @@ type TodoServiceProps = {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
   pagination: PaginationResult;
+  setPagination: React.Dispatch<React.SetStateAction<PaginationResult>>;
 };
 
 export type TodoServices = {
@@ -20,8 +21,10 @@ export type TodoServices = {
   updateTodos: Request<Todo[], [updates: TodoBody[]]>;
 };
 
-export function useTodoService({ setLoading, setTodos, pagination }: TodoServiceProps): TodoServices {
+export function useTodoService({ setLoading, setTodos, pagination, setPagination }: TodoServiceProps): TodoServices {
   const { setError } = useError();
+
+  const sort = (a: Todo, b: Todo) => a.dueDate.valueOf() - b.dueDate.valueOf();
 
   const getTodos = useMemo(
     () =>
@@ -30,16 +33,23 @@ export function useTodoService({ setLoading, setTodos, pagination }: TodoService
       )
         .retry(3)
         .loading(setLoading)
+        .transform((res) => {
+          setTodos((prev) => [...prev, ...res.data].sort(sort));
+          setPagination(res.getPagination());
+          return res;
+        })
         .config({ handleError: { setError } }),
-    [pagination.nextOffset, setError, setLoading]
+    [pagination.nextOffset, setError, setLoading, setPagination, setTodos]
   );
 
   const deleteTodo = useMemo(
     () =>
       getTodos
         .clone(({ signal }, id: string) => api.todo.delete<Todo>(`/${id}`, { signal }))
-        .onSuccess((res) => {
+        .reset("transform")
+        .transform((res) => {
           setTodos((prev) => prev.filter((todo) => todo.id !== res.data.id));
+          return res;
         }),
     [getTodos, setTodos]
   );
@@ -48,13 +58,14 @@ export function useTodoService({ setLoading, setTodos, pagination }: TodoService
     () =>
       getTodos
         .clone(({ signal }, body: BodyOf<TodoEndpoints["post"], "/">) => api.todo.post("/", body, { signal }))
-        .onSuccess((res) => {
+        .reset("transform", "config")
+        .transform((res) => {
           setTodos((prev) => {
             if (Array.isArray(res.data)) return [...prev, ...res.data];
             return [...prev, res.data];
           });
-        })
-        .reset("config"),
+          return res;
+        }),
     [getTodos, setTodos]
   );
 
@@ -62,10 +73,11 @@ export function useTodoService({ setLoading, setTodos, pagination }: TodoService
     () =>
       getTodos
         .clone(({ signal }, updates: BodyOf<TodoEndpoints["put"], "/:id"> & { id: string }) => api.todo.put(`/${updates.id}`, updates, { signal }))
-        .onSuccess((res) => {
+        .reset("transform", "config")
+        .transform((res) => {
           setTodos((prev) => prev.map((todo) => (todo.id === res.data.id ? res.data : todo)));
-        })
-        .reset("config"),
+          return res;
+        }),
     [getTodos, setTodos]
   );
 
@@ -73,10 +85,11 @@ export function useTodoService({ setLoading, setTodos, pagination }: TodoService
     () =>
       getTodos
         .clone(({ signal }, updates: BodyOf<TodoEndpoints["put"], "/">) => api.todo.put("/", updates, { signal }))
-        .onSuccess((res) => {
-          setTodos((prev) => prev.flatMap((todo) => res.data.map((t) => (t.id === todo.id ? t : todo))));
-        })
-        .reset("config"),
+        .reset("transform", "config")
+        .transform((res) => {
+          setTodos((prev) => prev.map((todo) => res.data.find((t) => t.id === todo.id) || todo));
+          return res;
+        }),
     [getTodos, setTodos]
   );
 

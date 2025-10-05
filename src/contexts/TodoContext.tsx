@@ -36,9 +36,7 @@ export const TodosProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState<PaginationResult>({});
 
-  const { createTodo, deleteTodo, getTodos, updateTodo, updateTodos } = useTodoService({ pagination, setLoading, setTodos });
-
-  const sort = (a: Todo, b: Todo) => a.dueDate.valueOf() - b.dueDate.valueOf();
+  const { createTodo, deleteTodo, getTodos, updateTodo, updateTodos } = useTodoService({ pagination, setLoading, setTodos, setPagination });
 
   const setComplete = async (id: string, val: boolean) => {
     const original = todos.find((todo) => todo.id === id);
@@ -48,7 +46,6 @@ export const TodosProvider = ({ children }: { children: React.ReactNode }) => {
 
     await updateTodo
       .clone()
-      .reset("onSuccess")
       .onError((_, retry) => {
         const { counted } = retry || {};
         if (counted === 3) {
@@ -59,21 +56,8 @@ export const TodosProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    getTodos.onSuccess((res) => {
-      setTodos((prev) => [...prev, ...res.data].sort(sort));
-      setPagination(res.getPagination());
-    });
-  }, [getTodos]);
-
-  useEffect(() => {
     if (isInitiated && isSignIn) {
-      getTodos
-        .clone()
-        .onSuccess((res) => {
-          setTodos(res.data.sort(sort));
-          setPagination(res.getPagination());
-        })
-        .safeExec(0);
+      getTodos.clone().safeExec(0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInitiated, isSignIn]);

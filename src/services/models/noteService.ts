@@ -10,6 +10,7 @@ type NoteServiceProps = {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setNotes: React.Dispatch<React.SetStateAction<Note[]>>;
   pagination: PaginationResult;
+  setPagination: React.Dispatch<React.SetStateAction<PaginationResult>>;
 };
 
 export type NoteServices = {
@@ -20,8 +21,10 @@ export type NoteServices = {
   updateNotes: Request<Note[], [updates: NoteBody[]]>;
 };
 
-export function useNoteService({ setLoading, setNotes, pagination }: NoteServiceProps): NoteServices {
+export function useNoteService({ setLoading, setNotes, pagination, setPagination }: NoteServiceProps): NoteServices {
   const { setError } = useError();
+
+  const sort = (a: Note, b: Note) => b.updatedAt.valueOf() - a.updatedAt.valueOf();
 
   const getNotes = useMemo(
     () =>
@@ -30,16 +33,23 @@ export function useNoteService({ setLoading, setNotes, pagination }: NoteService
       )
         .retry(3)
         .loading(setLoading)
+        .transform((res) => {
+          setNotes((prev) => [...prev, ...res.data].sort(sort));
+          setPagination(res.getPagination());
+          return res;
+        })
         .config({ handleError: { setError } }),
-    [pagination.nextOffset, setError, setLoading]
+    [pagination.nextOffset, setError, setLoading, setNotes, setPagination]
   );
 
   const deleteNote = useMemo(
     () =>
       getNotes
         .clone(({ signal }, id: string) => api.note.delete<Note>(`/${id}`, { signal }))
-        .onSuccess((res) => {
+        .reset("transform")
+        .transform((res) => {
           setNotes((prev) => prev.filter((note) => note.id !== res.data.id));
+          return res;
         }),
     [getNotes, setNotes]
   );
@@ -48,11 +58,13 @@ export function useNoteService({ setLoading, setNotes, pagination }: NoteService
     () =>
       getNotes
         .clone(({ signal }, body: BodyOf<NoteEndpoints["post"], "/">) => api.note.post("/", body, { signal }))
-        .onSuccess((res) => {
+        .reset("transform", "config")
+        .transform((res) => {
           setNotes((prev) => {
             if (Array.isArray(res.data)) return [...prev, ...res.data];
             return [...prev, res.data];
           });
+          return res;
         })
         .reset("config"),
     [getNotes, setNotes]
@@ -62,8 +74,10 @@ export function useNoteService({ setLoading, setNotes, pagination }: NoteService
     () =>
       getNotes
         .clone(({ signal }, updates: BodyOf<NoteEndpoints["put"], "/:id"> & { id: string }) => api.note.put(`/${updates.id}`, updates, { signal }))
-        .onSuccess((res) => {
+        .reset("transform", "config")
+        .transform((res) => {
           setNotes((prev) => prev.map((note) => (note.id === res.data.id ? res.data : note)));
+          return res;
         })
         .reset("config"),
     [getNotes, setNotes]
@@ -73,8 +87,10 @@ export function useNoteService({ setLoading, setNotes, pagination }: NoteService
     () =>
       getNotes
         .clone(({ signal }, updates: BodyOf<NoteEndpoints["put"], "/">) => api.note.put("/", updates, { signal }))
-        .onSuccess((res) => {
-          setNotes((prev) => prev.flatMap((note) => res.data.map((t) => (t.id === note.id ? t : note))));
+        .reset("transform", "config")
+        .transform((res) => {
+          setNotes((prev) => prev.map((note) => res.data.find((t) => t.id === note.id) || note));
+          return res;
         })
         .reset("config"),
     [getNotes, setNotes]

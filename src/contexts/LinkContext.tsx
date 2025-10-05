@@ -36,26 +36,11 @@ export const LinkProvider = ({ children }: { children: React.ReactNode }) => {
   const [pagination, setPagination] = useState<PaginationResult>({});
   const [loading, setLoading] = useState(false);
 
-  const { createLink, deleteLink, updateLink, getLinks, updateLinks } = useLinkService({ setLoading, setLinks, pagination });
-
-  const sort = (a: Link, b: Link) => a.position - b.position;
-
-  useEffect(() => {
-    getLinks.onSuccess((res) => {
-      setLinks((prev) => [...prev, ...res.data].sort(sort));
-      setPagination(res.getPagination());
-    });
-  }, [getLinks]);
+  const { createLink, deleteLink, updateLink, getLinks, updateLinks } = useLinkService({ setLoading, setLinks, pagination, setPagination });
 
   useEffect(() => {
     if (isInitiated && isSignIn) {
-      getLinks
-        .clone()
-        .onSuccess((res) => {
-          setLinks(res.data.sort(sort));
-          setPagination(res.getPagination());
-        })
-        .safeExec(0);
+      getLinks.clone().safeExec(0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInitiated, isSignIn]);

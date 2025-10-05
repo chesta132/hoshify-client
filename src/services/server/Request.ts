@@ -10,11 +10,13 @@ export type Config<N> = {
   handleError?: { setError: React.Dispatch<React.SetStateAction<StateErrorServer | null>> } & HandleErrorOptions;
   withLoad?: boolean;
 };
+
 type OnRetryCallback = (err: unknown, options: Omit<Retry, "onRetry">) => any;
 type OnErrorCallback = (error: unknown, retry?: Omit<Retry, "onRetry">) => any;
+
 export type Retry = { counted: number; count: number } & RetryOptions;
 export type RequestFetcher<T, A extends any[]> = (controller: AbortController, ...args: A) => Promise<ServerSuccess<T>>;
-export type SafeExcResult<T> = { ok: true; data: T } | { ok: false; error: unknown };
+export type SafeExecResult<T> = { ok: true; data: T } | { ok: false; error: unknown };
 
 type RetryOptions = { interval?: number; onRetry?: OnRetryCallback };
 
@@ -204,7 +206,7 @@ export class Request<T, A extends any[] = [], N extends NavigateFunction | undef
     }
   }
 
-  async safeExec(...args: A): Promise<SafeExcResult<ServerSuccess<T>>> {
+  async safeExec(...args: A): Promise<SafeExecResult<ServerSuccess<T>>> {
     try {
       const data = await this.exec(...args);
       return { ok: true, data };

@@ -10,6 +10,7 @@ type LinkServiceProps = {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setLinks: React.Dispatch<React.SetStateAction<Link[]>>;
   pagination: PaginationResult;
+  setPagination: React.Dispatch<React.SetStateAction<PaginationResult>>;
 };
 
 export type LinkServices = {
@@ -20,8 +21,9 @@ export type LinkServices = {
   updateLinks: Request<Link[], [updates: LinkBody[]]>;
 };
 
-export function useLinkService({ setLoading, setLinks, pagination }: LinkServiceProps): LinkServices {
+export function useLinkService({ setLoading, setLinks, pagination, setPagination }: LinkServiceProps): LinkServices {
   const { setError } = useError();
+  const sort = (a: Link, b: Link) => a.position - b.position;
 
   const getLinks = useMemo(
     () =>
@@ -30,16 +32,23 @@ export function useLinkService({ setLoading, setLinks, pagination }: LinkService
       )
         .retry(3)
         .loading(setLoading)
+        .transform((res) => {
+          setLinks((prev) => [...prev, ...res.data].sort(sort));
+          setPagination(res.getPagination());
+          return res;
+        })
         .config({ handleError: { setError } }),
-    [pagination.nextOffset, setError, setLoading]
+    [pagination.nextOffset, setError, setLinks, setLoading, setPagination]
   );
 
   const deleteLink = useMemo(
     () =>
       getLinks
         .clone(({ signal }, id: string) => api.link.delete<Link>(`/${id}`, { signal }))
-        .onSuccess((res) => {
+        .reset("transform")
+        .transform((res) => {
           setLinks((prev) => prev.filter((link) => link.id !== res.data.id));
+          return res;
         }),
     [getLinks, setLinks]
   );
@@ -48,13 +57,14 @@ export function useLinkService({ setLoading, setLinks, pagination }: LinkService
     () =>
       getLinks
         .clone(({ signal }, body: BodyOf<LinkEndpoints["post"], "/">) => api.link.post("/", body, { signal }))
-        .onSuccess((res) => {
+        .reset("transform", "config")
+        .transform((res) => {
           setLinks((prev) => {
-            if (Array.isArray(res.data)) return [...prev, ...res.data];
-            return [...prev, res.data];
+            if (Array.isArray(res.data)) return [...prev, ...res.data].sort(sort);
+            return [...prev, res.data].sort(sort);
           });
-        })
-        .reset("config"),
+          return res;
+        }),
     [getLinks, setLinks]
   );
 
@@ -62,16 +72,24 @@ export function useLinkService({ setLoading, setLinks, pagination }: LinkService
     () =>
       getLinks
         .clone(({ signal }, updates: BodyOf<LinkEndpoints["put"], "/:id"> & { id: string }) => api.link.put(`/${updates.id}`, updates, { signal }))
-        .onSuccess((res) => {
+        .reset("transform", "config")
+        .transform((res) => {
           setLinks((prev) => prev.map((link) => (link.id === res.data.id ? res.data : link)));
-        })
-        .reset("config"),
+          return res;
+        }),
     [getLinks, setLinks]
   );
 
   const updateLinks = useMemo(
-    () => getLinks.clone(({ signal }, updates: BodyOf<LinkEndpoints["put"], "/">) => api.link.put<Link[]>("/", updates, { signal })).reset("config"),
-    [getLinks]
+    () =>
+      getLinks
+        .clone(({ signal }, updates: BodyOf<LinkEndpoints["put"], "/">) => api.link.put<Link[]>("/", updates, { signal }))
+        .reset("transform", "config")
+        .transform((res) => {
+          setLinks((prev) => prev.map((link) => res.data.find((t) => t.id === link.id) || link));
+          return res;
+        }),
+    [getLinks, setLinks]
   );
 
   return { createLink, updateLink, deleteLink, getLinks, updateLinks };

@@ -39,22 +39,11 @@ export const MoneyProvider = ({ children }: { children: React.ReactNode }) => {
   const [money, setMoney] = useState(defaultMonet);
   const [loading, setLoading] = useState(false);
 
-  const { getMoney } = useMoneyService({ setLoading });
-
-  useEffect(() => {
-    getMoney.onSuccess((res) => {
-      setMoney(res.data);
-    });
-  }, [getMoney]);
+  const { getMoney } = useMoneyService({ setLoading, setMoney });
 
   useEffect(() => {
     if (isInitiated && isSignIn) {
-      getMoney
-        .clone()
-        .onSuccess((res) => {
-          setMoney(res.data);
-        })
-        .safeExec();
+      getMoney.clone().safeExec();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInitiated, isSignIn]);

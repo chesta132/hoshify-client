@@ -58,7 +58,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const { signIn, signUp } = useAuthService({ setLoading, setUser });
 
   useEffect(() => {
-    getUser.safeExec().finally(() => setIsInitiated(true));
+    getUser
+      .clone()
+      .onFinally(() => !isInitiated && setIsInitiated(true))
+      .safeExec();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

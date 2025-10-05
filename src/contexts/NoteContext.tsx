@@ -34,26 +34,11 @@ export const NotesProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState<PaginationResult>({});
 
-  const { createNote, deleteNote, getNotes, updateNote, updateNotes } = useNoteService({ pagination, setLoading, setNotes });
-
-  const sort = (a: Note, b: Note) => b.updatedAt.valueOf() - a.updatedAt.valueOf();
-
-  useEffect(() => {
-    getNotes.onSuccess((res) => {
-      setNotes((prev) => [...prev, ...res.data].sort(sort));
-      setPagination(res.getPagination());
-    });
-  }, [getNotes]);
+  const { createNote, deleteNote, getNotes, updateNote, updateNotes } = useNoteService({ pagination, setLoading, setNotes, setPagination });
 
   useEffect(() => {
     if (isInitiated && isSignIn) {
-      getNotes
-        .clone()
-        .onSuccess((res) => {
-          setNotes(res.data.sort(sort));
-          setPagination(res.getPagination());
-        })
-        .safeExec(0);
+      getNotes.clone().safeExec(0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInitiated, isSignIn]);

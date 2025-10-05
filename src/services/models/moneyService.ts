@@ -6,18 +6,24 @@ import { useMemo } from "react";
 
 type MoneyServiceProps = {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setMoney: React.Dispatch<React.SetStateAction<Money>>;
 };
 
 export type MoneyServices = {
   getMoney: Request<Money, []>;
 };
 
-export function useMoneyService({ setLoading }: MoneyServiceProps): MoneyServices {
+export function useMoneyService({ setLoading, setMoney }: MoneyServiceProps): MoneyServices {
   const { setError } = useError();
 
   const getMoney = useMemo(
-    () => new Request(({ signal }) => api.money.get("/", { signal })).retry(3).loading(setLoading).config({ handleError: { setError } }),
-    [setError, setLoading]
+    () =>
+      new Request(({ signal }) => api.money.get("/", { signal }))
+        .retry(3)
+        .loading(setLoading)
+        .config({ handleError: { setError } })
+        .mergeState(setMoney),
+    [setError, setLoading, setMoney]
   );
 
   return { getMoney };

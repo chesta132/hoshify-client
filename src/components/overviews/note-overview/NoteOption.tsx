@@ -55,14 +55,7 @@ export const NoteOption = ({ note, expanded, setExpanded }: { note: Note; expand
         )}
         {deletePopup && (
           <Popup blur>
-            <motion.div
-              initial={{ y: -50, opacity: 0 }}
-              animate={{ y: 0, opacity: 100 }}
-              exit={{ y: -50, opacity: 0 }}
-              transition={{ type: "keyframes", duration: 0.1 }}
-            >
-              <DeletePopup titleItem="note" item={note.title} onDelete={handleDelete} onCancel={() => setDeletePopup(false)} />
-            </motion.div>
+            <DeletePopup animate titleItem="note" item={note.title} onDelete={handleDelete} onCancel={() => setDeletePopup(false)} />
           </Popup>
         )}
       </AnimatePresence>

@@ -5,9 +5,10 @@ import { type TodoStatus } from "@/types/models";
 import dayjs from "dayjs";
 import { CheckSquare, Plus } from "lucide-react";
 import { AnimatePresence } from "motion/react";
-import { useState } from "react";
-import { TodoPopup } from "./TodoPopup";
+import { useMemo, useState } from "react";
+import { CreateTodoPopup } from "./CreateTodoPopup";
 import { TodoOption } from "./TodoOption";
+import { InfoTodoPopup } from "./InfoTodoPopup";
 
 export type TodoForm = {
   title: string;
@@ -22,8 +23,9 @@ export const TodoOverview = () => {
     { title: "", details: "", status: "ACTIVE", dueDate: dayjs() },
     { details: { max: 300 }, title: { max: 100 }, status: true }
   );
-
-  const [isOpen, setIsOpen] = useState(false);
+  const [isCreate, setIsCreate] = useState(false);
+  const [isInfo, setIsInfo] = useState<null | string>(null);
+  const infoTodos = useMemo(() => todos.find((todo) => todo.id === isInfo), [isInfo, todos]);
 
   return (
     <div className="bg-card rounded-2xl border-[0.8px] border-border flex flex-col">
@@ -32,7 +34,7 @@ export const TodoOverview = () => {
           <CheckSquare size={16} /> To-Do Overview
         </span>
         <div className="flex justify-end">
-          <Button variant={"outline"} onClick={() => setIsOpen(true)}>
+          <Button variant={"outline"} onClick={() => setIsCreate(true)}>
             <Plus />
             Add a task
           </Button>
@@ -40,10 +42,13 @@ export const TodoOverview = () => {
       </div>
       <div className="border-b-[0.8px] border-b-border p-4 flex flex-col gap-3.5">
         {todos.slice(0, 5).map((todo) => (
-          <TodoOption todo={todo} key={todo.id} />
+          <TodoOption todo={todo} key={todo.id} setIsInfo={setIsInfo} />
         ))}
       </div>
-      <AnimatePresence>{isOpen && <TodoPopup formGroup={formGroup} setIsOpen={setIsOpen} />}</AnimatePresence>
+      <AnimatePresence>
+        {isCreate && <CreateTodoPopup formGroup={formGroup} setIsOpen={setIsCreate} />}
+        {isInfo && infoTodos && <InfoTodoPopup todo={infoTodos} setClose={setIsInfo} />}
+      </AnimatePresence>
     </div>
   );
 };

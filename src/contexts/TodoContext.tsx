@@ -1,4 +1,4 @@
-import type { Todo } from "@/types/models";
+import type { Todo, TodoStatus } from "@/types/models";
 import { createContext, useEffect, useState } from "react";
 import { useUser } from ".";
 import { useTodoService, type TodoServices } from "@/services/models/todoService";
@@ -12,6 +12,7 @@ type TodosValues = {
   loading: boolean;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setComplete: (id: string, complete: boolean) => Promise<void>;
+  getBgByStatus: (status: TodoStatus) => string;
 } & TodoServices;
 
 const defaultValues: TodosValues = {
@@ -24,6 +25,7 @@ const defaultValues: TodosValues = {
   getTodos: new Request(() => api.todo.get("/")),
   updateTodo: new Request(() => api.todo.get("/")),
   updateTodos: new Request(() => api.todo.get("/")),
+  getBgByStatus: () => "",
   async setComplete() {},
 };
 
@@ -62,6 +64,19 @@ export const TodosProvider = ({ children }: { children: React.ReactNode }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInitiated, isSignIn]);
 
+  const getBgByStatus = (status: TodoStatus) => {
+    switch (status) {
+      case "ACTIVE":
+        return "bg-green-700/20 text-green-500";
+      case "PENDING":
+        return "bg-yellow-600/20 text-yellow-500";
+      case "CANCELED":
+        return "bg-red-700/20 text-red-500!";
+      case "COMPLETED":
+        return "bg-green-500/20 text-green-500";
+    }
+  };
+
   const value: TodosValues = {
     loading,
     setLoading,
@@ -73,6 +88,7 @@ export const TodosProvider = ({ children }: { children: React.ReactNode }) => {
     updateTodo,
     updateTodos,
     setComplete,
+    getBgByStatus,
   };
 
   return <TodoContext.Provider value={value}>{children}</TodoContext.Provider>;

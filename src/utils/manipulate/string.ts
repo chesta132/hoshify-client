@@ -1,6 +1,6 @@
 import { getMaxChar, type CharOptions } from "./number";
 
-type WidthOptions = { px: number } & Omit<CharOptions, "text">;
+export type WidthOptions = { px: number } & Omit<CharOptions, "text">;
 
 /**
  * Truncates the string and appends an ellipsis (`...`) if it exceeds the specified maximum length.

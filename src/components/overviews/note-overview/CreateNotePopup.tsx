@@ -5,9 +5,9 @@ import { motion } from "motion/react";
 import { useNote } from "@/contexts";
 import type { NoteBody } from "@/types/server/endpoints";
 
-type NotePopupProps = { formGroup: FormGroup<NoteBody>; setIsOpen: React.Dispatch<React.SetStateAction<boolean>> };
+type CreateNotePopupProps = { formGroup: FormGroup<NoteBody>; setIsOpen: React.Dispatch<React.SetStateAction<boolean>> };
 
-export const NotePopup = ({ formGroup, setIsOpen }: NotePopupProps) => {
+export const CreateNotePopup = ({ formGroup, setIsOpen }: CreateNotePopupProps) => {
   const { loading, createNote } = useNote();
   const {
     resetForm,

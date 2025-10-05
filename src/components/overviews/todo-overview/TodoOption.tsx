@@ -7,10 +7,15 @@ import { cn } from "@/lib/utils";
 import type { Todo } from "@/types/models";
 import { timeInMs } from "@/utils/manipulate/number";
 import { Info, Trash } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence } from "motion/react";
 import { useState } from "react";
 
-export const TodoOption = ({ todo }: { todo: Todo }) => {
+type TodoOptionProps = {
+  todo: Todo;
+  setIsInfo?: React.Dispatch<React.SetStateAction<string | null>>;
+};
+
+export const TodoOption = ({ todo, setIsInfo }: TodoOptionProps) => {
   const { setComplete, deleteTodo } = useTodo();
   const [deletePopup, setDeletePopup] = useState(false);
 
@@ -40,8 +45,7 @@ export const TodoOption = ({ todo }: { todo: Todo }) => {
         </span>
       </div>
       <div className="gap-2 flex items-center">
-        {/* INFO PAGE WIP */}
-        <Button variant={"outline"} size={"icon"}>
+        <Button variant={"outline"} size={"icon"} onClick={() => setIsInfo?.(todo.id)}>
           <Info size={16} />
         </Button>
         <Button variant={"outline"} size={"icon"} onClick={() => setDeletePopup(true)}>
@@ -51,14 +55,7 @@ export const TodoOption = ({ todo }: { todo: Todo }) => {
       <AnimatePresence>
         {deletePopup && (
           <Popup blur>
-            <motion.div
-              initial={{ y: -50, opacity: 0 }}
-              animate={{ y: 0, opacity: 100 }}
-              exit={{ y: -50, opacity: 0 }}
-              transition={{ type: "keyframes", duration: 0.1 }}
-            >
-              <DeletePopup titleItem="todo" item={todo.title} onDelete={handleDelete} onCancel={() => setDeletePopup(false)} />
-            </motion.div>
+            <DeletePopup animate titleItem="todo" item={todo.title} onDelete={handleDelete} onCancel={() => setDeletePopup(false)} />
           </Popup>
         )}
       </AnimatePresence>

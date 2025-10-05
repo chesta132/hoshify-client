@@ -1,6 +1,7 @@
 import { Info } from "lucide-react";
 import { Button } from "../form/Button";
 import React from "react";
+import { motion } from "motion/react";
 
 type DeletePopupProps = {
   titleItem: string;
@@ -9,11 +10,18 @@ type DeletePopupProps = {
   onCancel?: () => any;
   permanent?: boolean;
   info?: React.ReactNode;
+  animate?: boolean;
 };
 
-export const DeletePopup = ({ titleItem, onCancel, onDelete, permanent, info, item }: DeletePopupProps) => {
+export const DeletePopup = ({ titleItem, onCancel, onDelete, permanent, info, item, animate }: DeletePopupProps) => {
   return (
-    <div className="fixed-center bg-card p-5 border border-border rounded-md text-start min-w-80 max-w-xl">
+    <motion.div
+      initial={animate ? { y: -50, opacity: 0 } : {}}
+      animate={animate ? { y: 0, opacity: 100 } : {}}
+      exit={animate ? { y: -50, opacity: 0 } : {}}
+      transition={animate ? { type: "keyframes", duration: 0.1 } : {}}
+      className="fixed-center bg-card p-5 border border-border rounded-md text-start min-w-80 max-w-xl"
+    >
       <h1 className="font-heading text-[17px] font-medium">Delete {titleItem}</h1>
       <div className="h-px bg-border w-full my-2" />
       <div className="text-sm flex flex-col gap-2">
@@ -33,6 +41,6 @@ export const DeletePopup = ({ titleItem, onCancel, onDelete, permanent, info, it
           Delete
         </Button>
       </div>
-    </div>
+    </motion.div>
   );
 };

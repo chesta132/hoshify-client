@@ -6,9 +6,9 @@ import { motion } from "motion/react";
 import type { TodoForm } from "./TodoOverview";
 import { useTodo } from "@/contexts";
 
-type TodoPopupProps = { formGroup: FormGroup<TodoForm>; setIsOpen: React.Dispatch<React.SetStateAction<boolean>> };
+type CreateTodoPopupProps = { formGroup: FormGroup<TodoForm>; setIsOpen: React.Dispatch<React.SetStateAction<boolean>> };
 
-export const TodoPopup = ({ formGroup, setIsOpen }: TodoPopupProps) => {
+export const CreateTodoPopup = ({ formGroup, setIsOpen }: CreateTodoPopupProps) => {
   const { loading, createTodo } = useTodo();
   const {
     resetForm,

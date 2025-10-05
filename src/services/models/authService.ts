@@ -1,5 +1,5 @@
-import api, { type ApiConfig } from "@/class/server/ApiClient";
-import { Request } from "@/class/server/Request";
+import api, { type ApiConfig } from "@/services/server/ApiClient";
+import { Request } from "@/services/server/Request";
 import { useError } from "@/contexts";
 import type { User } from "@/types/models";
 import type { ResponseOf, AuthEndpoints, BodyOf, SignInBody, SignUpBody } from "@/types/server/endpoints";

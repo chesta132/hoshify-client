@@ -1,10 +1,10 @@
 import type { Todo } from "@/types/models";
 import { createContext, useEffect, useState } from "react";
 import { useUser } from ".";
-import { useTodoService, type TodoServices } from "@/services/todoService";
-import { type PaginationResult } from "@/class/server/ServerSuccess";
-import { Request } from "@/class/server/Request";
-import api from "@/class/server/ApiClient";
+import { useTodoService, type TodoServices } from "@/services/models/todoService";
+import { type PaginationResult } from "@/services/server/ServerSuccess";
+import { Request } from "@/services/server/Request";
+import api from "@/services/server/ApiClient";
 
 type TodosValues = {
   todos: Todo[];

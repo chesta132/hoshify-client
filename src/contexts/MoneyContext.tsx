@@ -1,6 +1,6 @@
-import api from "@/class/server/ApiClient";
-import { Request } from "@/class/server/Request";
-import { useMoneyService, type MoneyServices } from "@/services/moneyService";
+import api from "@/services/server/ApiClient";
+import { Request } from "@/services/server/Request";
+import { useMoneyService, type MoneyServices } from "@/services/models/moneyService";
 import type { Money } from "@/types/models";
 import { createContext, useEffect, useState } from "react";
 import { useUser } from ".";

@@ -1,5 +1,5 @@
-import api from "@/class/server/ApiClient";
-import { Request } from "@/class/server/Request";
+import api from "@/services/server/ApiClient";
+import { Request } from "@/services/server/Request";
 import { useError } from "@/contexts";
 import type { Money } from "@/types/models";
 import { useMemo } from "react";

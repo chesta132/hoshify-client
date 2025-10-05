@@ -1,10 +1,10 @@
 import type { Note } from "@/types/models";
 import { createContext, useEffect, useState } from "react";
 import { useUser } from ".";
-import { type PaginationResult } from "@/class/server/ServerSuccess";
-import { useNoteService, type NoteServices } from "@/services/noteService";
-import api from "@/class/server/ApiClient";
-import { Request } from "@/class/server/Request";
+import { type PaginationResult } from "@/services/server/ServerSuccess";
+import { useNoteService, type NoteServices } from "@/services/models/noteService";
+import api from "@/services/server/ApiClient";
+import { Request } from "@/services/server/Request";
 
 type NotesValues = {
   notes: Note[];

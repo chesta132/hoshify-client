@@ -1,10 +1,10 @@
-import api from "@/class/server/ApiClient";
-import { Request } from "@/class/server/Request";
-import { useLinkService, type LinkServices } from "@/services/linkService";
+import api from "@/services/server/ApiClient";
+import { Request } from "@/services/server/Request";
+import { useLinkService, type LinkServices } from "@/services/models/linkService";
 import type { Link } from "@/types/models";
 import { createContext, useEffect, useState } from "react";
 import { useUser } from ".";
-import type { PaginationResult } from "@/class/server/ServerSuccess";
+import type { PaginationResult } from "@/services/server/ServerSuccess";
 
 type LinkValues = {
   links: Link[];

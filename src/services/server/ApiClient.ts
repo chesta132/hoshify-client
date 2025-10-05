@@ -1,6 +1,6 @@
 import axios, { isAxiosError, type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from "axios";
-import { ServerSuccess } from "@/class/server/ServerSuccess";
-import { ServerError } from "@/class/server/ServerError";
+import { ServerSuccess } from "@/services/server/ServerSuccess";
+import { ServerError } from "@/services/server/ServerError";
 import type { Response } from "@/types/server";
 import { VITE_ENV, VITE_SERVER_URL } from "@/config";
 import { normalizeDates } from "@/utils/manipulate/date";

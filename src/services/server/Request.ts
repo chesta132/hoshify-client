@@ -1,6 +1,6 @@
 import { type NavigateFunction } from "react-router";
 import type { ServerSuccess } from "./ServerSuccess";
-import { directOnAuthError, handleError, type HandleErrorOptions } from "@/services/handleError";
+import { directOnAuthError, handleError, type HandleErrorOptions } from "@/services/models/handleError";
 import { type StateErrorServer } from "@/types/server/codes";
 import { ServerError } from "./ServerError";
 import { createMergeState } from "@/utils/hookUtils";

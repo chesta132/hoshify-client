@@ -1,7 +1,7 @@
 import { useError } from "@/contexts";
 import type { FormGroup } from "@/hooks/useForm";
 import { cn } from "@/lib/utils";
-import { handleFormError } from "@/services/handleError";
+import { handleFormError } from "@/services/models/handleError";
 import type { FormFields } from "@/types/form";
 import { createContext, useContext } from "react";
 import { FormInput } from "./FormInput";

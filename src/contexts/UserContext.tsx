@@ -1,7 +1,7 @@
-import api from "@/class/server/ApiClient";
-import { Request } from "@/class/server/Request";
-import { useAuthService, type AuthServices } from "@/services/authService";
-import { useUserService, type UserServices } from "@/services/userService";
+import api from "@/services/server/ApiClient";
+import { Request } from "@/services/server/Request";
+import { useAuthService, type AuthServices } from "@/services/models/authService";
+import { useUserService, type UserServices } from "@/services/models/userService";
 import type { User } from "@/types/models";
 import dayjs from "dayjs";
 import { createContext, useEffect, useState } from "react";

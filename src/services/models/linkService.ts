@@ -1,6 +1,6 @@
-import api from "@/class/server/ApiClient";
-import { Request } from "@/class/server/Request";
-import type { PaginationResult } from "@/class/server/ServerSuccess";
+import api from "@/services/server/ApiClient";
+import { Request } from "@/services/server/Request";
+import type { PaginationResult } from "@/services/server/ServerSuccess";
 import { useError } from "@/contexts";
 import type { Link } from "@/types/models";
 import type { BodyOf, LinkBody, LinkEndpoints } from "@/types/server/endpoints";

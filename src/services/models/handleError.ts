@@ -1,4 +1,4 @@
-import { ServerError } from "@/class/server/ServerError";
+import { ServerError } from "@/services/server/ServerError";
 import { codeErrorAuth, type CodeAuthError, type StateErrorServer } from "@/types/server/codes";
 import type { NavigateFunction } from "react-router";
 

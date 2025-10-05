@@ -1,4 +1,4 @@
-import { FormValidator } from "@/class/form-validator/FormValidator";
+import { FormValidator } from "@/services/form-validator/FormValidator";
 import type { Config, FormFields } from "@/types/form";
 import { record } from "@/utils/manipulate/object";
 import { useState } from "react";

@@ -26,7 +26,7 @@ export const NotePopup = ({ formGroup, setIsOpen }: NotePopupProps) => {
   };
 
   return (
-    <Popup blur bodyScroll>
+    <Popup blur>
       <motion.div
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 100 }}

@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import type React from "react";
 import { useEffect } from "react";
 
-type Position = "center" | "bottom" | "top";
+type Position = "center" | "bottom" | "top" | "left" | "right";
 
 type PopupProps = {
   position?: Position | Position[];
@@ -12,10 +12,9 @@ type PopupProps = {
   bodyScroll?: boolean;
 };
 
-export const Popup = ({ position = "center", blur = false, className, children, bodyScroll }: PopupProps) => {
-  const arrPosition = position as Position[];
+export const Popup = ({ position = "center", blur, className, children, bodyScroll }: PopupProps) => {
   useEffect(() => {
-    if (bodyScroll) {
+    if (!bodyScroll) {
       document.body.classList.add("overflow-hidden");
       return () => document.body.classList.remove("overflow-hidden");
     }
@@ -25,12 +24,11 @@ export const Popup = ({ position = "center", blur = false, className, children, 
     <div
       className={cn(
         "fixed-center flex flex-col size-full z-[9999]",
-        position === "center" && "justify-center items-center",
-        position === "top" && "justify-start",
-        position === "bottom" && "justify-end",
-        arrPosition.some?.((p) => p === "center") && "justify-center items-center!",
-        arrPosition.some?.((p) => p === "top") && "justify-start!",
-        arrPosition.some?.((p) => p === "bottom") && "justify-end!",
+        position.includes("center") && "justify-center items-center",
+        position.includes("top") && "justify-start",
+        position.includes("bottom") && "justify-end",
+        position.includes("left") && "items-start",
+        position.includes("right") && "items-end",
         blur && "backdrop-blur-xs",
         className
       )}

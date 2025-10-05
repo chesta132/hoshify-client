@@ -46,7 +46,7 @@ export function LinkPopup({ popup, setPopup }: LinkPopupProps) {
   };
 
   return (
-    <PopupWrapper blur bodyScroll>
+    <PopupWrapper blur>
       <motion.div
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 100 }}

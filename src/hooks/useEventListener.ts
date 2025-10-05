@@ -18,9 +18,9 @@ import { useEffect } from "react";
  * const ref2 = useRef<HTMLHeaderElement>(null)
  * useClickOutside([ref1, ref2], () => setOpen(false));
  */
-export function useClickOutside<T extends Element>(ref: React.RefObject<T | null>, callback: (e: MouseEvent) => void): void;
-export function useClickOutside<T extends Element>(ref: React.RefObject<T | null>[], callback: (e: MouseEvent) => void): void;
-export function useClickOutside<T extends Element>(ref: React.RefObject<T | null> | React.RefObject<T | null>[], callback: (e: MouseEvent) => void) {
+export function useClickOutside(ref: React.RefObject<Element | null>, callback: (e: MouseEvent) => void): void;
+export function useClickOutside(ref: React.RefObject<Element | null>[], callback: (e: MouseEvent) => void): void;
+export function useClickOutside(ref: React.RefObject<Element | null> | React.RefObject<Element | null>[], callback: (e: MouseEvent) => void) {
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as Element | null;
@@ -84,3 +84,50 @@ export const useInView = (ref: React.RefObject<Element | null>, callback: () => 
     return () => observer.disconnect();
   }, [callback, options, ref]);
 };
+
+/**
+ * Hook that triggers a callback when the size of a given element or elements changes using ResizeObserver.
+ *
+ * @param ref - A single React ref object or an array of React ref objects. The hook will monitor size changes on these element(s).
+ * @param callback - Function to run when a resize is detected on the given element(s). Receives ResizeObserverEntry as argument.
+ *
+ * @example
+ * // Single element
+ * const ref = useRef<HTMLDivElement>(null);
+ * useResize(ref, (entry) => console.log('Resized:', entry.contentRect));
+ *
+ * @example
+ * // Multiple elements
+ * const ref1 = useRef<HTMLDivElement>(null);
+ * const ref2 = useRef<HTMLCanvasElement>(null);
+ * useResize([ref1, ref2], (entry) => console.log('Resized:', entry.target));
+ */
+export function useResize(ref: React.RefObject<Element | null>[], callback: (entry: ResizeObserverEntry) => any): void;
+export function useResize(ref: React.RefObject<Element | null>, callback: (entry: ResizeObserverEntry) => any): void;
+export function useResize(ref: React.RefObject<Element | null> | React.RefObject<Element | null>[], callback: (entry: ResizeObserverEntry) => any) {
+  useEffect(() => {
+    const element = (Array.isArray(ref) ? ref.filter((r) => r.current).map((r) => r.current) : ref.current) as Element | Element[] | null;
+    if (!element) return;
+    if (Array.isArray(element) && element.length === 0) return;
+
+    const observer = new ResizeObserver(async (entries) => {
+      for (const entry of entries) {
+        await callback(entry);
+      }
+    });
+
+    if (Array.isArray(element)) {
+      element.forEach((e) => observer.observe(e));
+    } else {
+      observer.observe(element);
+    }
+
+    return () => {
+      if (Array.isArray(element)) {
+        element.forEach((e) => observer.unobserve(e));
+      } else {
+        observer.unobserve(element);
+      }
+    };
+  }, [callback, ref]);
+}

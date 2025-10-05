@@ -1,79 +1,47 @@
-import type { FieldValidations, FormFields } from "@/types/form";
+import type { Config, FieldValidations, FormFields, MinMax } from "@/types/form";
 import { isValidEmail } from "./validator";
-import { isValidUrl } from "@/utils/manipulate/string";
+import { capital, isValidUrl, spacing } from "@/utils/manipulate/string";
 import { todoStatus } from "@/types/models";
 
+const createLengthRules = (field: keyof PickByValue<Config, MinMax>, minMsg?: string, maxMsg?: string) => [
+  {
+    condition: (value: string | undefined, config: Config) =>
+      typeof config[field] !== "boolean" && !!config[field]?.min && !!value && value.length < config[field].min,
+    message: (config: Config) => minMsg || `Minimum ${field} character is ${(config[field] as any).min}`,
+  },
+  {
+    condition: (value: string | undefined, config: Config) =>
+      typeof config[field] !== "boolean" && !!config[field]?.max && !!value && value.length > config[field].max,
+    message: (config: Config) => maxMsg || `Maximum ${field} character is ${(config[field] as any).max}`,
+  },
+];
+
+const createRequiredRule = (field: keyof Config, message?: string) => [
+  {
+    condition: (value: string | undefined, config: Config) => !!config[field] && (!value || value.trim() === ""),
+    message: message || `${capital(spacing(field))} is required`,
+  },
+];
+
 export const VALIDATION_RULES: FieldValidations<FormFields> = {
-  title: [
-    {
-      condition: (value, config) => !!config.title && (!value || value.trim() === ""),
-      message: "Title is required",
-    },
-    {
-      condition: (value, config) => typeof config.title !== "boolean" && !!config.title?.max && !!value && value.length > config.title.max,
-      message: (config) => `Maximum title character is ${typeof config.title !== "boolean" ? config.title?.max : "unknown"}`,
-    },
-    {
-      condition: (value, config) => typeof config.title !== "boolean" && !!config.title?.min && !!value && value.length < config.title.min,
-      message: (config) => `Minimum title character is ${typeof config.title !== "boolean" ? config.title?.min : "unknown"}`,
-    },
-  ],
-  details: [
-    {
-      condition: (value, config) => !!config.details && (!value || value.trim() === ""),
-      message: "Description is required",
-    },
-    {
-      condition: (value, config) => typeof config.details !== "boolean" && !!config.details?.max && !!value && value.length > config.details?.max,
-      message: (config) => `Maximum detail character is ${typeof config.details !== "boolean" ? config.details?.max : "unknown"}`,
-    },
-    {
-      condition: (value, config) => typeof config.details !== "boolean" && !!config.details?.min && !!value && value.length < config.details?.min,
-      message: (config) => `Minimum detail character is ${typeof config.details !== "boolean" ? config.details?.min : "unknown"}`,
-    },
-  ],
+  title: [...createRequiredRule("title"), ...createLengthRules("title")],
+  details: [...createRequiredRule("details"), ...createLengthRules("details")],
   email: [
-    {
-      condition: (value, config) => !!config.email && (!value || value.trim() === ""),
-      message: "Email is required",
-    },
+    ...createRequiredRule("email"),
     {
       condition: (value, config) => typeof config.email !== "boolean" && !!config.email?.regex && !!value && !isValidEmail(value),
       message: "Please input a valid email",
     },
   ],
-  password: [
-    {
-      condition: (value, config) => !!config.password && (!value || value.trim() === ""),
-      message: "Password is required",
-    },
-    {
-      condition: (value, config) => typeof config.password !== "boolean" && !!config.password?.max && !!value && value.length > config.password?.max,
-      message: (config) => `Maximum password character is ${typeof config.password !== "boolean" && config.password?.max}`,
-    },
-    {
-      condition: (value, config) => typeof config.password !== "boolean" && !!config.password?.min && !!value && value.length < config.password?.min,
-      message: (config) => `Minimum password character is ${typeof config.password !== "boolean" && config.password?.min}`,
-    },
-  ],
+  password: [...createRequiredRule("password"), ...createLengthRules("password")],
   verifyPassword: [
     {
-      condition: (value, config, allValue) => !!config.verifyPassword && !!allValue && value !== allValue.password,
+      condition: (value, config, allValue) => !!config.verifyPassword && value !== allValue.password,
       message: "Password is not match",
     },
   ],
-  fullName: [
-    {
-      condition: (value, config) => !!config.fullName && (!value || value.trim() === ""),
-      message: "Full name is required",
-    },
-  ],
-  newFullName: [
-    {
-      condition: (value, config) => !!config.newFullName && (!value || value.trim() === ""),
-      message: "New full name is required",
-    },
-  ],
+  fullName: [...createRequiredRule("fullName")],
+  newFullName: [...createRequiredRule("newFullName")],
   link: [{ condition: (value, config) => !!(config.link && !isValidUrl(value!)), message: "Invalid URL" }],
   status: [{ condition: (value, config) => !!(config.status && value && !todoStatus.includes(value)), message: "Please select a valid status" }],
 };

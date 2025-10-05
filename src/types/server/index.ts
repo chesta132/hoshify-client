@@ -14,7 +14,7 @@ export interface ErrorResponse {
   /** Extra details for debugging */
   details?: string;
   /** Optional field reference (useful for forms) */
-  field?: ServerFields;
+  field?: keyof ServerFields;
 }
 
 /**

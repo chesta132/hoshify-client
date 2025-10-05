@@ -1,5 +1,5 @@
 import { FormLayout } from "@/components/form-layout/FormLayout";
-import { Popup } from "@/components/ui/Popup";
+import { Popup } from "@/components/popup/Popup";
 import type { FormGroup } from "@/hooks/useForm";
 import { motion } from "motion/react";
 import { useNote } from "@/contexts";

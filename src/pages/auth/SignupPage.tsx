@@ -4,7 +4,7 @@ import { useUser } from "@/contexts";
 import useForm from "@/hooks/useForm";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
-import { HoshifyLogo } from "@/components/ui/Logo";
+import { HoshifyLogo } from "@/components/Logo";
 import { omit } from "@/utils/manipulate/object";
 
 export const SignupPage = () => {

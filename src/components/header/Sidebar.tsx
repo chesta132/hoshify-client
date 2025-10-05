@@ -6,7 +6,7 @@ import { motion } from "motion/react";
 import { Link, useLocation } from "react-router";
 import { useClickOutside } from "@/hooks/useEventListener";
 import { SidebarToggle } from "./SidebarToggle";
-import { HoshifyLogo } from "../ui/Logo";
+import { HoshifyLogo } from "../Logo";
 import { cn } from "@/lib/utils";
 
 type Pages = {

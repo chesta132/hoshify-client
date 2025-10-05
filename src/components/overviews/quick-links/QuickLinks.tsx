@@ -1,5 +1,5 @@
 import { Button } from "@/components/form/Button";
-import { Popup } from "@/components/ui/Popup";
+import { Popup } from "@/components/popup/Popup";
 import { Plus } from "lucide-react";
 import { AnimatePresence, Reorder } from "motion/react";
 import { useRef, useState } from "react";

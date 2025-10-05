@@ -2,7 +2,7 @@ import { Laptop2, Moon, Sun } from "lucide-react";
 import { Button } from "../form/Button";
 import { useTheme } from "@/contexts";
 import type { Theme } from "@/contexts/appearance/theme";
-import { DropdownRadio } from "../ui/DropdownRadio";
+import { DropdownRadio } from "../dropdown/DropdownRadio";
 
 export const ThemeDropdown = () => {
   const { theme, setTheme } = useTheme();

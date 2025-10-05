@@ -9,7 +9,7 @@ import type {
   SelectContentProps,
   SelectItemProps,
 } from "@radix-ui/react-select";
-import { DropdownSelect } from "../ui/DropdownSelect";
+import { DropdownSelect } from "../dropdown/DropdownSelect";
 
 type StringOrNode = string | React.ReactNode;
 

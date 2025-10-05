@@ -2,7 +2,7 @@ import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button, type ButtonProps } from "@/components/form/Button";
-import { Calendar, type CalendarProps } from "@/components/ui/Calendar";
+import { Calendar, type CalendarProps } from "@/components/date/Calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
 import React, { useState } from "react";
 import type { PopoverProps, PopoverTriggerProps, PopoverContentProps } from "@radix-ui/react-popover";
@@ -63,7 +63,7 @@ export function SingleDatePicker({
             ) : React.isValidElement(placeholder) ? (
               placeholder
             ) : (
-              <p className="text-foreground/60">{placeholder}</p>
+              <p className="text-foreground/75">{placeholder}</p>
             )}
             {icon}
           </Button>

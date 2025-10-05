@@ -4,7 +4,7 @@ import { useUser } from "@/contexts";
 import useForm from "@/hooks/useForm";
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import { HoshifyLogo } from "@/components/ui/Logo";
+import { HoshifyLogo } from "@/components/Logo";
 
 export const SigninPage = () => {
   const { signIn, loading, setLoading, isSignIn, user } = useUser();

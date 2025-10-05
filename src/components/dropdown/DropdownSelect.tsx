@@ -1,15 +1,8 @@
 import { cn } from "@/lib/utils";
-import { Select, SelectTrigger, SelectValue, SelectSeparator, SelectContent, SelectItem } from "./Select"; // Asumsi ini dari Shadcn atau custom lu
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../form/Select"; // Asumsi ini dari Shadcn atau custom lu
 import { capital } from "@/utils/manipulate/string";
 
-import type {
-  SelectProps,
-  SelectTriggerProps,
-  SelectValueProps,
-  SelectSeparatorProps,
-  SelectContentProps,
-  SelectItemProps,
-} from "@radix-ui/react-select";
+import type { SelectProps, SelectTriggerProps, SelectValueProps, SelectContentProps, SelectItemProps } from "@radix-ui/react-select";
 
 type StringOrNode = string | React.ReactNode;
 
@@ -20,7 +13,6 @@ type FormSelectProps = {
   selectProps?: SelectProps & React.RefAttributes<HTMLSelectElement>;
   triggerProps?: SelectTriggerProps & React.RefAttributes<HTMLButtonElement>;
   valueProps?: SelectValueProps & React.RefAttributes<HTMLSpanElement>;
-  separatorProps?: SelectSeparatorProps & React.RefAttributes<HTMLDivElement>;
   contentProps?: SelectContentProps & React.RefAttributes<HTMLDivElement>;
   itemProps?: SelectItemProps & React.RefAttributes<HTMLDivElement>;
   error?: string;
@@ -34,7 +26,6 @@ export const DropdownSelect = ({
   selectProps,
   triggerProps,
   valueProps,
-  separatorProps,
   contentProps,
   itemProps,
   error,
@@ -47,7 +38,6 @@ export const DropdownSelect = ({
         <SelectTrigger {...triggerProps} className={cn("cursor-pointer w-full", triggerProps?.className)}>
           <SelectValue placeholder={placeholder} {...valueProps} />
         </SelectTrigger>
-        <SelectSeparator {...separatorProps} />
         <SelectContent {...contentProps}>
           {values.map((val, idx) => {
             const { label, value, className, ...rest } = typeof val === "string" ? { label: capital(val.toLowerCase()), value: val } : val;

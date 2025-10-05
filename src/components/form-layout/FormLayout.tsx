@@ -11,8 +11,8 @@ import { FormSelect } from "./FormSelect";
 import { FormTextArea } from "./FormTextArea";
 import { FormSeparator } from "./FormSeparator";
 import { FormDirection } from "./FormDirection";
-import { SecAuthMethod } from "../form-layout-template/SecAuthMethod";
 import { FormSingleDatePicker } from "./FormDatepicker";
+import { SecAuthMethod } from "./template/SecAuthMethod";
 
 type FormValues<F extends FormFields = FormFields> = { form: FormGroup<F> };
 

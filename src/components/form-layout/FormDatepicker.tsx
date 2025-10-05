@@ -1,5 +1,5 @@
 import type { FormFields } from "@/types/form";
-import { SingleDatePicker, type SingleDatePickerProps } from "../ui/Datepicker";
+import { SingleDatePicker, type SingleDatePickerProps } from "../date/Datepicker";
 import { useFormLayout } from "./FormLayout";
 import dayjs from "dayjs";
 

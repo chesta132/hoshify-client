@@ -31,7 +31,7 @@ const defaultValues: LinkValues = {
 export const LinkContext = createContext<LinkValues>(defaultValues);
 
 export const LinkProvider = ({ children }: { children: React.ReactNode }) => {
-  const { setUser, isInitiated, isSignIn } = useUser();
+  const { isInitiated, isSignIn } = useUser();
   const [links, setLinks] = useState<Link[]>([]);
   const [pagination, setPagination] = useState<PaginationResult>({});
   const [loading, setLoading] = useState(false);
@@ -59,10 +59,6 @@ export const LinkProvider = ({ children }: { children: React.ReactNode }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInitiated, isSignIn]);
-
-  useEffect(() => {
-    setUser((prev) => ({ ...prev, links }));
-  }, [links, setUser]);
 
   const value: LinkValues = {
     links,

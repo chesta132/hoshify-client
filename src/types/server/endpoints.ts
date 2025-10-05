@@ -10,12 +10,12 @@ export type Redirect = never;
 
 export type SignInBody = UserCredentialBody & { rememberMe: boolean };
 export type SignUpBody = SignInBody & UserFullName;
-export type CreateTodoBody = Pick<Todo, "title" | "details" | "dueDate"> & Partial<Pick<Todo, "status">>;
-export type CreateNoteBody = Pick<Note, "title" | "details">;
+export type TodoBody = Pick<Todo, "title" | "details" | "dueDate"> & Partial<Pick<Todo, "status">>;
+export type NoteBody = Pick<Note, "title" | "details">;
 export type UserCredentialBody = Pick<User, "email"> & { password: string };
-export type CreateTransactionBody = Pick<Transaction, "type" | "title" | "amount"> & Partial<Pick<Transaction, "details">>;
-export type CreateScheduleBody = Pick<Schedule, "title" | "details"> & Partial<Pick<Schedule, "start" | "end">>;
-export type CreateLinkBody = Pick<Link, "link" | "title"> & Partial<Pick<Link, "position">>;
+export type TransactionBody = Pick<Transaction, "type" | "title" | "amount"> & Partial<Pick<Transaction, "details">>;
+export type ScheduleBody = Pick<Schedule, "title" | "details"> & Partial<Pick<Schedule, "start" | "end">>;
+export type LinkBody = Pick<Link, "link" | "title"> & Partial<Pick<Link, "position">>;
 
 export type RefreshConfig = "income" | "outcome" | "total";
 export type UserFullName = Pick<User, "fullName">;
@@ -81,40 +81,40 @@ export type UserEndpoints = {
 
 export type TodoEndpoints = {
   get: GetTemplate<"root", Todo> | GetTemplate<"param", Todo>;
-  post: RootTemplate<CreateTodoBody, Todo> | RootTemplate<CreateTodoBody[], Todo[]>;
-  put: RootTemplate<CreateTodoBody[], Todo[]> | ParamTemplate<CreateTodoBody, Todo>;
+  post: RootTemplate<TodoBody, Todo> | RootTemplate<TodoBody[], Todo[]>;
+  put: RootTemplate<TodoBody[], Todo[]> | ParamTemplate<TodoBody, Todo>;
   delete: DeleteTemplate<"root", Todo> | DeleteTemplate<"param", Todo>;
   patch: RestoresTemplate<"root", Todo> | RestoresTemplate<"param", Todo>;
 };
 
 export type NoteEndpoints = {
   get: GetTemplate<"root", Note> | GetTemplate<"param", Note>;
-  post: RootTemplate<CreateNoteBody, Note> | RootTemplate<CreateNoteBody[], Note[]>;
-  put: RootTemplate<CreateNoteBody[], Note[]> | ParamTemplate<CreateNoteBody, Note>;
+  post: RootTemplate<NoteBody, Note> | RootTemplate<NoteBody[], Note[]>;
+  put: RootTemplate<NoteBody[], Note[]> | ParamTemplate<NoteBody, Note>;
   delete: DeleteTemplate<"root", Note> | DeleteTemplate<"param", Note>;
   patch: RestoresTemplate<"root", Note> | RestoresTemplate<"param", Note>;
 };
 
 export type TransactionEndpoints = {
   get: GetTemplate<"root", Transaction> | GetTemplate<"param", Transaction>;
-  post: RootTemplate<CreateTransactionBody, Transaction> | RootTemplate<CreateTransactionBody[], Transaction[]>;
-  put: RootTemplate<CreateTransactionBody, Transaction>;
+  post: RootTemplate<TransactionBody, Transaction> | RootTemplate<TransactionBody[], Transaction[]>;
+  put: RootTemplate<TransactionBody, Transaction>;
   delete: DeleteTemplate<"root", Transaction> | DeleteTemplate<"param", Transaction>;
   patch: RestoresTemplate<"root", Transaction> | RestoresTemplate<"param", Transaction>;
 };
 
 export type ScheduleEndpoints = {
   get: GetTemplate<"root", Schedule> | GetTemplate<"param", Schedule>;
-  post: RootTemplate<CreateScheduleBody, Schedule> | RootTemplate<CreateScheduleBody[], Schedule[]>;
-  put: ParamTemplate<CreateScheduleBody, Schedule> | RootTemplate<CreateScheduleBody[], Schedule[]>;
+  post: RootTemplate<ScheduleBody, Schedule> | RootTemplate<ScheduleBody[], Schedule[]>;
+  put: ParamTemplate<ScheduleBody, Schedule> | RootTemplate<ScheduleBody[], Schedule[]>;
   delete: DeleteTemplate<"root", Schedule> | DeleteTemplate<"param", Schedule>;
   patch: RestoresTemplate<"root", Schedule> | RestoresTemplate<"param", Schedule>;
 };
 
 export type LinkEndpoints = {
   get: GetTemplate<"root", Link> | GetTemplate<"param", Link>;
-  post: RootTemplate<CreateLinkBody, Link> | RootTemplate<CreateLinkBody[], Link[]>;
-  put: ParamTemplate<CreateLinkBody, Link> | RootTemplate<CreateLinkBody[], Link[]>;
+  post: RootTemplate<LinkBody, Link> | RootTemplate<LinkBody[], Link[]>;
+  put: ParamTemplate<LinkBody, Link> | RootTemplate<LinkBody[], Link[]>;
   delete: DeleteTemplate<"root", Link> | DeleteTemplate<"param", Link>;
   patch: never;
 };

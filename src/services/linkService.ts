@@ -3,7 +3,7 @@ import { Request } from "@/class/server/Request";
 import type { PaginationResult } from "@/class/server/ServerSuccess";
 import { useError } from "@/contexts";
 import type { Link } from "@/types/models";
-import type { BodyOf, CreateLinkBody, LinkEndpoints } from "@/types/server/endpoints";
+import type { BodyOf, LinkBody, LinkEndpoints } from "@/types/server/endpoints";
 import { useMemo } from "react";
 
 type LinkServiceProps = {
@@ -13,11 +13,11 @@ type LinkServiceProps = {
 };
 
 export type LinkServices = {
-  updateLink: Request<Link, [updates: CreateLinkBody & { id: string }]>;
-  createLink: Request<Link[], [body: CreateLinkBody | CreateLinkBody[]]>;
+  updateLink: Request<Link, [updates: LinkBody & { id: string }]>;
+  createLink: Request<Link[], [body: LinkBody | LinkBody[]]>;
   deleteLink: Request<Link, [id: string]>;
   getLinks: Request<Link[], [offset: number | "sequel"]>;
-  updateLinks: Request<Link[], [updates: CreateLinkBody[]]>;
+  updateLinks: Request<Link[], [updates: LinkBody[]]>;
 };
 
 export function useLinkService({ setLoading, setLinks, pagination }: LinkServiceProps): LinkServices {

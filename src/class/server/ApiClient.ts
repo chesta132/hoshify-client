@@ -65,6 +65,7 @@ export class ApiClient<
       this.money = new ApiClient(baseURL, "/money");
       this.transaction = new ApiClient(baseURL, "/transactions");
       this.link = new ApiClient(baseURL, "/links");
+      this.note = new ApiClient(baseURL, "/notes");
     }
 
     this.api.interceptors.response.use(

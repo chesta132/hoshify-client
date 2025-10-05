@@ -1,5 +1,5 @@
 export type CharOptions = {
-  fontSize: number;
+  fontSize?: number;
   fontFamily?: "Manrope" | "Inter" | (string & {});
   text: string;
 };
@@ -7,7 +7,7 @@ export type CharOptions = {
 const canvas = document.createElement("canvas");
 const ctx = canvas.getContext("2d")!;
 
-export const getMaxChar = (width: number, { fontSize, fontFamily = "Manrope", text }: CharOptions) => {
+export const getMaxChar = (width: number, { fontSize = 16, fontFamily = "Manrope", text }: CharOptions) => {
   ctx.font = `${fontSize}px ${fontFamily}, sans-serif`;
 
   let low = 0;

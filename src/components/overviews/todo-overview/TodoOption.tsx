@@ -15,8 +15,13 @@ export const TodoOption = ({ todo }: { todo: Todo }) => {
 
   return (
     <div className="rounded-[12px] border-[0.8px] border-border bg-card-foreground/5 flex justify-between px-3 py-2 text-sm" key={todo.id}>
-      <div className="gap-3 flex">
-        <Checkbox classBox="bg-card dark:bg-card" checked={todo.status === "COMPLETED"} onCheckedChange={(val) => setComplete(todo.id, val)} />
+      <div className="gap-3 flex items-center">
+        <Checkbox
+          classBox="bg-card dark:bg-card"
+          id={todo.id}
+          checked={todo.status === "COMPLETED"}
+          onCheckedChange={(val) => setComplete(todo.id, val)}
+        />
         <span
           className={cn(
             todo.status === "ACTIVE" &&

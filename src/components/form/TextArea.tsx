@@ -50,7 +50,7 @@ export const TextArea = ({
       <textarea
         ref={textAreaRef}
         className={cn(
-          "w-full px-3 py-3 border border-accent text-accent-foreground rounded-md transition-all duration-200 ease-in-out focus:outline-none focus:border-accent",
+          "w-full p-3 border border-accent text-foreground transition-all duration-200 ease-in-out focus:outline-none focus:border-accent rounded-md",
           error && "border-red-500!",
           focusRing && "focus:ring-2 focus:ring-primary/30",
           classTextArea

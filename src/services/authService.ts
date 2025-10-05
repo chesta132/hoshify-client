@@ -31,7 +31,6 @@ export const useAuthService = ({ setLoading, setUser }: AuthServiceProps): AuthS
         .loading(setLoading)
         .onSuccess(() => setIsSignIn(true))
         .mergeState(setUser)
-        .retry(3)
         .config({ handleError: { setError } }),
     [setLoading, setUser, setError]
   );

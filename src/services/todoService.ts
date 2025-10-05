@@ -3,7 +3,7 @@ import { Request } from "@/class/server/Request";
 import type { PaginationResult } from "@/class/server/ServerSuccess";
 import { useError } from "@/contexts";
 import type { Todo } from "@/types/models";
-import type { BodyOf, CreateTodoBody, TodoEndpoints } from "@/types/server/endpoints";
+import type { BodyOf, TodoBody, TodoEndpoints } from "@/types/server/endpoints";
 import { useMemo } from "react";
 
 type TodoServiceProps = {
@@ -13,11 +13,11 @@ type TodoServiceProps = {
 };
 
 export type TodoServices = {
-  updateTodo: Request<Todo, [updates: CreateTodoBody & { id: string }]>;
-  createTodo: Request<Todo[], [body: CreateTodoBody | CreateTodoBody[]]>;
+  updateTodo: Request<Todo, [updates: TodoBody & { id: string }]>;
+  createTodo: Request<Todo[], [body: TodoBody | TodoBody[]]>;
   deleteTodo: Request<Todo, [id: string]>;
   getTodos: Request<Todo[], [offset: number | "sequel"]>;
-  updateTodos: Request<Todo[], [updates: CreateTodoBody[]]>;
+  updateTodos: Request<Todo[], [updates: TodoBody[]]>;
 };
 
 export function useTodoService({ setLoading, setTodos, pagination }: TodoServiceProps): TodoServices {

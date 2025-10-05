@@ -35,7 +35,7 @@ const defaultValues: MoneyValues = {
 export const MoneyContext = createContext<MoneyValues>(defaultValues);
 
 export const MoneyProvider = ({ children }: { children: React.ReactNode }) => {
-  const { setUser, isInitiated, isSignIn } = useUser();
+  const { isInitiated, isSignIn } = useUser();
   const [money, setMoney] = useState(defaultMonet);
   const [loading, setLoading] = useState(false);
 
@@ -58,10 +58,6 @@ export const MoneyProvider = ({ children }: { children: React.ReactNode }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInitiated, isSignIn]);
-
-  useEffect(() => {
-    setUser((prev) => ({ ...prev, money }));
-  }, [money, setUser]);
 
   const value: MoneyValues = {
     money,

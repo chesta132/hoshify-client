@@ -31,7 +31,7 @@ const defaultValues: TodosValues = {
 export const TodoContext = createContext(defaultValues);
 
 export const TodosProvider = ({ children }: { children: React.ReactNode }) => {
-  const { isSignIn, isInitiated, setUser } = useUser();
+  const { isSignIn, isInitiated } = useUser();
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState<PaginationResult>({});
@@ -77,10 +77,6 @@ export const TodosProvider = ({ children }: { children: React.ReactNode }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInitiated, isSignIn]);
-
-  useEffect(() => {
-    setUser((prev) => ({ ...prev, todos }));
-  }, [setUser, todos]);
 
   const value: TodosValues = {
     loading,

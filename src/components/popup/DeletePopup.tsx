@@ -3,6 +3,7 @@ import { Button } from "../form/Button";
 import React from "react";
 
 type DeletePopupProps = {
+  titleItem: string;
   item: string;
   onDelete?: () => any;
   onCancel?: () => any;
@@ -10,10 +11,10 @@ type DeletePopupProps = {
   info?: React.ReactNode;
 };
 
-export const DeletePopup = ({ item, onCancel, onDelete, permanent, info }: DeletePopupProps) => {
+export const DeletePopup = ({ titleItem, onCancel, onDelete, permanent, info, item }: DeletePopupProps) => {
   return (
     <div className="fixed-center bg-card p-5 border border-border rounded-md text-start min-w-80 max-w-xl">
-      <h1 className="font-heading text-[17px] font-medium">Delete {item}</h1>
+      <h1 className="font-heading text-[17px] font-medium">Delete {titleItem}</h1>
       <div className="h-px bg-border w-full my-2" />
       <div className="text-sm flex flex-col gap-2">
         <p>Are you sure you want to delete {item}?</p>

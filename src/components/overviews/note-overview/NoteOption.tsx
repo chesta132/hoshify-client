@@ -1,14 +1,17 @@
 import { Button } from "@/components/form/Button";
+import { DeletePopup } from "@/components/popup/DeletePopup";
+import { Popup } from "@/components/popup/Popup";
 import { useNote } from "@/contexts";
 import { cn } from "@/lib/utils";
 import type { Note } from "@/types/models";
 import { ArrowDown, Info, Trash } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 export const NoteOption = ({ note, expanded, setExpanded }: { note: Note; expanded: boolean; setExpanded: (val: boolean) => void }) => {
   const { deleteNote } = useNote();
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const [deletePopup, setDeletePopup] = useState(false);
 
   const handleDelete = () => {
     deleteNote.exec(note.id);
@@ -27,7 +30,7 @@ export const NoteOption = ({ note, expanded, setExpanded }: { note: Note; expand
           <Button variant={"outline"} size={"icon"}>
             <Info size={16} />
           </Button>
-          <Button variant={"outline"} size={"icon"} onClick={handleDelete}>
+          <Button variant={"outline"} size={"icon"} onClick={() => setDeletePopup(true)}>
             <Trash size={16} />
           </Button>
           <Button variant={"outline"} size={"icon"} onClick={() => setExpanded(!expanded)}>
@@ -49,6 +52,18 @@ export const NoteOption = ({ note, expanded, setExpanded }: { note: Note; expand
               {note.details}
             </motion.div>
           </>
+        )}
+        {deletePopup && (
+          <Popup blur>
+            <motion.div
+              initial={{ y: -50, opacity: 0 }}
+              animate={{ y: 0, opacity: 100 }}
+              exit={{ y: -50, opacity: 0 }}
+              transition={{ type: "keyframes", duration: 0.1 }}
+            >
+              <DeletePopup titleItem="note" item={note.title} onDelete={handleDelete} onCancel={() => setDeletePopup(false)} />
+            </motion.div>
+          </Popup>
         )}
       </AnimatePresence>
     </div>

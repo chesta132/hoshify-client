@@ -1,13 +1,18 @@
 import { Button } from "@/components/form/Button";
 import { Checkbox } from "@/components/form/Checkbox";
+import { DeletePopup } from "@/components/popup/DeletePopup";
+import { Popup } from "@/components/popup/Popup";
 import { useTodo } from "@/contexts";
 import { cn } from "@/lib/utils";
 import type { Todo } from "@/types/models";
 import { timeInMs } from "@/utils/manipulate/number";
 import { Info, Trash } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { useState } from "react";
 
 export const TodoOption = ({ todo }: { todo: Todo }) => {
   const { setComplete, deleteTodo } = useTodo();
+  const [deletePopup, setDeletePopup] = useState(false);
 
   const handleDelete = () => {
     deleteTodo.exec(todo.id);
@@ -39,10 +44,24 @@ export const TodoOption = ({ todo }: { todo: Todo }) => {
         <Button variant={"outline"} size={"icon"}>
           <Info size={16} />
         </Button>
-        <Button variant={"outline"} size={"icon"} onClick={handleDelete}>
+        <Button variant={"outline"} size={"icon"} onClick={() => setDeletePopup(true)}>
           <Trash size={16} />
         </Button>
       </div>
+      <AnimatePresence>
+        {deletePopup && (
+          <Popup blur>
+            <motion.div
+              initial={{ y: -50, opacity: 0 }}
+              animate={{ y: 0, opacity: 100 }}
+              exit={{ y: -50, opacity: 0 }}
+              transition={{ type: "keyframes", duration: 0.1 }}
+            >
+              <DeletePopup titleItem="todo" item={todo.title} onDelete={handleDelete} onCancel={() => setDeletePopup(false)} />
+            </motion.div>
+          </Popup>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

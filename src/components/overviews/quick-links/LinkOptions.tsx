@@ -124,7 +124,7 @@ export const LinkOptions = ({ setPopup, link: linkProp, isDrag, optionIndex, set
             <li role="none">
               <button
                 role="menuitem"
-                className="w-full pl-4 pr-7 py-2 text-start hover:bg-card-foreground/20 focus:outline-none focus:bg-card-foreground/20"
+                className="cursor-pointer w-full pl-4 pr-7 py-2 text-start hover:bg-card-foreground/20 focus:outline-none focus:bg-card-foreground/20"
                 onClick={handlePopup(`edit/${id}`)}
                 aria-label={`Edit ${title} link`}
               >
@@ -134,7 +134,7 @@ export const LinkOptions = ({ setPopup, link: linkProp, isDrag, optionIndex, set
             <li role="none">
               <button
                 role="menuitem"
-                className="w-full pl-4 py-2 text-start hover:bg-card-foreground/20 focus:outline-none focus:bg-card-foreground/20"
+                className="cursor-pointer w-full pl-4 py-2 text-start hover:bg-card-foreground/20 focus:outline-none focus:bg-card-foreground/20"
                 onClick={() => deleteLink.exec(id)}
                 aria-label={`Delete ${title} link`}
               >

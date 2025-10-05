@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router";
-import { DashboardPage } from "./pages/dashboard/DashboardPage";
+import { DashboardPage } from "./pages/DashboardPage";
 import { Layout } from "./layouts/Layout";
 import { AppearanceProvider } from "./contexts/appearance/AppearanceContext";
 import "./utils/extends";

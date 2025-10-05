@@ -19,5 +19,5 @@ export const FormSubmit = ({ className, ...props }: ButtonProps) => {
 };
 
 export const FormCancel = ({ className, ...props }: ButtonProps) => {
-  return <Button variant={"outline"} className={cn("hover:bg-red-500 dark:hover:bg-red-500 hover:text-white", className)} type="button" {...props} />;
+  return <Button variant={"outline"} className={cn("hover:bg-red-600 dark:hover:bg-red-600 hover:text-white", className)} type="button" {...props} />;
 };

@@ -1,5 +1,5 @@
 import { useUser } from "@/contexts";
-import { QuickLinks } from "../../components/overviews/quick-links/QuickLinks";
+import { QuickLinks } from "../components/overviews/quick-links/QuickLinks";
 import { MoneyOverview } from "@/components/overviews/money-overview/MoneyOverview";
 import { TodoOverview } from "@/components/overviews/todo-overview/TodoOverview";
 import { NoteOverview } from "@/components/overviews/note-overview/NoteOverview";

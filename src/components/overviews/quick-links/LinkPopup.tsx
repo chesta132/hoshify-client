@@ -5,10 +5,14 @@ import { motion } from "motion/react";
 import { useEffect, useMemo } from "react";
 import { type Popup } from "./QuickLinks";
 import { pick } from "@/utils/manipulate/object";
-import { useLink, useUser } from "@/contexts";
+import { useLink } from "@/contexts";
 
-export function LinkPopup({ popup, setPopup }: { popup: Popup; setPopup: React.Dispatch<React.SetStateAction<Popup>> }) {
-  const { user } = useUser();
+type LinkPopupProps = {
+  popup: Popup;
+  setPopup: React.Dispatch<React.SetStateAction<Popup>>;
+};
+
+export function LinkPopup({ popup, setPopup }: LinkPopupProps) {
   const { createLink, links, updateLink, loading } = useLink();
   const formSchema = useMemo(() => ({ link: "", title: "" }), []);
   const formGroup = useForm(formSchema, { link: true, title: { max: 100 } });
@@ -21,6 +25,7 @@ export function LinkPopup({ popup, setPopup }: { popup: Popup; setPopup: React.D
     error: [_, setFormError],
     validate: { compareOld },
   } = formGroup;
+  const oldLink = !isAdd && links.find((link) => link.id === editId);
 
   useEffect(() => {
     if (!isAdd) {
@@ -36,7 +41,6 @@ export function LinkPopup({ popup, setPopup }: { popup: Popup; setPopup: React.D
 
   const handleUpdate = () => {
     if (!currentLink) return;
-    const oldLink = user.links.find((link) => link.id === currentLink.id);
     if (!oldLink || !compareOld(pick(oldLink, ["link", "title"]))) return;
     return updateLink.exec({ ...currentLink, ...form });
   };

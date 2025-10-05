@@ -61,7 +61,6 @@ export const LinkOptions = ({ setPopup, link: linkProp, isDrag, optionIndex, set
       handleLinkClick();
     }
   };
-  console.debug(newLiner(title, { fontSize: 16, px: 80 }));
 
   return (
     <div

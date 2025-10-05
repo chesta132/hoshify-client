@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import type React from "react";
+import { useEffect } from "react";
 
 type Position = "center" | "bottom" | "top";
 
@@ -8,10 +9,17 @@ type PopupProps = {
   blur?: boolean;
   children: React.ReactNode;
   className?: string;
+  bodyScroll?: boolean;
 };
 
-export const Popup = ({ position = "center", blur = false, className, children }: PopupProps) => {
+export const Popup = ({ position = "center", blur = false, className, children, bodyScroll }: PopupProps) => {
   const arrPosition = position as Position[];
+  useEffect(() => {
+    if (bodyScroll) {
+      document.body.classList.add("overflow-hidden");
+      return () => document.body.classList.remove("overflow-hidden");
+    }
+  }, [bodyScroll]);
 
   return (
     <div

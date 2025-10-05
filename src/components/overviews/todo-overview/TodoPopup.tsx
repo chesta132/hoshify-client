@@ -26,7 +26,7 @@ export const TodoPopup = ({ formGroup, setIsOpen }: TodoPopupProps) => {
   };
 
   return (
-    <Popup blur>
+    <Popup blur bodyScroll>
       <motion.div
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 100 }}

@@ -61,6 +61,7 @@ export const LinkOptions = ({ setPopup, link: linkProp, isDrag, optionIndex, set
       handleLinkClick();
     }
   };
+  console.debug(newLiner(title, { fontSize: 16, px: 80 }));
 
   return (
     <div
@@ -89,7 +90,7 @@ export const LinkOptions = ({ setPopup, link: linkProp, isDrag, optionIndex, set
           draggable={false}
         />
       )}
-      <span className="pointer-events-none select-none">{ellipsis(newLiner(title, { fontSize: 16, px: 80 }), { px: 145, fontSize: 16 })}</span>
+      <span className="pointer-events-none select-none whitespace-break-spaces">{ellipsis(newLiner(title, { fontSize: 16, px: 80 }), { px: 145, fontSize: 16 })}</span>
       <button
         ref={infoButtonRef}
         type="button"

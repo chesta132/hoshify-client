@@ -86,7 +86,7 @@ export const QuickLinks = () => {
         <div
           ref={addRef}
           onClick={handlePopup("add")}
-          className="cursor-pointer flex flex-col justify-between items-center gap-1 text-center px-2 py-3 min-w-20 hover:bg-muted rounded-md shrink-0"
+          className="cursor-pointer flex flex-col items-center gap-1 text-center px-2 py-3 min-w-20 hover:bg-muted rounded-md shrink-0"
         >
           <Button variant={"outline"} className="size-10">
             <Plus />

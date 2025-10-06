@@ -10,8 +10,14 @@ import { useRef, useState } from "react";
 
 export const NoteOption = ({ note, expanded, setExpanded }: { note: Note; expanded: boolean; setExpanded: (val: boolean) => void }) => {
   const { deleteNote } = useNote();
-  const wrapperRef = useRef<HTMLDivElement>(null);
   const [deletePopup, setDeletePopup] = useState(false);
+  const [wrapperRect, setWrapperRect] = useState<DOMRect | null>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const handleResize = useDebounce(({ target }: ResizeObserverEntry) => {
+    setWrapperRect(target.getBoundingClientRect());
+  }, 200);
+  useResize(wrapperRef, handleResize);
 
   const handleDelete = () => {
     deleteNote.exec(note.id);
@@ -20,11 +26,14 @@ export const NoteOption = ({ note, expanded, setExpanded }: { note: Note; expand
   return (
     <div
       className={cn("rounded-[12px] border-[0.8px] border-border bg-card-foreground/5 px-3 py-2 text-sm transition-[padding]", expanded && "py-3")}
-      key={note.id}
       ref={wrapperRef}
     >
       <div className="flex justify-between gap-2 items-center">
-        <span className="wrap-anywhere">{note.title}</span>
+        <span className="wrap-anywhere">
+          {ellipsis(note.title, {
+            px: ((wrapperRect?.width || 500) - 120) * 2,
+          })}
+        </span>
         <div className="gap-2 flex h-fit">
           {/* INFO PAGE WIP */}
           <Button variant={"outline"} size={"icon"}>

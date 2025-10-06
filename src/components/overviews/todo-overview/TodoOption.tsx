@@ -16,13 +16,20 @@ type TodoOptionProps = {
 export const TodoOption = ({ todo, setIsInfo }: TodoOptionProps) => {
   const { setComplete, deleteTodo, getTextColorByStatus } = useTodo();
   const [deletePopup, setDeletePopup] = useState(false);
+  const [wrapperRect, setWrapperRect] = useState<DOMRect | null>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const handleResize = useDebounce(({ target }: ResizeObserverEntry) => {
+    setWrapperRect(target.getBoundingClientRect());
+  }, 200);
+  useResize(wrapperRef, handleResize);
 
   const handleDelete = () => {
     deleteTodo.exec(todo.id);
   };
 
   return (
-    <div className="rounded-[12px] border-[0.8px] border-border bg-card-foreground/5 flex justify-between px-3 py-2 text-sm" key={todo.id}>
+    <div className="rounded-[12px] border-[0.8px] border-border bg-card-foreground/5 flex justify-between px-3 py-2 text-sm" ref={wrapperRef}>
       <div className="gap-3 flex items-center">
         <Checkbox
           classBox="bg-card dark:bg-card"
@@ -30,7 +37,11 @@ export const TodoOption = ({ todo, setIsInfo }: TodoOptionProps) => {
           checked={todo.status === "COMPLETED"}
           onCheckedChange={(val) => setComplete(todo.id, val)}
         />
-        <span className={getTextColorByStatus(todo)}>{todo.title}</span>
+        <span className={cn("wrap-anywhere", getTextColorByStatus(todo))}>
+          {ellipsis(todo.title, {
+            px: ((wrapperRect?.width || 500) - 120) * 2,
+          })}
+        </span>
       </div>
       <div className="gap-2 flex items-center">
         <Button variant={"outline"} size={"icon"} onClick={() => setIsInfo?.(todo.id)}>

@@ -5,6 +5,8 @@ import { useTodoService, type TodoServices } from "@/services/models/todoService
 import { type PaginationResult } from "@/services/server/ServerSuccess";
 import { Request } from "@/services/server/Request";
 import api from "@/services/server/ApiClient";
+import { timeInMs } from "@/utils/manipulate/number";
+import type { Dayjs } from "dayjs";
 
 type TodosValues = {
   todos: Todo[];
@@ -13,6 +15,7 @@ type TodosValues = {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setComplete: (id: string, complete: boolean) => Promise<void>;
   getBgByStatus: (status: TodoStatus) => string;
+  getTextColorByStatus: (todo: Todo) => string;
 } & TodoServices;
 
 const defaultValues: TodosValues = {
@@ -26,6 +29,7 @@ const defaultValues: TodosValues = {
   updateTodo: new Request(() => api.todo.get("/")),
   updateTodos: new Request(() => api.todo.get("/")),
   getBgByStatus: () => "",
+  getTextColorByStatus: () => "",
   async setComplete() {},
 };
 
@@ -77,6 +81,22 @@ export const TodosProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const isRed = (dueDate: Dayjs) => dueDate.valueOf() < Date.now() || dueDate.valueOf() < Date.now() + timeInMs({ day: 3 });
+  const isAmber = (dueDate: Dayjs) => dueDate.valueOf() > Date.now() - timeInMs({ day: 5 });
+
+  const getTextColorByStatus = (todo: Todo) => {
+    switch (todo.status) {
+      case "ACTIVE":
+        return isRed(todo.dueDate) ? "text-red-600" : isAmber(todo.dueDate) ? "text-amber-500" : "text-foreground";
+      case "COMPLETED":
+        return "line-through text-foreground/40";
+      case "PENDING":
+        return isRed(todo.dueDate) ? "text-red-600/70" : isAmber(todo.dueDate) ? "text-amber-500/70" : "text-foreground/70";
+      case "CANCELED":
+        return "text-gray-400";
+    }
+  };
+
   const value: TodosValues = {
     loading,
     setLoading,
@@ -89,6 +109,7 @@ export const TodosProvider = ({ children }: { children: React.ReactNode }) => {
     updateTodos,
     setComplete,
     getBgByStatus,
+    getTextColorByStatus,
   };
 
   return <TodoContext.Provider value={value}>{children}</TodoContext.Provider>;

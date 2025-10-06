@@ -3,9 +3,7 @@ import { Checkbox } from "@/components/form/Checkbox";
 import { DeletePopup } from "@/components/popup/DeletePopup";
 import { Popup } from "@/components/popup/Popup";
 import { useTodo } from "@/contexts";
-import { cn } from "@/lib/utils";
 import type { Todo } from "@/types/models";
-import { timeInMs } from "@/utils/manipulate/number";
 import { Info, Trash } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import { useState } from "react";
@@ -16,7 +14,7 @@ type TodoOptionProps = {
 };
 
 export const TodoOption = ({ todo, setIsInfo }: TodoOptionProps) => {
-  const { setComplete, deleteTodo } = useTodo();
+  const { setComplete, deleteTodo, getTextColorByStatus } = useTodo();
   const [deletePopup, setDeletePopup] = useState(false);
 
   const handleDelete = () => {
@@ -32,17 +30,7 @@ export const TodoOption = ({ todo, setIsInfo }: TodoOptionProps) => {
           checked={todo.status === "COMPLETED"}
           onCheckedChange={(val) => setComplete(todo.id, val)}
         />
-        <span
-          className={cn(
-            todo.status === "ACTIVE" &&
-              (todo.dueDate.valueOf() < Date.now() ? "text-red-600" : todo.dueDate.valueOf() > Date.now() - timeInMs({ day: 5 }) && "text-amber-500"),
-            todo.status === "COMPLETED" && "line-through text-gray-500",
-            todo.status === "PENDING" && "text-gray-700",
-            todo.status === "CANCELED" && "text-gray-400"
-          )}
-        >
-          {todo.title}
-        </span>
+        <span className={getTextColorByStatus(todo)}>{todo.title}</span>
       </div>
       <div className="gap-2 flex items-center">
         <Button variant={"outline"} size={"icon"} onClick={() => setIsInfo?.(todo.id)}>

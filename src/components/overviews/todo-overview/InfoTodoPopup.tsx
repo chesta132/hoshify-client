@@ -5,7 +5,7 @@ import { ReadMore } from "@/components/toggle/ReadMore";
 import { useTodo } from "@/contexts";
 import { cn } from "@/lib/utils";
 import type { Todo } from "@/types/models";
-import { capital } from "@/utils/manipulate/string";
+import { capital, kebab } from "@/utils/manipulate/string";
 import { Clock, Info, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useRef, useState } from "react";
@@ -17,7 +17,7 @@ type InfoTodoPopupProps = {
 };
 
 export const InfoTodoPopup = ({ todo, setClose }: InfoTodoPopupProps) => {
-  const { getBgByStatus, deleteTodo } = useTodo();
+  const { getBgByStatus, deleteTodo, getTextColorByStatus } = useTodo();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const [deletePopup, setDeletePopup] = useState(false);
@@ -29,7 +29,8 @@ export const InfoTodoPopup = ({ todo, setClose }: InfoTodoPopupProps) => {
   const timeline = [
     { title: "Created at", date: todo.createdAt },
     { title: "Last updated", date: todo.updatedAt },
-  ];
+    { title: "Due date", date: todo.dueDate },
+  ] as const;
 
   return (
     <Popup blur>
@@ -66,9 +67,9 @@ export const InfoTodoPopup = ({ todo, setClose }: InfoTodoPopupProps) => {
             </span>
             <div className="p-3 rounded-lg bg-background/65 border-1 border-border text-foreground/95">
               {timeline.map(({ date, title }) => (
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center" key={kebab(title.toLowerCase())}>
                   <span>{title}</span>
-                  <span>{date.format("MMMM D, YYYY")}</span>
+                  <span className={cn(title === "Due date" && getTextColorByStatus(todo))}>{date.format("MMMM D, YYYY")}</span>
                 </div>
               ))}
             </div>

@@ -34,7 +34,13 @@ export const NoteOption = ({ note, expanded, setExpanded }: { note: Note; expand
             <Trash size={16} />
           </Button>
           <Button variant={"outline"} size={"icon"} onClick={() => setExpanded(!expanded)}>
-            <ArrowDown size={16} className={cn("transition-transform", expanded && "rotate-180")} />
+            <ArrowDown
+              size={16}
+              aria-expanded={expanded}
+              aria-describedby={`note-${note.title}-details`}
+              aria-label="Toggle note details"
+              className={cn("transition-transform", expanded && "rotate-180")}
+            />
           </Button>
         </div>
       </div>
@@ -42,7 +48,8 @@ export const NoteOption = ({ note, expanded, setExpanded }: { note: Note; expand
         {expanded && (
           <>
             <div className="h-px w-full bg-border my-1" role="separator" />
-            <motion.div
+            <motion.p
+              id={`note-${note.title}-details`}
               initial={{ height: 0 }}
               animate={{ height: "auto" }}
               exit={{ height: 0 }}
@@ -50,7 +57,7 @@ export const NoteOption = ({ note, expanded, setExpanded }: { note: Note; expand
               className="p-3 rounded-lg overflow-hidden bg-background/65 border-2 border-border text-foreground/95"
             >
               {note.details}
-            </motion.div>
+            </motion.p>
           </>
         )}
         {deletePopup && (

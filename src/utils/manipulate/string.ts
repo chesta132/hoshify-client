@@ -146,21 +146,31 @@ export const newLiner = (text: string, width: WidthOptions & { maxSlice?: number
   const { fontSize, px, fontFamily, maxSlice } = width;
   const limit = getMaxChar(px, { text, fontSize, fontFamily });
 
+  if (limit <= 0 || !text) return text;
   if (text.length <= limit) return text;
 
-  const hasLatin = /[a-zA-Z]/.test(text);
-
+  const breakChars = [" ", ".", "_", "-", ",", ";", ":", "/", "\\", "!", "?"];
   let cut = limit;
 
-  if (hasLatin) {
-    const vocal = ["a", "i", "u", "e", "o"];
-    const lastVocal = vocal.map((v) => text.slice(0, limit).lastIndexOf(v)).sort((a, b) => b - a)[0];
-
-    if (lastVocal > 0) {
-      cut = lastVocal + 1;
+  for (let i = limit; i > 0; i--) {
+    if (breakChars.includes(text[i - 1])) {
+      cut = i;
+      break;
     }
   }
 
+  if (cut === limit) {
+    const hasLatin = /[a-zA-Z]/.test(text);
+    if (hasLatin) {
+      const vocal = ["a", "i", "u", "e", "o"];
+      const lastVocal = vocal.map((v) => text.slice(0, limit).lastIndexOf(v)).sort((a, b) => b - a)[0];
+      if (lastVocal > 0) {
+        cut = lastVocal + 1;
+      }
+    }
+  }
+
+  cut = Math.max(1, cut);
   if (maxSlice && text.length - cut > maxSlice) {
     cut = limit;
   }

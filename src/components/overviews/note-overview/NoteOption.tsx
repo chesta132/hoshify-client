@@ -2,13 +2,23 @@ import { Button } from "@/components/form/Button";
 import { DeletePopup } from "@/components/popup/DeletePopup";
 import { Popup } from "@/components/popup/Popup";
 import { useNote } from "@/contexts";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useResize } from "@/hooks/useEventListener";
 import { cn } from "@/lib/utils";
 import type { Note } from "@/types/models";
+import { ellipsis } from "@/utils/manipulate/string";
 import { ArrowDown, Info, Trash } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useRef, useState } from "react";
 
-export const NoteOption = ({ note, expanded, setExpanded }: { note: Note; expanded: boolean; setExpanded: (val: boolean) => void }) => {
+type NoteOptionProps = {
+  setInfo: React.Dispatch<React.SetStateAction<string | null>>;
+  note: Note;
+  expanded: boolean;
+  setExpanded: (val: boolean) => void;
+};
+
+export const NoteOption = ({ note, expanded, setExpanded, setInfo }: NoteOptionProps) => {
   const { deleteNote } = useNote();
   const [deletePopup, setDeletePopup] = useState(false);
   const [wrapperRect, setWrapperRect] = useState<DOMRect | null>(null);
@@ -35,8 +45,7 @@ export const NoteOption = ({ note, expanded, setExpanded }: { note: Note; expand
           })}
         </span>
         <div className="gap-2 flex h-fit">
-          {/* INFO PAGE WIP */}
-          <Button variant={"outline"} size={"icon"}>
+          <Button variant={"outline"} size={"icon"} onClick={() => setInfo(note.id)}>
             <Info size={16} />
           </Button>
           <Button variant={"outline"} size={"icon"} onClick={() => setDeletePopup(true)}>

@@ -39,7 +39,7 @@ export const CreateNotePopup = ({ formGroup, setIsOpen }: CreateNotePopupProps) 
         </div>
         <FormLayout form={formGroup} onFormSubmit={handleSubmit}>
           <FormLayout.input size="sm" classLabel="bg-popover" label="Title" placeholder="Note title" fieldId="title" />
-          <FormLayout.textarea classLabel="bg-popover" label="Details" placeholder="Note details" fieldId="details" />
+          <FormLayout.textarea classLabel="bg-popover" label="Details" placeholder="Note details" fieldId="details" classTextArea="max-h-64" />
           <FormLayout.direction position={"right"}>
             <FormLayout.cancel
               onClick={() => {

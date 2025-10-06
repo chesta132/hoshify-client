@@ -3,17 +3,21 @@ import { Checkbox } from "@/components/form/Checkbox";
 import { DeletePopup } from "@/components/popup/DeletePopup";
 import { Popup } from "@/components/popup/Popup";
 import { useTodo } from "@/contexts";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useResize } from "@/hooks/useEventListener";
+import { cn } from "@/lib/utils";
 import type { Todo } from "@/types/models";
+import { ellipsis } from "@/utils/manipulate/string";
 import { Info, Trash } from "lucide-react";
 import { AnimatePresence } from "motion/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 type TodoOptionProps = {
   todo: Todo;
-  setIsInfo?: React.Dispatch<React.SetStateAction<string | null>>;
+  setInfo: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
-export const TodoOption = ({ todo, setIsInfo }: TodoOptionProps) => {
+export const TodoOption = ({ todo, setInfo }: TodoOptionProps) => {
   const { setComplete, deleteTodo, getTextColorByStatus } = useTodo();
   const [deletePopup, setDeletePopup] = useState(false);
   const [wrapperRect, setWrapperRect] = useState<DOMRect | null>(null);
@@ -44,7 +48,7 @@ export const TodoOption = ({ todo, setIsInfo }: TodoOptionProps) => {
         </span>
       </div>
       <div className="gap-2 flex items-center">
-        <Button variant={"outline"} size={"icon"} onClick={() => setIsInfo?.(todo.id)}>
+        <Button variant={"outline"} size={"icon"} onClick={() => setInfo(todo.id)}>
           <Info size={16} />
         </Button>
         <Button variant={"outline"} size={"icon"} onClick={() => setDeletePopup(true)}>

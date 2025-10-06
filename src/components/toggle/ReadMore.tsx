@@ -19,7 +19,7 @@ export const ReadMore = ({ text, className, classButton, max, as: Wrapper = "spa
   }
 
   return (
-    <Wrapper className={clsx(readMore && "overflow-auto", className)}>
+    <Wrapper className={clsx(readMore && "overflow-auto scroll-bar", className)}>
       {max > 30 ? (
         <>
           {readMore ? text : ellipsis(text, max)}

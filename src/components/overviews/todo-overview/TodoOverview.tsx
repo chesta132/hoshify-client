@@ -19,13 +19,10 @@ export type TodoForm = {
 
 export const TodoOverview = () => {
   const { todos } = useTodo();
-  const formGroup = useForm<TodoForm>(
-    { title: "", details: "", status: "ACTIVE", dueDate: dayjs() },
-    { details: { max: 300 }, title: { max: 100 }, status: true }
-  );
+  const formGroup = useForm<TodoForm>({ title: "", details: "", status: "ACTIVE", dueDate: dayjs() }, { title: { max: 200 }, status: true });
   const [isCreate, setIsCreate] = useState(false);
-  const [isInfo, setIsInfo] = useState<null | string>(null);
-  const infoTodos = useMemo(() => todos.find((todo) => todo.id === isInfo), [isInfo, todos]);
+  const [info, setInfo] = useState<null | string>(null);
+  const infoTodo = useMemo(() => todos.find((todo) => todo.id === info), [info, todos]);
 
   return (
     <div className="bg-card rounded-2xl border-[0.8px] border-border flex flex-col">
@@ -42,12 +39,12 @@ export const TodoOverview = () => {
       </div>
       <div className="border-b-[0.8px] border-b-border p-4 flex flex-col gap-3.5">
         {todos.slice(0, 5).map((todo) => (
-          <TodoOption todo={todo} key={todo.id} setIsInfo={setIsInfo} />
+          <TodoOption todo={todo} key={todo.id} setInfo={setInfo} />
         ))}
       </div>
       <AnimatePresence>
         {isCreate && <CreateTodoPopup formGroup={formGroup} setIsOpen={setIsCreate} />}
-        {isInfo && infoTodos && <InfoTodoPopup todo={infoTodos} setClose={setIsInfo} />}
+        {info && infoTodo && <InfoTodoPopup todo={infoTodo} setClose={setInfo} />}
       </AnimatePresence>
     </div>
   );

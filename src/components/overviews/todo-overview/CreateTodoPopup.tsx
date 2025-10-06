@@ -39,7 +39,7 @@ export const CreateTodoPopup = ({ formGroup, setIsOpen }: CreateTodoPopupProps) 
         </div>
         <FormLayout form={formGroup} onFormSubmit={handleSubmit}>
           <FormLayout.input size="sm" classLabel="bg-popover" label="Title" placeholder="Task title" fieldId="title" />
-          <FormLayout.input size="sm" classLabel="bg-popover" label="Details" placeholder="Task details" fieldId="details" />
+          <FormLayout.textarea classTextArea="max-h-64" classLabel="bg-popover" label="Details" placeholder="Task details" fieldId="details" />
           <FormLayout.select
             values={todoStatus}
             placeholder="Task status"

@@ -3,17 +3,20 @@ import { useNote } from "@/contexts";
 import useForm from "@/hooks/useForm";
 import type { NoteBody } from "@/types/server/endpoints";
 import { NotebookText, Plus } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { CreateNotePopup } from "./CreateNotePopup";
 import { AnimatePresence } from "motion/react";
 import { NoteOption } from "./NoteOption";
+import { InfoNotePopup } from "./InfoNotePopup";
 
 export const NoteOverview = () => {
   const { notes } = useNote();
   const [expandIndex, setExpandIndex] = useState<null | number>(null);
-  const formGroup = useForm<NoteBody>({ title: "", details: "" }, { details: { max: 300 }, title: { max: 100 } });
+  const formGroup = useForm<NoteBody>({ title: "", details: "" }, { title: { max: 200 } });
 
   const [isOpen, setIsOpen] = useState(false);
+  const [info, setInfo] = useState<null | string>(null);
+  const infoNote = useMemo(() => notes.find((note) => note.id === info), [info, notes]);
 
   return (
     <div className="bg-card rounded-2xl border-[0.8px] border-border flex flex-col">
@@ -35,10 +38,14 @@ export const NoteOverview = () => {
             key={note.id}
             expanded={expandIndex === idx}
             setExpanded={(val) => (val ? setExpandIndex(idx) : setExpandIndex(null))}
+            setInfo={setInfo}
           />
         ))}
       </div>
-      <AnimatePresence>{isOpen && <CreateNotePopup formGroup={formGroup} setIsOpen={setIsOpen} />}</AnimatePresence>
+      <AnimatePresence>
+        {isOpen && <CreateNotePopup formGroup={formGroup} setIsOpen={setIsOpen} />}
+        {info && infoNote && <InfoNotePopup note={infoNote} setClose={setInfo} />}
+      </AnimatePresence>
     </div>
   );
 };

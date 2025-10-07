@@ -1,7 +1,7 @@
 import type dayjs from "dayjs";
 import type { TodoStatus } from "./models";
 import type { ErrorResponse } from "./server";
-import type { UnionToInter } from ".";
+import type { MergeUnion } from ".";
 
 type FieldPlaces = "server" | "local";
 
@@ -41,9 +41,9 @@ export type BooleanFields = {
 };
 
 export type ServerFields = StringFields["server"] & BooleanFields["server"] & DateFields["server"];
-export type AllStringFields = UnionToInter<StringFields[FieldPlaces]>;
-export type AllBooelanFields = UnionToInter<BooleanFields[FieldPlaces]>;
-export type AllDateFields = UnionToInter<DateFields[FieldPlaces]>;
+export type AllStringFields = MergeUnion<StringFields[FieldPlaces]>;
+export type AllBooelanFields = MergeUnion<BooleanFields[FieldPlaces]>;
+export type AllDateFields = MergeUnion<DateFields[FieldPlaces]>;
 
 export type FormFields = Partial<AllStringFields & AllBooelanFields & AllDateFields>;
 

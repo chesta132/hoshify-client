@@ -2,8 +2,10 @@ import type { Link, Money, Note, Schedule, Todo, Transaction, User, UserRole } f
 
 export type Root = "/";
 export type Param = `/${string}${string}`;
+export type Query<Q extends string = string, V extends Exclude<AllType, symbol | object> = string> = `${Q}=${V}`;
 export type ParamRestores = `/restores/${string}${string}`;
 export type Restores = "/restores";
+export type Recycled = "/recycled";
 export type WithQuery = `/${string}?${string}`;
 export type DirectToServer = never;
 export type Redirect = never;
@@ -37,6 +39,11 @@ export type RestoresTemplate<E extends "root" | "param", T> = {
   path: E extends "root" ? Restores : ParamRestores;
   body: E extends "root" ? Ids : never;
   response: E extends "root" ? T[] : T;
+};
+export type RecycledTemplate<T> = {
+  path: `${Recycled}?${Query<"query", string>}&${Query<"offset", number>}`;
+  body: never;
+  response: T[];
 };
 export type RootTemplate<B, T> = {
   path: Root;
@@ -80,7 +87,7 @@ export type UserEndpoints = {
 };
 
 export type TodoEndpoints = {
-  get: GetTemplate<"root", Todo> | GetTemplate<"param", Todo>;
+  get: GetTemplate<"root", Todo> | GetTemplate<"param", Todo> | RecycledTemplate<Todo>;
   post: RootTemplate<TodoBody, Todo> | RootTemplate<TodoBody[], Todo[]>;
   put: RootTemplate<TodoBody[], Todo[]> | ParamTemplate<TodoBody, Todo>;
   delete: DeleteTemplate<"root", Todo> | DeleteTemplate<"param", Todo>;
@@ -88,7 +95,7 @@ export type TodoEndpoints = {
 };
 
 export type NoteEndpoints = {
-  get: GetTemplate<"root", Note> | GetTemplate<"param", Note>;
+  get: GetTemplate<"root", Note> | GetTemplate<"param", Note> | RecycledTemplate<Note>;
   post: RootTemplate<NoteBody, Note> | RootTemplate<NoteBody[], Note[]>;
   put: RootTemplate<NoteBody[], Note[]> | ParamTemplate<NoteBody, Note>;
   delete: DeleteTemplate<"root", Note> | DeleteTemplate<"param", Note>;
@@ -104,7 +111,7 @@ export type TransactionEndpoints = {
 };
 
 export type ScheduleEndpoints = {
-  get: GetTemplate<"root", Schedule> | GetTemplate<"param", Schedule>;
+  get: GetTemplate<"root", Schedule> | GetTemplate<"param", Schedule> | RecycledTemplate<Schedule>;
   post: RootTemplate<ScheduleBody, Schedule> | RootTemplate<ScheduleBody[], Schedule[]>;
   put: ParamTemplate<ScheduleBody, Schedule> | RootTemplate<ScheduleBody[], Schedule[]>;
   delete: DeleteTemplate<"root", Schedule> | DeleteTemplate<"param", Schedule>;

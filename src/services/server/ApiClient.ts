@@ -15,6 +15,7 @@ import type {
   NoteEndpoints,
   ResponseOf,
   ScheduleEndpoints,
+  SearchEndpoints,
   TodoEndpoints,
   TransactionEndpoints,
   UserEndpoints,
@@ -23,7 +24,7 @@ import type {
 type LogType = "default" | "none" | "no trace" | "table";
 type SetEndpoints<E extends Endpoints, O extends string = ""> = Omit<
   ApiClient<E["get"], E["put"], E["post"], E["delete"], E["patch"]>,
-  ModelNames | "auth" | O
+  ModelNames | "auth" | "search" | keyof PickByValueStrict<E, never> | O
 >;
 
 export type ApiConfig<D = any> = AxiosRequestConfig<D> & { logType?: LogType };
@@ -39,13 +40,14 @@ export class ApiClient<
   private endpoint: string;
 
   readonly auth!: SetEndpoints<AuthEndpoints>;
-  readonly user!: SetEndpoints<UserEndpoints, "patch">;
+  readonly user!: SetEndpoints<UserEndpoints>;
   readonly todo!: SetEndpoints<TodoEndpoints>;
   readonly schedule!: SetEndpoints<ScheduleEndpoints>;
-  readonly money!: SetEndpoints<MoneyEndpoints, "delete">;
+  readonly money!: SetEndpoints<MoneyEndpoints>;
   readonly transaction!: SetEndpoints<TransactionEndpoints>;
-  readonly link!: SetEndpoints<LinkEndpoints, "patch">;
+  readonly link!: SetEndpoints<LinkEndpoints>;
   readonly note!: SetEndpoints<NoteEndpoints>;
+  readonly search!: SetEndpoints<SearchEndpoints>;
 
   constructor(baseURL: string, endpoint = "", initiate = false) {
     this.endpoint = endpoint;
@@ -66,6 +68,7 @@ export class ApiClient<
       this.transaction = new ApiClient(baseURL, "/transactions");
       this.link = new ApiClient(baseURL, "/links");
       this.note = new ApiClient(baseURL, "/notes");
+      this.search = new ApiClient(baseURL, "/search");
     }
 
     this.api.interceptors.response.use(

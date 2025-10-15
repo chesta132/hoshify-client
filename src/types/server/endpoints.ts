@@ -134,6 +134,14 @@ export type MoneyEndpoints = {
   delete: never;
 };
 
+export type SearchEndpoints = {
+  get: { path: "/search"; body: never; response: never };
+  put: never;
+  patch: never;
+  post: never;
+  delete: never;
+};
+
 export type Endpoints =
   | AuthEndpoints
   | UserEndpoints
@@ -142,7 +150,8 @@ export type Endpoints =
   | ScheduleEndpoints
   | LinkEndpoints
   | MoneyEndpoints
-  | NoteEndpoints;
+  | NoteEndpoints
+  | SearchEndpoints;
 
 export type EndpointOf<P extends Endpoints[keyof Endpoints], M extends P["path"] = P["path"]> = P extends infer E
   ? E extends { path: infer Path }

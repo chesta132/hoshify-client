@@ -13,6 +13,7 @@ import type {
   LinkEndpoints,
   MoneyEndpoints,
   NoteEndpoints,
+  QueryOf,
   ResponseOf,
   ScheduleEndpoints,
   SearchEndpoints,
@@ -26,8 +27,9 @@ type SetEndpoints<E extends Endpoints, O extends string = ""> = Omit<
   ApiClient<E["get"], E["put"], E["post"], E["delete"], E["patch"]>,
   ModelNames | "auth" | "search" | keyof PickByValueStrict<E, never> | O
 >;
+type DefaultArgs<T, E extends Endpoints[keyof Endpoints], P extends E["path"]> = [T] extends [never] ? ResponseOf<E, P> : T;
 
-export type ApiConfig<D = any> = AxiosRequestConfig<D> & { logType?: LogType };
+export type ApiConfig<D = any, Q = any> = AxiosRequestConfig<D> & { logType?: LogType; query?: Q };
 
 export class ApiClient<
   Get extends Endpoints["get"] = any,
@@ -111,7 +113,7 @@ export class ApiClient<
     try {
       const response = (await this.api.request<T>({
         ...config,
-        url: `${this.endpoint}${config.url}`.replace(/\/{2,}/g, "/"),
+        url: `${this.endpoint}${config.url}`.replace(/\/{2,}/g, "/") + this.generateQuery(config.query),
       })) as AxiosResponse<Response<T>>;
       this.logResponse(response, config.logType);
       return new ServerSuccess(response);
@@ -123,32 +125,46 @@ export class ApiClient<
     }
   }
 
-  get<T extends Get["response"] | undefined = undefined, U extends Get["path"] = Get["path"]>(url: U, config?: ApiConfig) {
-    return this.request<T extends undefined ? ResponseOf<Get, U> : T>({ ...config, url, method: "GET" });
+  generateQuery(query: Record<string, any> | undefined) {
+    if (!query) return "";
+    const entries = Object.typedEntries(query);
+    if (entries.length === 0) return "";
+    return "?" + entries.map(([key, val]) => `${encodeURIComponent(key)}=${encodeURIComponent(val)}`).join("&");
   }
 
-  post<T extends Post["response"] | undefined = undefined, U extends Post["path"] = Post["path"]>(
+  get<T extends Get["response"] = never, U extends Get["path"] = Get["path"]>(url: U, config?: ApiConfig<DefaultArgs<T, Get, U>, QueryOf<Get, U>>) {
+    return this.request<DefaultArgs<T, Get, U>>({ ...config, url, method: "GET" });
+  }
+
+  post<T extends Post["response"] = never, U extends Post["path"] = Post["path"]>(
     url: U,
     data?: BodyOf<Post, U>,
-    config?: ApiConfig
+    config?: ApiConfig<DefaultArgs<T, Post, U>, QueryOf<Post, U>>
   ) {
-    return this.request<T extends undefined ? ResponseOf<Get, U> : T>({ ...config, url, method: "POST", data });
+    return this.request<DefaultArgs<T, Post, U>>({ ...config, url, method: "POST", data });
   }
 
-  patch<T extends Patch["response"] | undefined = undefined, U extends Patch["path"] = Patch["path"]>(
+  patch<T extends Patch["response"] = never, U extends Patch["path"] = Patch["path"]>(
     url: U,
     data?: BodyOf<Patch, U>,
-    config?: ApiConfig
+    config?: ApiConfig<DefaultArgs<T, Patch, U>, QueryOf<Patch, U>>
   ) {
-    return this.request<T extends undefined ? ResponseOf<Get, U> : T>({ ...config, url, method: "PATCH", data });
+    return this.request<DefaultArgs<T, Patch, U>>({ ...config, url, method: "PATCH", data });
   }
 
-  put<T extends Put["response"] | undefined = undefined, U extends Put["path"] = Put["path"]>(url: U, data?: BodyOf<Put, U>, config?: ApiConfig) {
-    return this.request<T extends undefined ? ResponseOf<Get, U> : T>({ ...config, url, method: "PUT", data });
+  put<T extends Put["response"] = never, U extends Put["path"] = Put["path"]>(
+    url: U,
+    data?: BodyOf<Put, U>,
+    config?: ApiConfig<DefaultArgs<T, Put, U>, QueryOf<Put, U>>
+  ) {
+    return this.request<DefaultArgs<T, Put, U>>({ ...config, url, method: "PUT", data });
   }
 
-  delete<T extends Delete["response"] | undefined = undefined, U extends Delete["path"] = Delete["path"]>(url: U, config?: ApiConfig) {
-    return this.request<T extends undefined ? ResponseOf<Get, U> : T>({ ...config, url, method: "DELETE" });
+  delete<T extends Delete["response"] = never, U extends Delete["path"] = Delete["path"]>(
+    url: U,
+    config?: ApiConfig<DefaultArgs<T, Delete, U>, QueryOf<Delete, U>>
+  ) {
+    return this.request<DefaultArgs<T, Delete, U>>({ ...config, url, method: "DELETE" });
   }
 }
 

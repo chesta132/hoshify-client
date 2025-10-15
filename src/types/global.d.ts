@@ -36,7 +36,7 @@ interface JSON {
    * JSON.safeParse<number>("123", 0) // 123
    * JSON.safeParse<number>("not-a-number", 0) // 0
    */
-  safeParse: <T = any>(text?: string, fallback?: T) => T;
+  safeParse: <T = any>(text: string | Falsy, fallback?: T, options?: { mergeWithFallback?: boolean }) => T;
 }
 
 interface ObjectConstructor {
@@ -120,8 +120,18 @@ type PickByValue<T, U> = {
   [K in keyof T as U extends T[K] ? K : never]: T[K];
 };
 
+/** Strict version OmitByValue. */
+type OmitByValueStrict<T, U> = {
+  [K in keyof T as T[K] extends U ? never : K]: T[K];
+};
+
+/** Strict version PickByValue. */
+type PickByValueStrict<T, U> = {
+  [K in keyof T as T[K] extends U ? K : never]: T[K];
+};
+
 /** Type representing all falsy values. */
-type Falsy = "" | 0 | false | null | undefined | never;
+type Falsy = "" | 0 | false | null | undefined;
 
 /** Type representing all truthy values. */
 type Truthy = Exclude<AllType, Falsy>;

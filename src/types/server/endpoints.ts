@@ -1,14 +1,14 @@
 import type { Link, Money, Note, Schedule, Todo, Transaction, User, UserRole } from "../models";
 
 export type Root = "/";
-export type Param = `/${string}${string}`;
+export type Param = "/" | (string & {});
 export type Query<Q extends string = string, V extends Exclude<AllType, symbol | object> = string> = `${Q}=${V}`;
-export type ParamRestores = `/restores/${string}${string}`;
+export type ParamRestores = "/restores/" | (string & {});
 export type Restores = "/restores";
 export type Recycled = "/recycled";
-export type WithQuery = `/${string}?${string}`;
 export type DirectToServer = never;
 export type Redirect = never;
+export type KnownRootPaths = "/" | "/restores" | "/recycled";
 
 export type SignInBody = UserCredentialBody & { rememberMe: boolean };
 export type SignUpBody = SignInBody & UserFullName;
@@ -26,62 +26,68 @@ export type Ids = { ids: string[] };
 export type SendOtpType = "CHANGE_EMAIL" | "CHANGE_PASSWORD" | "DELETE_ACCOUNT";
 
 export type GetTemplate<E extends "root" | "param", T> = {
-  path: E extends "root" ? Root | WithQuery : Param;
+  path: E extends "root" ? Root : Param;
+  query: E extends "root" ? Partial<{ query: string; offset: number }> & Record<string, any> : never;
   body: never;
   response: E extends "root" ? T[] : T;
 };
 export type DeleteTemplate<E extends "root" | "param", T> = {
-  path: E extends "root" ? Root | WithQuery : Param;
+  path: E extends "root" ? Root : Param;
+  query: never;
   body: E extends "root" ? Ids : never;
   response: E extends "root" ? T[] : T;
 };
 export type RestoresTemplate<E extends "root" | "param", T> = {
   path: E extends "root" ? Restores : ParamRestores;
+  query: never;
   body: E extends "root" ? Ids : never;
   response: E extends "root" ? T[] : T;
 };
 export type RecycledTemplate<T> = {
-  path: `${Recycled}?${Query<"query", string>}&${Query<"offset", number>}`;
+  path: Recycled;
+  query: Partial<{ query: string; offset: number }> & Record<string, any>;
   body: never;
   response: T[];
 };
 export type RootTemplate<B, T> = {
   path: Root;
+  query: never;
   body: B;
   response: T;
 };
 export type ParamTemplate<B, T> = {
   path: Param;
+  query: never;
   body: B;
   response: T;
 };
 
 export type AuthEndpoints = {
   get:
-    | { path: "/google"; body: never; response: DirectToServer }
-    | { path: "/send-email-verif"; body: never; response: User }
-    | { path: "/google-bind"; body: never; response: DirectToServer };
+    | { path: "/google"; query: never; body: never; response: DirectToServer }
+    | { path: "/send-email-verif"; query: never; body: never; response: User }
+    | { path: "/google-bind"; query: never; body: never; response: DirectToServer };
   post:
-    | { path: "/signup"; body: SignUpBody; response: User }
-    | { path: "/signin"; body: SignInBody; response: User }
-    | { path: "/signout"; body: never; response: Redirect }
-    | { path: "/verify-email"; body: never; response: User }
-    | { path: `/send-otp?type=${SendOtpType}`; body: never; response: User }
-    | { path: `/request-role?role=${UserRole}`; body: never; response: User };
+    | { path: "/signup"; query: never; body: SignUpBody; response: User }
+    | { path: "/signin"; query: never; body: SignInBody; response: User }
+    | { path: "/signout"; query: never; body: never; response: Redirect }
+    | { path: "/verify-email"; query: never; body: never; response: User }
+    | { path: "/send-otp"; query: Partial<{ type: SendOtpType }> & Record<string, any>; body: never; response: User }
+    | { path: "/request-role"; query: Partial<{ role: UserRole }> & Record<string, any>; body: never; response: User };
   put:
-    | { path: "/bind-local"; body: UserCredentialBody; response: User }
-    | { path: "/update-email"; body: { newEmail: string }; response: User }
-    | { path: `/reset-password?token=${string}${string}`; body: { newPassword: string }; response: User }
-    | { path: "/update-password"; body: { newPassword: string; oldPassword: string }; response: User }
-    | { path: `/accept-request-role?token=${string}${string}`; body: never; response: User };
+    | { path: "/bind-local"; query: never; body: UserCredentialBody; response: User }
+    | { path: "/update-email"; query: never; body: { newEmail: string }; response: User }
+    | { path: "/reset-password"; query: Partial<{ token: string }> & Record<string, any>; body: { newPassword: string }; response: User }
+    | { path: "/update-password"; query: never; body: { newPassword: string; oldPassword: string }; response: User }
+    | { path: "/accept-request-role"; query: Partial<{ token: string }> & Record<string, any>; body: never; response: User };
   delete: never;
   patch: never;
 };
 
 export type UserEndpoints = {
-  get: { path: Root; body: never; response: User };
-  delete: { path: `${Root}?token=${string}${string}`; body: never; response: User };
-  put: { path: Root; body: UserFullName; response: User };
+  get: { path: Root; query: never; body: never; response: User };
+  delete: { path: Root; query: Partial<{ token: string }> & Record<string, any>; body: never; response: User };
+  put: { path: Root; query: never; body: UserFullName; response: User };
   patch: never;
   post: never;
 };
@@ -129,13 +135,13 @@ export type LinkEndpoints = {
 export type MoneyEndpoints = {
   get: RootTemplate<never, Money>;
   put: ParamTemplate<never, Money>;
-  patch: { path: `/refresh${Param}?refresh=${RefreshConfig}`; body: never; response: Money };
+  patch: { path: "/refresh/" | (string & {}); query: Partial<{ refresh: RefreshConfig }> & Record<string, any>; body: never; response: Money };
   post: never;
   delete: never;
 };
 
 export type SearchEndpoints = {
-  get: { path: "/search"; body: never; response: never };
+  get: { path: "/"; query: never; body: never; response: never };
   put: never;
   patch: never;
   post: never;
@@ -153,13 +159,32 @@ export type Endpoints =
   | NoteEndpoints
   | SearchEndpoints;
 
-export type EndpointOf<P extends Endpoints[keyof Endpoints], M extends P["path"] = P["path"]> = P extends infer E
-  ? E extends { path: infer Path }
-    ? M extends Path
-      ? E
+// Helper to check if a type is exactly a literal (not a union with string & {})
+type IsExactLiteral<T> = string extends T ? false : true;
+
+export type EndpointOf<P extends Endpoints[keyof Endpoints], M extends P["path"] = P["path"]> = P extends any
+  ? P extends { path: infer Path }
+    ? IsExactLiteral<M> extends true
+      ? // If M is a known root path, only match exact literals
+        M extends KnownRootPaths
+        ? IsExactLiteral<Path> extends true
+          ? M extends Path
+            ? Path extends M
+              ? P
+              : never
+            : never
+          : never
+        : // If M is a literal but not a known root, match against Param types
+        M extends Path
+        ? P
+        : never
+      : // If M is not exact literal, do normal matching
+      M extends Path
+      ? P
       : never
     : never
   : never;
 
 export type BodyOf<P extends Endpoints[keyof Endpoints], M extends P["path"]> = EndpointOf<P, M>["body"];
 export type ResponseOf<P extends Endpoints[keyof Endpoints], M extends P["path"]> = EndpointOf<P, M>["response"];
+export type QueryOf<P extends Endpoints[keyof Endpoints], M extends P["path"]> = EndpointOf<P, M>["query"];
